@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Token Casino Royale ✨</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="sparkle-container" id="sparkleContainer"></div>
+
+  <div class="casino-frame">
+    <header class="casino-header">
+      <div class="vip-badge" id="vipBadge">🥉 FREE TIER</div>
+      <h1 class="casino-title">
+        <span class="title-accent">✦</span>
+        AI TOKEN CASINO
+        <span class="title-accent">✦</span>
+      </h1>
+      <p class="casino-subtitle">Premium AI-Powered Luxury Gaming Experience™</p>
+      <p class="casino-tagline" id="tagline">"Where Every Spin is a Hallucination of Wealth"</p>
+    </header>
+
+    <div class="token-display">
+      <div class="token-icon">🪙</div>
+      <div class="token-info">
+        <span class="token-label">YOUR TOKENS</span>
+        <span class="token-amount" id="tokenAmount">1000</span>
+      </div>
+      <div class="token-icon">🪙</div>
+    </div>
+
+    <div class="machine-body">
+      <div class="machine-top-accent"></div>
+
+      <div class="reels-window">
+        <div class="reel-container">
+          <div class="reel" id="reel0">
+            <div class="reel-strip">
+              <div class="symbol">🤖</div>
+            </div>
+          </div>
+          <div class="reel" id="reel1">
+            <div class="reel-strip">
+              <div class="symbol">🧠</div>
+            </div>
+          </div>
+          <div class="reel" id="reel2">
+            <div class="reel-strip">
+              <div class="symbol">⚡</div>
+            </div>
+          </div>
+        </div>
+        <div class="payline"></div>
+      </div>
+
+      <div class="controls">
+        <div class="bet-section">
+          <label class="bet-label">BET</label>
+          <div class="bet-controls">
+            <button class="bet-btn" id="betDown" aria-label="Decrease bet">−</button>
+            <span class="bet-amount" id="betAmount">10</span>
+            <button class="bet-btn" id="betUp" aria-label="Increase bet">+</button>
+          </div>
+        </div>
+
+        <button class="spin-btn" id="spinBtn">
+          <span class="spin-text">SPIN</span>
+          <span class="spin-subtext">Use AI Tokens™</span>
+        </button>
+
+        <button class="max-bet-btn" id="maxBetBtn">MAX BET<br><small>Go Bankrupt Faster™</small></button>
+      </div>
+    </div>
+
+    <div class="message-board">
+      <div class="message-text" id="messageText">Welcome, valued token holder! Insert tokens to experience premium AI-generated luck.</div>
+    </div>
+
+    <div class="paytable">
+      <h3 class="paytable-title">✦ AI PAYOUT TABLE ✦</h3>
+      <div class="paytable-grid" id="paytableGrid"></div>
+      <p class="paytable-disclaimer">* Payouts determined by our proprietary GPT-powered RNG (Random Nonsense Generator)</p>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-label">Spins</span>
+        <span class="stat-value" id="spinCount">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Wins</span>
+        <span class="stat-value" id="winCount">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Biggest Win</span>
+        <span class="stat-value" id="biggestWin">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Tokens Burned</span>
+        <span class="stat-value" id="tokensBurned">0</span>
+      </div>
+    </div>
+
+    <footer class="casino-footer">
+      <p>🎰 AI Token Casino Royale™ — Not responsible for hallucinated winnings</p>
+      <p class="footer-small">Powered by 100% organic, free-range neural networks. No actual AI was consulted in the making of this casino.</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

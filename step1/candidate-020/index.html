@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-chan's Token Slots ✿</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="floating-decorations">
+    <span class="float-item" style="left:5%;animation-delay:0s">✿</span>
+    <span class="float-item" style="left:15%;animation-delay:1.2s">⋆</span>
+    <span class="float-item" style="left:25%;animation-delay:0.5s">♡</span>
+    <span class="float-item" style="left:40%;animation-delay:1.8s">✧</span>
+    <span class="float-item" style="left:55%;animation-delay:0.3s">✿</span>
+    <span class="float-item" style="left:65%;animation-delay:2.1s">⋆</span>
+    <span class="float-item" style="left:78%;animation-delay:0.8s">♡</span>
+    <span class="float-item" style="left:90%;animation-delay:1.5s">✧</span>
+  </div>
+
+  <div class="app-container">
+    <header class="header">
+      <div class="mascot">
+        <div class="mascot-face">
+          <div class="mascot-eyes">
+            <span class="eye left-eye">◕</span>
+            <span class="eye right-eye">◕</span>
+          </div>
+          <div class="mascot-mouth">ω</div>
+          <div class="mascot-blush left-blush"></div>
+          <div class="mascot-blush right-blush"></div>
+        </div>
+        <div class="mascot-antenna">⚡</div>
+      </div>
+      <h1 class="title">AI-chan's Token Slots</h1>
+      <p class="subtitle">～ where your tokens go to hallucinate ～</p>
+    </header>
+
+    <div class="token-display">
+      <div class="token-icon">🪙</div>
+      <div class="token-info">
+        <span class="token-label">Your Tokens</span>
+        <span class="token-count" id="tokenCount">1000</span>
+      </div>
+      <div class="token-sparkle">✨</div>
+    </div>
+
+    <div class="machine-frame">
+      <div class="machine-top-decoration">
+        <span>♡</span><span>AI-chan Lucky Slots</span><span>♡</span>
+      </div>
+
+      <div class="reels-container">
+        <div class="reel-window">
+          <div class="reel" id="reel0">
+            <div class="reel-strip"></div>
+          </div>
+        </div>
+        <div class="reel-divider">✿</div>
+        <div class="reel-window">
+          <div class="reel" id="reel1">
+            <div class="reel-strip"></div>
+          </div>
+        </div>
+        <div class="reel-divider">✿</div>
+        <div class="reel-window">
+          <div class="reel" id="reel2">
+            <div class="reel-strip"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="payline"></div>
+    </div>
+
+    <div class="controls">
+      <div class="bet-section">
+        <button class="bet-btn" id="betDown" aria-label="Decrease bet">−</button>
+        <div class="bet-display">
+          <span class="bet-label">Bet</span>
+          <span class="bet-amount" id="betAmount">10</span>
+        </div>
+        <button class="bet-btn" id="betUp" aria-label="Increase bet">+</button>
+      </div>
+      <button class="spin-btn" id="spinBtn">
+        <span class="spin-text">SPIN!</span>
+        <span class="spin-sub">～ がんばって！～</span>
+      </button>
+    </div>
+
+    <div class="message-box" id="messageBox">
+      <p class="message-text" id="messageText">AI-chan wants to play! Spin the reels~ ♡</p>
+    </div>
+
+    <div class="paytable">
+      <h3 class="paytable-title">✿ Payout Table ✿</h3>
+      <div class="paytable-grid" id="paytableGrid"></div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-label">Spins</span>
+        <span class="stat-value" id="totalSpins">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Biggest Win</span>
+        <span class="stat-value" id="biggestWin">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">AI Mood</span>
+        <span class="stat-value" id="aiMood">(◕ᴗ◕✿)</span>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p>Made with ♡ by AI-chan | "I'm not hallucinating, you're hallucinating!" | v0.1-kawaii</p>
+    </footer>
+  </div>
+
+  <div class="win-overlay" id="winOverlay">
+    <div class="win-content">
+      <div class="win-particles" id="winParticles"></div>
+      <p class="win-amount" id="winAmount"></p>
+      <p class="win-message" id="winMessage"></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

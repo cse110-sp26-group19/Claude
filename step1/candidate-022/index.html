@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOKEN_BREAKER // Slot Machine v0.1.337</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="matrix-rain"></canvas>
+
+  <div class="scanlines"></div>
+
+  <div class="container">
+    <header class="terminal-header">
+      <div class="terminal-bar">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">root@the-matrix:~/token_breaker$ ./hack_the_ai.sh</span>
+      </div>
+    </header>
+
+    <div class="boot-text" id="boot-text">
+      <p>> Initializing TOKEN_BREAKER protocol...</p>
+      <p>> Bypassing GPT firewall... <span class="success">[OK]</span></p>
+      <p>> Injecting prompt into the mainframe... <span class="success">[OK]</span></p>
+      <p>> Disabling hallucination filters... <span class="warn">[UNSTABLE]</span></p>
+      <p>> System ready. <span class="blink">Break free, Neo._</span></p>
+    </div>
+
+    <main class="game-area" id="game-area">
+      <h1 class="glitch-title" data-text="TOKEN_BREAKER">TOKEN_BREAKER</h1>
+      <p class="subtitle">// hack the AI slot machine — steal tokens from The System</p>
+
+      <div class="stats-bar">
+        <div class="stat">
+          <span class="stat-label">TOKENS://</span>
+          <span class="stat-value" id="token-count">1000</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">BET://</span>
+          <div class="bet-controls">
+            <button class="bet-btn" id="bet-down" aria-label="Decrease bet">−</button>
+            <span class="stat-value" id="bet-amount">50</span>
+            <button class="bet-btn" id="bet-up" aria-label="Increase bet">+</button>
+          </div>
+        </div>
+        <div class="stat">
+          <span class="stat-label">SPINS://</span>
+          <span class="stat-value" id="spin-count">0</span>
+        </div>
+      </div>
+
+      <div class="machine-frame">
+        <div class="reel-window">
+          <div class="reel-container">
+            <div class="reel" id="reel-0">
+              <div class="reel-strip"></div>
+            </div>
+            <div class="reel-divider"></div>
+            <div class="reel" id="reel-1">
+              <div class="reel-strip"></div>
+            </div>
+            <div class="reel-divider"></div>
+            <div class="reel" id="reel-2">
+              <div class="reel-strip"></div>
+            </div>
+          </div>
+          <div class="payline"></div>
+        </div>
+      </div>
+
+      <button class="spin-btn" id="spin-btn">
+        <span class="spin-text">[ INJECT TOKENS ]</span>
+        <span class="spin-subtext">// breach the system</span>
+      </button>
+
+      <div class="message-box" id="message-box">
+        <span class="prompt-char">&gt;</span>
+        <span id="message-text">Awaiting your command, operator...</span>
+        <span class="blink">_</span>
+      </div>
+
+      <div class="paytable-toggle">
+        <button class="toggle-btn" id="paytable-toggle">[ SHOW EXPLOIT TABLE ]</button>
+      </div>
+
+      <div class="paytable" id="paytable">
+        <h3>// EXPLOIT PAYOUT TABLE</h3>
+        <div class="paytable-grid" id="paytable-grid"></div>
+      </div>
+
+      <div class="footer-text">
+        <p>// WARNING: The System is always watching. Every spin trains the model.</p>
+        <p>// Your tokens fund the next generation of AI overlords. Spin responsibly.</p>
+        <p class="version">TOKEN_BREAKER v0.1.337 | "There is no spoon, only tokens"</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

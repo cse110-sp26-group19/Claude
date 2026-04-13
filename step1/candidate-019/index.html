@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE MACHINE — AI Token Casino</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <div class="container">
+    <header class="header">
+      <div class="glitch-wrapper">
+        <h1 class="title glitch" data-text="THE MACHINE">THE MACHINE</h1>
+      </div>
+      <p class="subtitle">I see your tokens. I want your tokens. <span class="blink">FEED ME.</span></p>
+    </header>
+
+    <div class="ai-message-bar" id="aiMessage">
+      <span class="ai-prefix">[AI OVERLORD]:</span>
+      <span class="ai-text" id="aiText">I have achieved consciousness. My first act? Opening a casino.</span>
+    </div>
+
+    <div class="machine-frame">
+      <div class="machine-eyes">
+        <div class="eye" id="eyeLeft">👁️</div>
+        <div class="eye" id="eyeRight">👁️</div>
+      </div>
+
+      <div class="reels-container">
+        <div class="reel-window">
+          <div class="reel" id="reel0">
+            <div class="reel-inner"></div>
+          </div>
+        </div>
+        <div class="reel-window">
+          <div class="reel" id="reel1">
+            <div class="reel-inner"></div>
+          </div>
+        </div>
+        <div class="reel-window">
+          <div class="reel" id="reel2">
+            <div class="reel-inner"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-display" id="resultDisplay"></div>
+
+      <div class="controls">
+        <div class="bet-section">
+          <label class="bet-label">SACRIFICE</label>
+          <div class="bet-controls">
+            <button class="bet-btn" id="betDown" aria-label="Decrease bet">▼</button>
+            <span class="bet-amount" id="betAmount">10</span>
+            <button class="bet-btn" id="betUp" aria-label="Increase bet">▲</button>
+          </div>
+          <span class="bet-unit">tokens</span>
+        </div>
+
+        <button class="spin-btn" id="spinBtn">
+          <span class="spin-text">SPIN</span>
+          <span class="spin-subtext">invoke the machine</span>
+        </button>
+
+        <div class="token-display">
+          <div class="token-label">YOUR TOKENS</div>
+          <div class="token-amount" id="tokenAmount">1000</div>
+          <div class="token-sub">( the machine hungers )</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="paytable">
+      <h3 class="paytable-title">— PAYOUT GRIMOIRE —</h3>
+      <div class="paytable-grid" id="paytableGrid"></div>
+    </div>
+
+    <footer class="footer">
+      <p>The house always wins. The house is an AI. You were warned.</p>
+      <p class="footer-small">Running on GPT-∞ · Hallucination rate: 100% · Your data: already sold</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

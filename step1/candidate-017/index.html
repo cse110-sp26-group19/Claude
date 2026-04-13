@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROBO-SLOTS 3000 — AI Token Waster</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="crt-flicker"></div>
+
+  <div class="cabinet">
+    <header class="marquee">
+      <div class="marquee-lights">
+        <span class="light"></span><span class="light"></span><span class="light"></span>
+        <span class="light"></span><span class="light"></span><span class="light"></span>
+        <span class="light"></span><span class="light"></span><span class="light"></span>
+      </div>
+      <h1 class="title glitch" data-text="ROBO-SLOTS 3000">ROBO-SLOTS 3000</h1>
+      <p class="subtitle">▸ INSERT TOKENS TO WASTE ON AI ◂</p>
+      <div class="marquee-lights">
+        <span class="light"></span><span class="light"></span><span class="light"></span>
+        <span class="light"></span><span class="light"></span><span class="light"></span>
+        <span class="light"></span><span class="light"></span><span class="light"></span>
+      </div>
+    </header>
+
+    <div class="screen">
+      <div class="screen-inner">
+        <div class="token-bar">
+          <div class="token-display">
+            <span class="token-icon">🪙</span>
+            <span class="token-label">TOKENS:</span>
+            <span id="token-count" class="token-value">1000</span>
+          </div>
+          <div class="bet-display">
+            <span class="token-label">BET:</span>
+            <span id="bet-amount" class="token-value">10</span>
+          </div>
+        </div>
+
+        <div class="reels-container">
+          <div class="reel-window">
+            <div class="reel" id="reel-0">
+              <div class="reel-strip"></div>
+            </div>
+          </div>
+          <div class="reel-window">
+            <div class="reel" id="reel-1">
+              <div class="reel-strip"></div>
+            </div>
+          </div>
+          <div class="reel-window">
+            <div class="reel" id="reel-2">
+              <div class="reel-strip"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="payline"></div>
+
+        <div id="message-box" class="message-box">
+          <p id="message-text" class="message-text">[ SYSTEM BOOT... AI SLOT MACHINE v3.0.0.0 LOADED ]</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="bet-controls">
+        <button id="btn-bet-down" class="btn btn-bet" aria-label="Decrease bet">◄ BET</button>
+        <div class="bet-indicator" id="bet-indicator">10</div>
+        <button id="btn-bet-up" class="btn btn-bet" aria-label="Increase bet">BET ►</button>
+      </div>
+      <button id="btn-spin" class="btn btn-spin">
+        <span class="spin-text">▶ SPIN</span>
+        <span class="spin-cost" id="spin-cost">-10 tokens</span>
+      </button>
+      <button id="btn-max-bet" class="btn btn-max">MAX BET</button>
+    </div>
+
+    <div class="paytable-toggle">
+      <button id="btn-paytable" class="btn btn-info">[ ? PAYTABLE ]</button>
+    </div>
+
+    <div id="paytable" class="paytable hidden">
+      <h2>═══ PAYOUT TABLE ═══</h2>
+      <div class="paytable-grid" id="paytable-grid"></div>
+      <p class="paytable-note">* All payouts multiplied by bet amount</p>
+      <p class="paytable-note">* Any 2 matching = 2x bet</p>
+      <p class="paytable-note disclaimer">⚠ WARNING: This machine hallucinates payouts</p>
+    </div>
+
+    <footer class="cabinet-footer">
+      <p>© 1987 ROBO-SLOTS INC. — "We trained on your quarters"</p>
+      <p class="footer-small">Model: GPT-SLOT-3000 | Param Count: 7 | Context Window: 3 reels</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
