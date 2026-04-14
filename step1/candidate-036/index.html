@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TokenSlot™ — The AI Casino</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="casino-wrapper">
+    <header class="header">
+      <div class="header-badge">POWERED BY GPT-∞</div>
+      <h1 class="title">TOKEN<span class="title-accent">SLOT</span>™</h1>
+      <p class="tagline">The World's First Hallucination-Powered Casino</p>
+    </header>
+
+    <div class="machine">
+      <!-- Token balance -->
+      <div class="balance-bar">
+        <div class="balance-group">
+          <span class="balance-label">TOKENS REMAINING</span>
+          <span class="balance-value" id="balance">1000</span>
+        </div>
+        <div class="balance-group">
+          <span class="balance-label">TOKENS WON</span>
+          <span class="balance-value highlight" id="total-won">0</span>
+        </div>
+        <div class="balance-group">
+          <span class="balance-label">TOKENS BURNED</span>
+          <span class="balance-value danger" id="total-spent">0</span>
+        </div>
+      </div>
+
+      <!-- Slot window -->
+      <div class="slot-window">
+        <div class="slot-glare"></div>
+        <div class="reels-container" id="reels-container">
+          <div class="reel-wrapper">
+            <div class="reel" id="reel-0">
+              <div class="reel-inner" id="reel-inner-0"></div>
+            </div>
+          </div>
+          <div class="reel-separator"></div>
+          <div class="reel-wrapper">
+            <div class="reel" id="reel-1">
+              <div class="reel-inner" id="reel-inner-1"></div>
+            </div>
+          </div>
+          <div class="reel-separator"></div>
+          <div class="reel-wrapper">
+            <div class="reel" id="reel-2">
+              <div class="reel-inner" id="reel-inner-2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="payline"></div>
+      </div>
+
+      <!-- Message area -->
+      <div class="message-area">
+        <div class="message" id="message">Insert tokens to begin inference...</div>
+      </div>
+
+      <!-- Bet controls -->
+      <div class="bet-controls">
+        <span class="bet-label">BET:</span>
+        <button class="bet-btn" id="bet-minus">−</button>
+        <span class="bet-value" id="bet-amount">10</span>
+        <button class="bet-btn" id="bet-plus">+</button>
+        <button class="bet-btn bet-max" id="bet-max">MAX</button>
+      </div>
+
+      <!-- Spin button -->
+      <button class="spin-btn" id="spin-btn">
+        <span class="spin-btn-text">SPIN</span>
+        <span class="spin-btn-sub">— costs <span id="spin-cost">10</span> tokens —</span>
+      </button>
+
+      <!-- Buy more tokens -->
+      <div class="buy-tokens">
+        <span class="buy-label">Out of tokens?</span>
+        <button class="buy-btn" id="buy-tokens-btn">Raise Seed Round (+500 tokens)</button>
+      </div>
+    </div>
+
+    <!-- Paytable -->
+    <div class="paytable">
+      <h2 class="paytable-title">PAYTABLE — Context Window Payouts</h2>
+      <div class="paytable-grid" id="paytable-grid"></div>
+    </div>
+
+    <!-- History log -->
+    <div class="history-panel">
+      <h2 class="history-title">INFERENCE LOG</h2>
+      <div class="history-list" id="history-list">
+        <div class="history-item neutral">Session started. Context window: 1000 tokens. Hallucination probability: HIGH.</div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      ⚠️ TokenSlot™ is not responsible for any existential crises, job losses, or infinite loops caused by this machine.<br/>
+      Results may vary. AI outputs are non-deterministic. Temperature: 0.99
+    </footer>
+  </div>
+
+  <div class="win-overlay" id="win-overlay">
+    <div class="win-modal" id="win-modal">
+      <div class="win-emoji" id="win-emoji">🎉</div>
+      <div class="win-title" id="win-title">JACKPOT!</div>
+      <div class="win-amount" id="win-amount">+500 tokens</div>
+      <div class="win-message" id="win-message">The model has converged.</div>
+      <button class="win-close" id="win-close">Continue Inference</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
