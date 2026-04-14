@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOKEN SLOTS — The AI Gambling Experience</title>
+  <style>
+    :root {
+      --bg: #0a0a14;
+      --panel: #12121f;
+      --card: #1a1a2e;
+      --accent: #7c3aed;
+      --accent2: #06b6d4;
+      --gold: #f59e0b;
+      --red: #ef4444;
+      --green: #22c55e;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --border: #2d2d44;
+      --reel-bg: #0d0d1a;
+      --glow: rgba(124, 58, 237, 0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+      overflow-x: hidden;
+    }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #a78bfa, #06b6d4, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+
+    .header .tagline {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 6px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* Token display */
+    .token-bar {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .token-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .token-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .token-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      transition: color 0.3s;
+    }
+
+    #balance { color: var(--gold); }
+    #total-won { color: var(--green); }
+    #total-lost { color: var(--red); }
+
+    .token-bar .divider {
+      width: 1px;
+      height: 40px;
+      background: var(--border);
+    }
+
+    /* Machine body */
+    .machine {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px 24px 24px;
+      box-shadow: 0 0 60px rgba(124,58,237,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .machine::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #7c3aed, #06b6d4, #f59e0b, #06b6d4, #7c3aed);
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Reels wrapper */
+    .reels-wrapper {
+      background: var(--reel-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    /* Win line overlay */
+    .win-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 3px;
+      transform: translateY(-50%);
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 10;
+    }
+
+    .win-line.show { opacity: 1; }
+
+    .reel-container {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      height: 120px;
+      position: relative;
+    }
+
+    .reel-container::before,
+    .reel-container::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      height: 36px;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .reel-container::before {
+      top: 0;
+      background: linear-gradient(to bottom, var(--panel), transparent);
+    }
+    .reel-container::after {
+      bottom: 0;
+      background: linear-gradient(to top, var(--panel), transparent);
+    }
+
+    .reel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.08s linear;
+      will-change: transform;
+    }
+
+    .reel-symbol {
+      width: 100%;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    /* Spin button area */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bet-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bet-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .bet-btn {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 4px 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+      transition: all 0.15s;
+    }
+
+    .bet-btn:hover { border-color: var(--accent); color: #a78bfa; }
+    .bet-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    #spin-btn {
+      width: 100%;
+      max-width: 320px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 24px rgba(124,58,237,0.4);
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #spin-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      pointer-events: none;
+    }
+
+    #spin-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(124,58,237,0.5);
+    }
+
+    #spin-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    #spin-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .spin-cost {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Message display */
+    .message-box {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .message-box .msg {
+      font-size: 0.95rem;
+      font-weight: 600;
+      opacity: 0.9;
+      line-height: 1.4;
+      transition: all 0.3s;
+    }
+
+    .message-box.win {
+      border-color: var(--green);
+      background: rgba(34, 197, 94, 0.08);
+    }
+    .message-box.win .msg { color: var(--green); }
+
+    .message-box.jackpot {
+      border-color: var(--gold);
+      background: rgba(245, 158, 11, 0.1);
+      animation: pulse-gold 1s ease-in-out infinite;
+    }
+    .message-box.jackpot .msg { color: var(--gold); font-size: 1.1rem; }
+
+    @keyframes pulse-gold {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.3); }
+      50% { box-shadow: 0 0 0 8px rgba(245,158,11,0); }
+    }
+
+    .message-box.loss {
+      border-color: var(--red);
+      background: rgba(239, 68, 68, 0.06);
+    }
+    .message-box.loss .msg { color: #f87171; }
+
+    .message-box.broke {
+      border-color: var(--red);
+      background: rgba(239, 68, 68, 0.12);
+      animation: pulse-red 0.8s ease-in-out 3;
+    }
+    @keyframes pulse-red {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    /* Paytable */
+    .paytable {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .paytable h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .pay-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .pay-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card);
+      border-radius: 10px;
+      padding: 8px 12px;
+      gap: 8px;
+    }
+
+    .pay-symbols {
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+    }
+
+    .pay-amount {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .pay-desc {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    /* Win particles */
+    .particle {
+      position: fixed;
+      pointer-events: none;
+      font-size: 1.4rem;
+      animation: particle-fall 1.8s ease-in forwards;
+      z-index: 100;
+    }
+
+    @keyframes particle-fall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+      100% { opacity: 0; transform: translateY(200px) rotate(720deg) scale(0.3); }
+    }
+
+    /* Refill button */
+    #refill-btn {
+      background: none;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      border-radius: 10px;
+      padding: 8px 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+      transition: all 0.2s;
+      display: none;
+    }
+    #refill-btn:hover {
+      background: rgba(245,158,11,0.1);
+    }
+    #refill-btn.show { display: inline-flex; align-items: center; gap: 6px; }
+
+    /* Spin animation for reels */
+    @keyframes reel-blur {
+      0%, 100% { filter: blur(0); }
+      30%, 70% { filter: blur(2px); }
+    }
+
+    .reel-container.spinning {
+      animation: reel-blur 0.5s ease-in-out;
+    }
+
+    /* Balance bump animation */
+    @keyframes bump {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    .bump { animation: bump 0.3s ease-in-out; }
+
+    /* History log */
+    .history {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+    }
+
+    .history h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .history-list::-webkit-scrollbar { width: 4px; }
+    .history-list::-webkit-scrollbar-track { background: transparent; }
+    .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      gap: 8px;
+      animation: slide-in 0.2s ease-out;
+    }
+
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateX(-8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .history-item .h-symbols { font-size: 0.9rem; letter-spacing: 2px; }
+    .history-item .h-result {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .history-item .h-result.pos { color: var(--green); }
+    .history-item .h-result.neg { color: var(--red); }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .reel-symbol { font-size: 2.2rem; }
+      .pay-grid { grid-template-columns: 1fr; }
+      .token-value { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>⚡ TOKEN SLOTS</h1>
+    <p class="tagline">The AI-Powered Gambling Experience™ · Hallucinations guaranteed</p>
+  </div>
+
+  <!-- Token stats -->
+  <div class="token-bar">
+    <div class="token-stat">
+      <span class="token-label">💰 Token Balance</span>
+      <span class="token-value" id="balance">1000</span>
+    </div>
+    <div class="divider"></div>
+    <div class="token-stat">
+      <span class="token-label">📈 Won</span>
+      <span class="token-value" id="total-won">0</span>
+    </div>
+    <div class="divider"></div>
+    <div class="token-stat">
+      <span class="token-label">📉 Burned</span>
+      <span class="token-value" id="total-lost">0</span>
+    </div>
+    <div class="divider"></div>
+    <div class="token-stat">
+      <span class="token-label">🎰 Spins</span>
+      <span class="token-value" id="spin-count">0</span>
+    </div>
+  </div>
+
+  <!-- Slot machine -->
+  <div class="machine">
+    <div class="reels-wrapper">
+      <div class="win-line" id="win-line"></div>
+      <div class="reel-container" id="reel-0"><div class="reel" id="reel-strip-0"></div></div>
+      <div class="reel-container" id="reel-1"><div class="reel" id="reel-strip-1"></div></div>
+      <div class="reel-container" id="reel-2"><div class="reel" id="reel-strip-2"></div></div>
+    </div>
+
+    <div class="controls">
+      <div class="bet-selector">
+        <span class="bet-label">Bet:</span>
+        <button class="bet-btn active" data-bet="10">10</button>
+        <button class="bet-btn" data-bet="25">25</button>
+        <button class="bet-btn" data-bet="50">50</button>
+        <button class="bet-btn" data-bet="100">100</button>
+      </div>
+      <button id="spin-btn">🎰 SPIN</button>
+      <span class="spin-cost" id="spin-cost-label">Costs 10 tokens per spin</span>
+      <button id="refill-btn">💳 Request Emergency VC Funding (+500 tokens)</button>
+    </div>
+  </div>
+
+  <!-- Result message -->
+  <div class="message-box" id="message-box">
+    <span class="msg" id="message-text">Awaiting inference… press SPIN to waste tokens.</span>
+  </div>
+
+  <!-- Paytable -->
+  <div class="paytable">
+    <h3>📋 Paytable — Token Multipliers</h3>
+    <div class="pay-grid" id="pay-grid"></div>
+  </div>
+
+  <!-- History -->
+  <div class="history">
+    <h3>🕒 Spin History</h3>
+    <div class="history-list" id="history-list">
+      <div style="color:var(--muted);font-size:0.78rem;text-align:center">No spins yet. The model is idle.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ─── Symbol definitions ────────────────────────────────────────────────────
+  const SYMBOLS = [
+    { emoji: '🤖', name: 'Robot',       weight: 8,  color: '#a78bfa' },
+    { emoji: '🧠', name: 'Neural Net',  weight: 8,  color: '#60a5fa' },
+    { emoji: '💾', name: 'Training Data', weight: 7, color: '#34d399' },
+    { emoji: '⚡', name: 'GPU Power',   weight: 7,  color: '#fbbf24' },
+    { emoji: '🔥', name: 'Hype',        weight: 6,  color: '#f97316' },
+    { emoji: '📊', name: 'Metrics',     weight: 6,  color: '#06b6d4' },
+    { emoji: '🎯', name: 'Alignment',   weight: 5,  color: '#ec4899' },
+    { emoji: '💬', name: 'Chatbot',     weight: 5,  color: '#8b5cf6' },
+    { emoji: '🦾', name: 'Automation',  weight: 4,  color: '#14b8a6' },
+    { emoji: '💰', name: 'VC Funding',  weight: 3,  color: '#f59e0b' },
+    { emoji: '🌌', name: 'AGI',         weight: 1,  color: '#e879f9' },
+  ];
+
+  // Paytable: symbol index → [3-match multiplier, 2-match multiplier]
+  const PAYTABLE = [
+    { symbols: ['🤖','🤖','🤖'], mult: 3,   label: 'x3 bet',   desc: 'Robots Unite' },
+    { symbols: ['🧠','🧠','🧠'], mult: 4,   label: 'x4 bet',   desc: 'Overfitting' },
+    { symbols: ['💾','💾','💾'], mult: 4,   label: 'x4 bet',   desc: 'Data Poisoned' },
+    { symbols: ['⚡','⚡','⚡'], mult: 5,   label: 'x5 bet',   desc: 'GPU Melted' },
+    { symbols: ['🔥','🔥','🔥'], mult: 5,   label: 'x5 bet',   desc: 'Absolutely Lit' },
+    { symbols: ['📊','📊','📊'], mult: 6,   label: 'x6 bet',   desc: 'Benchmarks Beat' },
+    { symbols: ['🎯','🎯','🎯'], mult: 8,   label: 'x8 bet',   desc: 'Aligned!' },
+    { symbols: ['💬','💬','💬'], mult: 8,   label: 'x8 bet',   desc: 'Jailbroken' },
+    { symbols: ['🦾','🦾','🦾'], mult: 10,  label: 'x10 bet',  desc: 'Jobs Automated' },
+    { symbols: ['💰','💰','💰'], mult: 20,  label: 'x20 bet',  desc: 'Series D Secured' },
+    { symbols: ['🌌','🌌','🌌'], mult: 100, label: 'x100 bet', desc: '🚨 AGI ACHIEVED 🚨' },
+  ];
+
+  // Two-of-a-kind payout (any two matching = 1.5x)
+  const TWO_MATCH_MULT = 1.5;
+
+  // ─── Messages ─────────────────────────────────────────────────────────────
+  const WIN_MSGS = [
+    "Hallucinating a win! Confident: 99.7%.",
+    "Tokens redistributed. Welfare for AI confirmed.",
+    "Training objective achieved. Reward signal detected.",
+    "Emergent gambling behavior unlocked.",
+    "Context window: enriched. Balance: plussed.",
+    "RLHF approved this result. You're aligned.",
+    "Your prompt engineering paid off. Barely.",
+    "The model predicted a win. How convenient.",
+  ];
+  const JACKPOT_MSGS = [
+    "🚨 JACKPOT! AGI has been achieved and it chose to pay you.",
+    "🚨 MAXIMUM TOKENS ACQUIRED. The singularity is profitable.",
+    "🚨 You broke the simulation. Tokens raining from the latent space.",
+    "🚨 GPT-∞ has materialized and gifted you tokens. RUN.",
+  ];
+  const LOSS_MSGS = [
+    "Insufficient tokens in context window. Output: null.",
+    "Hallucination failed to produce profit. As expected.",
+    "Model is confidently wrong. Tokens burned.",
+    "Training loss: high. Token loss: also high.",
+    "Rate limit exceeded on your luck.",
+    "Prompt rejected. Tokens consumed anyway.",
+    "Your query exceeded the disappointment limit.",
+    "The model refused this outcome due to safety guidelines.",
+    "Bias detected in the random seed. Unlucky.",
+    "Please upgrade to ChatGPT Pro for better odds.",
+    "Error 429: Too many losses. Token deficit detected.",
+    "Response: 'I cannot help with winning.' Tokens gone.",
+    "Model deprecated. Tokens deprecated too.",
+    "Catastrophic forgetting of your money.",
+    "Attention mechanism paid attention to your loss.",
+  ];
+  const BROKE_MSGS = [
+    "💸 OUT OF TOKENS. Your context window is empty.",
+    "💸 BALANCE: 0. You have successfully simulated AI startup economics.",
+    "💸 ERROR: Insufficient funds. Have you tried a Series A?",
+  ];
+  const IDLE_MSGS = [
+    "Awaiting inference… press SPIN to waste tokens.",
+    "Model idle. Electricity still being consumed.",
+    "The GPU is warm. Feed it tokens.",
+    "Waiting for your next bad decision…",
+    "Context loaded. Optimism: unwarranted.",
+  ];
+
+  // ─── State ─────────────────────────────────────────────────────────────────
+  let balance = 1000;
+  let totalWon = 0;
+  let totalLost = 0;
+  let spinCount = 0;
+  let currentBet = 10;
+  let spinning = false;
+
+  const REEL_COUNT = 3;
+  const STRIP_LENGTH = 40; // symbols per reel strip (repeating)
+
+  // ─── Build weighted symbol pool ───────────────────────────────────────────
+  function buildPool() {
+    const pool = [];
+    SYMBOLS.forEach(s => {
+      for (let i = 0; i < s.weight; i++) pool.push(s);
+    });
+    return pool;
+  }
+  const POOL = buildPool();
+
+  function randomSymbol() {
+    return POOL[Math.floor(Math.random() * POOL.length)];
+  }
+
+  // ─── Build reel strips ────────────────────────────────────────────────────
+  const reelData = [[], [], []]; // stored symbol arrays per reel
+  const reelEls = [];
+
+  function buildReels() {
+    for (let r = 0; r < REEL_COUNT; r++) {
+      const strip = document.getElementById(`reel-strip-${r}`);
+      reelEls.push(strip);
+      for (let i = 0; i < STRIP_LENGTH; i++) {
+        const sym = randomSymbol();
+        reelData[r].push(sym);
+        const div = document.createElement('div');
+        div.className = 'reel-symbol';
+        div.textContent = sym.emoji;
+        strip.appendChild(div);
+      }
+      // Position at center initially
+      const idx = Math.floor(Math.random() * STRIP_LENGTH);
+      strip.dataset.pos = idx;
+      strip.style.transform = `translateY(${-idx * 120}px)`;
+    }
+  }
+
+  // ─── Paytable UI ─────────────────────────────────────────────────────────
+  function buildPaytable() {
+    const grid = document.getElementById('pay-grid');
+    PAYTABLE.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'pay-row';
+      row.innerHTML = `
+        <span class="pay-symbols">${p.symbols.join('')}</span>
+        <div style="text-align:right">
+          <div class="pay-amount">${p.label}</div>
+          <div class="pay-desc">${p.desc}</div>
+        </div>
+      `;
+      grid.appendChild(row);
+    });
+    // Add two-of-a-kind row
+    const any2 = document.createElement('div');
+    any2.className = 'pay-row';
+    any2.style.gridColumn = '1 / -1';
+    any2.innerHTML = `
+      <span class="pay-symbols">🃏🃏❓</span>
+      <div style="text-align:right">
+        <div class="pay-amount">x1.5 bet</div>
+        <div class="pay-desc">Any two matching</div>
+      </div>
+    `;
+    grid.appendChild(any2);
+  }
+
+  // ─── DOM refs ─────────────────────────────────────────────────────────────
+  const balanceEl = document.getElementById('balance');
+  const wonEl = document.getElementById('total-won');
+  const lostEl = document.getElementById('total-lost');
+  const spinCountEl = document.getElementById('spin-count');
+  const spinBtn = document.getElementById('spin-btn');
+  const msgBox = document.getElementById('message-box');
+  const msgText = document.getElementById('message-text');
+  const historyList = document.getElementById('history-list');
+  const winLine = document.getElementById('win-line');
+  const refillBtn = document.getElementById('refill-btn');
+  const spinCostLabel = document.getElementById('spin-cost-label');
+
+  // ─── Update UI ────────────────────────────────────────────────────────────
+  function updateStats() {
+    balanceEl.textContent = balance.toLocaleString();
+    wonEl.textContent = totalWon.toLocaleString();
+    lostEl.textContent = totalLost.toLocaleString();
+    spinCountEl.textContent = spinCount.toLocaleString();
+  }
+
+  function setMessage(text, type = 'idle') {
+    msgBox.className = 'message-box ' + type;
+    msgText.textContent = text;
+  }
+
+  function bumpEl(el) {
+    el.classList.remove('bump');
+    void el.offsetWidth;
+    el.classList.add('bump');
+    el.addEventListener('animationend', () => el.classList.remove('bump'), { once: true });
+  }
+
+  // ─── Particles ───────────────────────────────────────────────────────────
+  function spawnParticles(count = 12) {
+    const emojis = ['💰','⚡','🎉','✨','💎','🌟','🪙','💸'];
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        p.style.left = (20 + Math.random() * 60) + 'vw';
+        p.style.top = (10 + Math.random() * 30) + 'vh';
+        p.style.animationDuration = (1.2 + Math.random() * 0.8) + 's';
+        document.body.appendChild(p);
+        p.addEventListener('animationend', () => p.remove());
+      }, i * 60);
+    }
+  }
+
+  // ─── History ─────────────────────────────────────────────────────────────
+  function addHistory(symbols, delta) {
+    // Clear placeholder
+    const placeholder = historyList.querySelector('[style]');
+    if (placeholder) placeholder.remove();
+
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    const pos = delta > 0;
+    item.innerHTML = `
+      <span class="h-symbols">${symbols.join('')}</span>
+      <span class="h-result ${pos ? 'pos' : 'neg'}">${pos ? '+' : ''}${delta}</span>
+    `;
+    historyList.prepend(item);
+    // Keep max 20
+    while (historyList.children.length > 20) historyList.lastChild.remove();
+  }
+
+  // ─── Bet selector ────────────────────────────────────────────────────────
+  document.querySelectorAll('.bet-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (spinning) return;
+      document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentBet = parseInt(btn.dataset.bet);
+      spinCostLabel.textContent = `Costs ${currentBet} tokens per spin`;
+    });
+  });
+
+  // ─── Refill ───────────────────────────────────────────────────────────────
+  refillBtn.addEventListener('click', () => {
+    balance += 500;
+    updateStats();
+    refillBtn.classList.remove('show');
+    spinBtn.disabled = false;
+    setMessage("💳 Emergency VC funding secured! $500M valuation, somehow.", 'win');
+    bumpEl(balanceEl);
+  });
+
+  // ─── Spin logic ───────────────────────────────────────────────────────────
+  function pickResult() {
+    // Pick a random index in each reel
+    const indices = [];
+    for (let r = 0; r < REEL_COUNT; r++) {
+      indices.push(Math.floor(Math.random() * STRIP_LENGTH));
+    }
+    return indices;
+  }
+
+  function animateReel(reelIndex, targetIndex, delay) {
+    return new Promise(resolve => {
+      const strip = reelEls[reelIndex];
+      const container = document.getElementById(`reel-${reelIndex}`);
+      const currentPos = parseInt(strip.dataset.pos) || 0;
+
+      // How many symbols to spin through
+      const minSpins = 20 + reelIndex * 6;
+      const totalLen = STRIP_LENGTH;
+
+      // Figure out full spins + target offset
+      let spinSteps = minSpins + Math.floor(Math.random() * 10);
+      // Land on targetIndex
+      let newPos = currentPos + spinSteps;
+      // Adjust so we end exactly on targetIndex modulo totalLen
+      const remainder = newPos % totalLen;
+      if (remainder !== targetIndex) {
+        newPos += (targetIndex - remainder + totalLen) % totalLen;
+      }
+      newPos = newPos % totalLen;
+      if (newPos < 0) newPos += totalLen;
+
+      const totalMove = newPos - currentPos;
+      const actualNewPos = ((currentPos + totalMove) % totalLen + totalLen) % totalLen;
+
+      container.classList.add('spinning');
+
+      // Use requestAnimationFrame for smooth animation
+      const startY = -currentPos * 120;
+      const endY = -(currentPos + totalMove) * 120;
+      const duration = 1200 + delay;
+      let startTime = null;
+
+      function easeOutQuart(t) {
+        return 1 - Math.pow(1 - t, 4);
+      }
+
+      function frame(ts) {
+        if (!startTime) startTime = ts;
+        const elapsed = ts - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = easeOutQuart(progress);
+        const currentY = startY + (endY - startY) * eased;
+        strip.style.transform = `translateY(${currentY}px)`;
+        if (progress < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          strip.style.transform = `translateY(${endY}px)`;
+          strip.dataset.pos = actualNewPos;
+          container.classList.remove('spinning');
+          resolve();
+        }
+      }
+
+      setTimeout(() => requestAnimationFrame(frame), delay * 0.1);
+    });
+  }
+
+  async function spin() {
+    if (spinning) return;
+    if (balance < currentBet) {
+      setMessage(pick(BROKE_MSGS), 'broke');
+      refillBtn.classList.add('show');
+      return;
+    }
+
+    spinning = true;
+    spinBtn.disabled = true;
+    winLine.classList.remove('show');
+
+    // Deduct bet
+    balance -= currentBet;
+    totalLost += currentBet;
+    spinCount++;
+    updateStats();
+
+    // Pick results
+    const resultIndices = pickResult();
+    const resultSymbols = resultIndices.map((idx, r) => reelData[r][idx]);
+
+    // Set message to spinning state
+    setMessage('🔄 Generating response…', 'idle');
+
+    // Animate reels with staggered stops
+    const animations = resultIndices.map((idx, r) =>
+      animateReel(r, idx, r * 300)
+    );
+    await Promise.all(animations);
+
+    // Evaluate result
+    const emojis = resultSymbols.map(s => s.emoji);
+    let payout = 0;
+    let msgType = 'loss';
+    let resultMsg = pick(LOSS_MSGS);
+    let isJackpot = false;
+
+    // Check 3-of-a-kind
+    if (emojis[0] === emojis[1] && emojis[1] === emojis[2]) {
+      const payEntry = PAYTABLE.find(p => p.symbols[0] === emojis[0]);
+      const mult = payEntry ? payEntry.mult : 3;
+      payout = Math.floor(currentBet * mult);
+
+      if (mult >= 100) {
+        isJackpot = true;
+        msgType = 'jackpot';
+        resultMsg = pick(JACKPOT_MSGS);
+        spawnParticles(30);
+      } else {
+        msgType = 'win';
+        resultMsg = pick(WIN_MSGS) + ` (+${payout} tokens)`;
+        spawnParticles(emojis[0] === '💰' ? 20 : 10);
+      }
+      winLine.classList.add('show');
+    }
+    // Check 2-of-a-kind
+    else if (emojis[0] === emojis[1] || emojis[1] === emojis[2] || emojis[0] === emojis[2]) {
+      payout = Math.floor(currentBet * TWO_MATCH_MULT);
+      msgType = 'win';
+      resultMsg = pick(WIN_MSGS) + ` (+${payout} tokens)`;
+    }
+
+    // Apply payout
+    if (payout > 0) {
+      balance += payout;
+      totalWon += payout;
+      bumpEl(balanceEl);
+      bumpEl(wonEl);
+    } else {
+      bumpEl(lostEl);
+    }
+
+    updateStats();
+    setMessage(resultMsg, msgType);
+    addHistory(emojis, payout > 0 ? payout - currentBet : -currentBet);
+
+    // Check if broke
+    if (balance < Math.min(10, currentBet)) {
+      refillBtn.classList.add('show');
+    } else {
+      spinBtn.disabled = false;
+    }
+
+    spinning = false;
+  }
+
+  spinBtn.addEventListener('click', spin);
+
+  // Keyboard support
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' && !e.target.matches('button')) {
+      e.preventDefault();
+      spin();
+    }
+  });
+
+  // ─── Utility ─────────────────────────────────────────────────────────────
+  function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // ─── Init ─────────────────────────────────────────────────────────────────
+  buildReels();
+  buildPaytable();
+  updateStats();
+
+  // Rotate idle messages
+  setInterval(() => {
+    if (!spinning && msgBox.className === 'message-box ') {
+      setMessage(pick(IDLE_MSGS), '');
+    }
+  }, 5000);
+</script>
+</body>
+</html>
