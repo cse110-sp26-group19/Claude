@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🤖 Token Slots — The AI Casino</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="stars" id="stars"></div>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-badge">BETA v∞.∞</div>
+      <h1 class="title">TOKEN<span class="accent">SLOTS</span></h1>
+      <p class="subtitle">The only casino where the house hallucinates</p>
+    </header>
+
+    <!-- Token balance -->
+    <div class="balance-bar">
+      <div class="balance-item">
+        <span class="balance-label">YOUR TOKENS</span>
+        <span class="balance-value" id="balance">100</span>
+      </div>
+      <div class="balance-item center">
+        <span class="balance-label">BET</span>
+        <div class="bet-controls">
+          <button class="bet-btn" id="bet-down">−</button>
+          <span class="balance-value" id="bet">10</span>
+          <button class="bet-btn" id="bet-up">+</button>
+        </div>
+      </div>
+      <div class="balance-item right">
+        <span class="balance-label">LAST WIN</span>
+        <span class="balance-value win-value" id="last-win">—</span>
+      </div>
+    </div>
+
+    <!-- Slot Machine -->
+    <div class="machine">
+      <div class="machine-top">
+        <div class="machine-label">⚡ GPU POWERED ⚡</div>
+      </div>
+
+      <div class="reels-window">
+        <div class="scanline"></div>
+        <div class="reels" id="reels">
+          <div class="reel-container">
+            <div class="reel" id="reel-0">
+              <div class="reel-inner" id="reel-inner-0"></div>
+            </div>
+          </div>
+          <div class="reel-divider"></div>
+          <div class="reel-container">
+            <div class="reel" id="reel-1">
+              <div class="reel-inner" id="reel-inner-1"></div>
+            </div>
+          </div>
+          <div class="reel-divider"></div>
+          <div class="reel-container">
+            <div class="reel" id="reel-2">
+              <div class="reel-inner" id="reel-inner-2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="payline" id="payline"></div>
+      </div>
+
+      <!-- Message box -->
+      <div class="message-box" id="message-box">
+        <span id="message-text">Insert tokens to begin inference...</span>
+      </div>
+
+      <!-- Spin button -->
+      <button class="spin-btn" id="spin-btn">
+        <span class="spin-btn-inner">
+          <span class="spin-icon">⚙</span>
+          <span>RUN INFERENCE</span>
+        </span>
+      </button>
+
+      <!-- Paytable toggle -->
+      <button class="paytable-toggle" id="paytable-toggle">📋 View Paytable</button>
+    </div>
+
+    <!-- Paytable -->
+    <div class="paytable" id="paytable" hidden>
+      <h2 class="paytable-title">PAYTABLE <span class="blink">///</span></h2>
+      <div class="paytable-grid">
+        <div class="pay-row jackpot">
+          <span class="pay-symbols">🤖🤖🤖</span>
+          <span class="pay-label">AGI ACHIEVED</span>
+          <span class="pay-mult">×50</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">💎💎💎</span>
+          <span class="pay-label">GPT-5 DETECTED</span>
+          <span class="pay-mult">×25</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🧠🧠🧠</span>
+          <span class="pay-label">SUPERINTELLIGENCE</span>
+          <span class="pay-mult">×15</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">⚡⚡⚡</span>
+          <span class="pay-label">GPU CLUSTER</span>
+          <span class="pay-mult">×10</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🔥🔥🔥</span>
+          <span class="pay-label">SERVER ON FIRE</span>
+          <span class="pay-mult">×8</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">📊📊📊</span>
+          <span class="pay-label">BENCHMARKS GO BRR</span>
+          <span class="pay-mult">×5</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🐦🐦🐦</span>
+          <span class="pay-label">PROMPT INJECTION</span>
+          <span class="pay-mult">×3</span>
+        </div>
+        <div class="pay-row dim">
+          <span class="pay-symbols">any 2 match</span>
+          <span class="pay-label">PARTIAL ALIGNMENT</span>
+          <span class="pay-mult">×1.5</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- History feed -->
+    <div class="history-panel">
+      <div class="history-title">📡 INFERENCE LOG</div>
+      <div class="history-feed" id="history-feed">
+        <div class="history-item neutral">System boot... loading weights... done.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

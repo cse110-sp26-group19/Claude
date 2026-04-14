@@ -1,0 +1,462 @@
+/* ── Reset & base ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold:   #f5c518;
+  --gold2:  #ffd700;
+  --dark:   #0d0d1a;
+  --panel:  #12122a;
+  --card:   #1a1a35;
+  --accent: #7c3aed;
+  --accent2:#a855f7;
+  --green:  #22c55e;
+  --red:    #ef4444;
+  --text:   #e2e8f0;
+  --muted:  #94a3b8;
+  --radius: 1rem;
+  --shadow: 0 8px 32px rgba(0,0,0,.6);
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--dark);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Casino background ─────────────────────────────────────────── */
+.casino-bg {
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(124,58,237,.25) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(168,85,247,.15) 0%, transparent 50%),
+    var(--dark);
+  min-height: 100vh;
+  padding: 1.5rem 1rem 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* ── Header ───────────────────────────────────────────────────── */
+.header { text-align: center; }
+
+.header h1 {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  background: linear-gradient(135deg, var(--gold), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(245,197,24,.4));
+  letter-spacing: .03em;
+}
+
+.tagline {
+  color: var(--muted);
+  font-size: .95rem;
+  margin-top: .35rem;
+}
+
+/* ── Token bar ────────────────────────────────────────────────── */
+.token-bar {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--radius);
+  padding: .75rem 2rem;
+  box-shadow: var(--shadow);
+}
+
+.token-display {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.token-icon { font-size: 1.6rem; }
+
+#token-count {
+  color: var(--gold2);
+  min-width: 4ch;
+  text-align: right;
+  transition: color .2s;
+}
+
+.token-label { color: var(--muted); font-size: .85rem; align-self: flex-end; padding-bottom: .1rem; }
+
+.bet-controls {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: 1rem;
+}
+
+.bet-controls label { color: var(--muted); }
+
+.bet-controls button {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent2);
+  font-size: 1.2rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background .15s;
+}
+
+.bet-controls button:hover { background: rgba(124,58,237,.25); }
+
+#bet-amount {
+  min-width: 3ch;
+  text-align: center;
+  font-weight: 700;
+  color: var(--gold2);
+}
+
+/* ── Machine ──────────────────────────────────────────────────── */
+.machine {
+  background: linear-gradient(160deg, #1e1e40, #12122a);
+  border: 2px solid rgba(245,197,24,.3);
+  border-radius: 1.5rem;
+  padding: 1.5rem 2rem 2rem;
+  box-shadow: var(--shadow), 0 0 40px rgba(124,58,237,.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+}
+
+/* ── Marquee lights ───────────────────────────────────────────── */
+.machine-top { width: 100%; }
+
+.light-row {
+  display: flex;
+  justify-content: space-around;
+  padding: .3rem 0;
+}
+
+.bulb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold2);
+  opacity: .35;
+  transition: opacity .15s, box-shadow .15s;
+}
+
+.bulb.on {
+  opacity: 1;
+  box-shadow: 0 0 14px var(--gold2), 0 0 6px var(--gold);
+}
+
+/* ── Reels ────────────────────────────────────────────────────── */
+.reels-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.reel-window {
+  width: 110px;
+  height: 110px;
+  background: var(--dark);
+  border: 2px solid rgba(255,255,255,.12);
+  border-radius: .75rem;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 4px 16px rgba(0,0,0,.6);
+}
+
+.reel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform .05s linear;
+}
+
+.symbol {
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  user-select: none;
+}
+
+/* win glow on reel windows */
+.reel-window.win {
+  border-color: var(--gold2);
+  box-shadow: 0 0 20px var(--gold2), inset 0 4px 16px rgba(0,0,0,.4);
+  animation: reel-win-pulse .6s ease-in-out 2;
+}
+
+@keyframes reel-win-pulse {
+  0%, 100% { box-shadow: 0 0 20px var(--gold2), inset 0 4px 16px rgba(0,0,0,.4); }
+  50%       { box-shadow: 0 0 40px var(--gold2), 0 0 80px rgba(245,197,24,.3), inset 0 4px 16px rgba(0,0,0,.4); }
+}
+
+/* ── Payline ──────────────────────────────────────────────────── */
+.payline {
+  width: calc(3 * 110px + 2 * 1rem);
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold2), transparent);
+  opacity: .4;
+  border-radius: 2px;
+  margin-top: -1.4rem;
+  pointer-events: none;
+}
+
+/* ── Result banner ────────────────────────────────────────────── */
+.result-banner {
+  min-height: 2.8rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  padding: .4rem 1rem;
+  border-radius: .5rem;
+  width: 100%;
+  transition: background .3s, color .3s;
+}
+
+.result-banner.win  { background: rgba(34,197,94,.15);  color: var(--green); }
+.result-banner.lose { background: rgba(239,68,68,.1);   color: var(--red);   }
+
+/* ── Buttons ──────────────────────────────────────────────────── */
+.spin-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: .75rem;
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  padding: .85rem 3rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(124,58,237,.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .15rem;
+  transition: transform .1s, box-shadow .1s;
+  width: 100%;
+}
+
+.spin-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(124,58,237,.7);
+}
+
+.spin-btn:active:not(:disabled) { transform: translateY(0); }
+
+.spin-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.spin-cost { font-size: .75rem; font-weight: 400; opacity: .8; }
+
+.max-btn {
+  background: transparent;
+  border: 1px solid var(--gold);
+  border-radius: .5rem;
+  color: var(--gold);
+  font-size: .85rem;
+  font-weight: 700;
+  padding: .4rem 1.2rem;
+  cursor: pointer;
+  letter-spacing: .05em;
+  transition: background .15s;
+  width: 100%;
+}
+
+.max-btn:hover { background: rgba(245,197,24,.12); }
+
+/* ── Paytable ─────────────────────────────────────────────────── */
+.paytable {
+  width: 100%;
+  max-width: 700px;
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.paytable h2 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--gold2);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .88rem;
+}
+
+th {
+  text-align: left;
+  padding: .5rem .75rem;
+  color: var(--muted);
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  font-weight: 600;
+}
+
+td {
+  padding: .5rem .75rem;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  vertical-align: middle;
+}
+
+tr:last-child td { border-bottom: none; }
+
+.jackpot-row td {
+  color: var(--gold2);
+  font-weight: 700;
+}
+
+tr:hover td { background: rgba(255,255,255,.03); }
+
+/* ── History panel ────────────────────────────────────────────── */
+.history-panel {
+  width: 100%;
+  max-width: 700px;
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.history-panel h2 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--accent2);
+}
+
+#history-list {
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+
+#history-list li {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .85rem;
+  padding: .35rem .6rem;
+  background: rgba(255,255,255,.03);
+  border-radius: .4rem;
+  animation: slide-in .25s ease;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.log-win  { color: var(--green); }
+.log-lose { color: var(--red); }
+.log-time { color: var(--muted); font-size: .75rem; margin-left: auto; }
+
+/* ── Footer ───────────────────────────────────────────────────── */
+.footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: .78rem;
+  padding-top: .5rem;
+}
+
+/* ── Modal ────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  background: var(--card);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 2rem;
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(124,58,237,.4);
+  animation: pop-in .25s cubic-bezier(.175,.885,.32,1.275);
+}
+
+@keyframes pop-in {
+  from { transform: scale(.8); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+
+.modal h2 { font-size: 1.5rem; margin-bottom: .75rem; }
+
+.modal p {
+  color: var(--muted);
+  font-size: .95rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+#modal-close {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: .5rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: .6rem 2rem;
+  cursor: pointer;
+}
+
+/* ── Confetti canvas ──────────────────────────────────────────── */
+#confetti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* ── Token flash ──────────────────────────────────────────────── */
+.flash-win  { color: var(--green) !important; animation: flash .4s ease 2; }
+.flash-lose { color: var(--red)   !important; animation: flash .4s ease 2; }
+
+@keyframes flash {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.25); }
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .reel-window { width: 88px; height: 88px; }
+  .symbol { width: 88px; height: 88px; font-size: 2.8rem; }
+  .payline { width: calc(3 * 88px + 2 * 1rem); }
+  .machine { padding: 1.2rem 1.2rem 1.6rem; }
+}

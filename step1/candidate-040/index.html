@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Token Casino 🎰</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="casino-bg">
+    <header class="header">
+      <h1>🤖 AI Token Casino 🎰</h1>
+      <p class="tagline">"We're not gambling — we're <em>reinforcing</em>."</p>
+    </header>
+
+    <div class="token-bar">
+      <div class="token-display">
+        <span class="token-icon">🪙</span>
+        <span id="token-count">100</span>
+        <span class="token-label">tokens</span>
+      </div>
+      <div class="bet-controls">
+        <label for="bet">Bet:</label>
+        <button id="bet-down" aria-label="Decrease bet">−</button>
+        <span id="bet-amount">10</span>
+        <button id="bet-up" aria-label="Increase bet">+</button>
+        <span class="token-label">tokens</span>
+      </div>
+    </div>
+
+    <div class="machine">
+      <div class="machine-top">
+        <div class="light-row" aria-hidden="true">
+          <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+          <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+          <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
+        </div>
+      </div>
+
+      <div class="reels-container">
+        <div class="reel-window">
+          <div class="reel" id="reel-0">
+            <div class="symbol">🤖</div>
+          </div>
+        </div>
+        <div class="reel-window">
+          <div class="reel" id="reel-1">
+            <div class="symbol">🧠</div>
+          </div>
+        </div>
+        <div class="reel-window">
+          <div class="reel" id="reel-2">
+            <div class="symbol">🪙</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="payline" aria-hidden="true"></div>
+
+      <div class="result-banner" id="result-banner" aria-live="polite"></div>
+
+      <button class="spin-btn" id="spin-btn">
+        <span class="spin-btn-text">SPIN&nbsp;&nbsp;🎰</span>
+        <span class="spin-cost" id="spin-cost">(costs 10 tokens)</span>
+      </button>
+
+      <button class="max-btn" id="max-btn">MAX BET</button>
+    </div>
+
+    <div class="paytable">
+      <h2>📜 Paytable — Alignment Guide</h2>
+      <table>
+        <thead>
+          <tr><th>Combo</th><th>Symbols</th><th>Payout</th><th>Flavour</th></tr>
+        </thead>
+        <tbody>
+          <tr class="jackpot-row">
+            <td>JACKPOT</td>
+            <td>🤖 🤖 🤖</td>
+            <td>×50</td>
+            <td>Superintelligence achieved! (Please hold.)</td>
+          </tr>
+          <tr>
+            <td>CONTEXT WINDOW</td>
+            <td>📜 📜 📜</td>
+            <td>×20</td>
+            <td>You remembered everything. For once.</td>
+          </tr>
+          <tr>
+            <td>HALLUCINATION</td>
+            <td>🌀 🌀 🌀</td>
+            <td>×15</td>
+            <td>Confidently wrong, but at scale!</td>
+          </tr>
+          <tr>
+            <td>GPU CLUSTER</td>
+            <td>🖥️ 🖥️ 🖥️</td>
+            <td>×12</td>
+            <td>Training costs covered... maybe.</td>
+          </tr>
+          <tr>
+            <td>BIG BRAIN</td>
+            <td>🧠 🧠 🧠</td>
+            <td>×10</td>
+            <td>Parameters go brrr.</td>
+          </tr>
+          <tr>
+            <td>TOKEN RAIN</td>
+            <td>🪙 🪙 🪙</td>
+            <td>×8</td>
+            <td>You generated tokens by spending tokens!</td>
+          </tr>
+          <tr>
+            <td>PROMPT PAIR</td>
+            <td>Any 2 match</td>
+            <td>×2</td>
+            <td>Few-shot wins!</td>
+          </tr>
+          <tr>
+            <td>DEPRECATED</td>
+            <td>No match</td>
+            <td>×0</td>
+            <td>This model has been sunset. Sorry.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="history-panel">
+      <h2>📋 Inference Log</h2>
+      <ul id="history-list"></ul>
+    </div>
+
+    <footer class="footer">
+      <p>🔒 Your tokens are real* &nbsp;|&nbsp; *No they're not &nbsp;|&nbsp; Hallucinations may vary</p>
+    </footer>
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title"></h2>
+      <p id="modal-body"></p>
+      <button id="modal-close">OK fine.</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

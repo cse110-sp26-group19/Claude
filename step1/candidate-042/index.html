@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Token Slots — Powered by Hallucinations</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+
+  <div class="machine-wrapper">
+    <!-- Header -->
+    <header class="machine-header">
+      <div class="header-glow">⚡ AI TOKEN SLOTS ⚡</div>
+      <p class="tagline">The only casino where the house was trained on your data</p>
+    </header>
+
+    <!-- Token Balance -->
+    <div class="balance-panel">
+      <div class="balance-label">CONTEXT WINDOW</div>
+      <div class="balance-display">
+        <span id="token-count">100</span>
+        <span class="balance-unit">tokens</span>
+      </div>
+      <div class="balance-bar-wrap">
+        <div class="balance-bar" id="balance-bar"></div>
+      </div>
+    </div>
+
+    <!-- Machine Body -->
+    <div class="machine-body">
+      <!-- Reels -->
+      <div class="reels-container">
+        <div class="reel-frame" id="frame-0">
+          <div class="reel" id="reel-0">
+            <div class="symbol"></div>
+          </div>
+        </div>
+        <div class="reel-frame" id="frame-1">
+          <div class="reel" id="reel-1">
+            <div class="symbol"></div>
+          </div>
+        </div>
+        <div class="reel-frame" id="frame-2">
+          <div class="reel" id="reel-2">
+            <div class="symbol"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payline -->
+      <div class="payline">
+        <span class="payline-arrow">◀</span>
+        <span class="payline-label">INFERENCE LINE</span>
+        <span class="payline-arrow">▶</span>
+      </div>
+    </div>
+
+    <!-- Bet Controls -->
+    <div class="bet-panel">
+      <div class="bet-label">BET (tokens per spin)</div>
+      <div class="bet-controls">
+        <button class="bet-btn" id="bet-down" aria-label="Decrease bet">−</button>
+        <span class="bet-amount" id="bet-amount">10</span>
+        <button class="bet-btn" id="bet-up" aria-label="Increase bet">+</button>
+      </div>
+    </div>
+
+    <!-- Spin Button -->
+    <button class="spin-btn" id="spin-btn">
+      <span class="spin-icon">🤖</span>
+      <span class="spin-text">GENERATE SPIN</span>
+      <span class="spin-cost" id="spin-cost">-10 tokens</span>
+    </button>
+
+    <!-- Message Box -->
+    <div class="message-box" id="message-box" aria-live="polite">
+      <span id="message-text">Insert tokens to begin inference...</span>
+    </div>
+
+    <!-- Paytable -->
+    <details class="paytable">
+      <summary>📊 View Paytable (training data)</summary>
+      <table class="pay-table">
+        <thead>
+          <tr><th>Combination</th><th>Payout</th><th>Description</th></tr>
+        </thead>
+        <tbody id="paytable-body"></tbody>
+      </table>
+    </details>
+
+    <!-- Stats -->
+    <div class="stats-panel">
+      <div class="stat">
+        <div class="stat-value" id="stat-spins">0</div>
+        <div class="stat-label">Spins</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-wins">0</div>
+        <div class="stat-label">Wins</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-tokens-won">0</div>
+        <div class="stat-label">Tokens Won</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-tokens-lost">0</div>
+        <div class="stat-label">Tokens Burned</div>
+      </div>
+    </div>
+
+    <!-- Reset -->
+    <button class="reset-btn" id="reset-btn">🔄 Restart Training Run</button>
+
+    <footer class="machine-footer">
+      ⚠️ This app is 100% deterministic. Randomness is a hallucination.
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
