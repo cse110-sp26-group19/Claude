@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Token Slots — Waste Your Tokens™</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="scanlines"></div>
+
+  <div class="container">
+    <header>
+      <h1 class="glitch" data-text="AI TOKEN SLOTS">AI TOKEN SLOTS</h1>
+      <p class="subtitle">Where Your Tokens Go to Die&trade;</p>
+    </header>
+
+    <div class="balance-bar">
+      <div class="balance">
+        <span class="label">TOKEN BALANCE</span>
+        <span class="amount" id="balance">1000</span>
+      </div>
+      <div class="bet-controls">
+        <button id="bet-down" class="btn-bet" aria-label="Decrease bet">−</button>
+        <div class="bet-display">
+          <span class="label">BET</span>
+          <span class="amount" id="bet-amount">10</span>
+        </div>
+        <button id="bet-up" class="btn-bet" aria-label="Increase bet">+</button>
+      </div>
+    </div>
+
+    <div class="machine">
+      <div class="reel-window">
+        <div class="reel-container">
+          <div class="reel" id="reel-0">
+            <div class="symbol">🤖</div>
+          </div>
+          <div class="reel-divider"></div>
+          <div class="reel" id="reel-1">
+            <div class="symbol">🤖</div>
+          </div>
+          <div class="reel-divider"></div>
+          <div class="reel" id="reel-2">
+            <div class="symbol">🤖</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button id="spin-btn" class="spin-button">
+      <span class="spin-text">GENERATE RESPONSE</span>
+      <span class="spin-subtext">( spin )</span>
+    </button>
+
+    <div class="message-box" id="message-box">
+      <p id="message">Insert tokens to hallucinate…</p>
+    </div>
+
+    <div class="paytable">
+      <h2>// PAYOUT TABLE</h2>
+      <div class="paytable-grid">
+        <div class="pay-row"><span>🧠🧠🧠</span><span class="payout">×50</span><span class="pay-label">AGI Achieved</span></div>
+        <div class="pay-row"><span>💎💎💎</span><span class="payout">×25</span><span class="pay-label">Series B Funding</span></div>
+        <div class="pay-row"><span>🤖🤖🤖</span><span class="payout">×15</span><span class="pay-label">Sentient Bot</span></div>
+        <div class="pay-row"><span>🔥🔥🔥</span><span class="payout">×10</span><span class="pay-label">Viral Tweet</span></div>
+        <div class="pay-row"><span>⚡⚡⚡</span><span class="payout">×8</span><span class="pay-label">GPU Cluster</span></div>
+        <div class="pay-row"><span>📊📊📊</span><span class="payout">×5</span><span class="pay-label">Benchmark Win</span></div>
+        <div class="pay-row"><span>🎰🎰🎰</span><span class="payout">×5</span><span class="pay-label">Lucky Prompt</span></div>
+        <div class="pay-row"><span>Any pair</span><span class="payout">×2</span><span class="pay-label">Partial Match</span></div>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2026 Hallucination Labs Inc. — "We made it up and so can you"</p>
+      <p class="fine-print">Not responsible for lost tokens, wasted GPU cycles, or existential dread.</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

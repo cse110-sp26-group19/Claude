@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOKEN BURNER 9000 — The AI Slot Machine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="matrix-bg"></canvas>
+
+  <div class="scanlines"></div>
+
+  <div class="container">
+    <header>
+      <h1 class="glitch" data-text="TOKEN BURNER 9000">TOKEN BURNER 9000</h1>
+      <p class="subtitle">/// where your tokens go to die ///</p>
+    </header>
+
+    <div class="balance-bar">
+      <div class="balance-display">
+        <span class="label">BALANCE:</span>
+        <span id="balance" class="value">1000</span>
+        <span class="currency">tokens</span>
+      </div>
+      <div class="bet-controls">
+        <span class="label">BET:</span>
+        <button class="bet-btn" id="bet-down" aria-label="Decrease bet">−</button>
+        <span id="bet-amount" class="value">10</span>
+        <button class="bet-btn" id="bet-up" aria-label="Increase bet">+</button>
+      </div>
+    </div>
+
+    <div class="machine-frame">
+      <div class="reels-window">
+        <div class="reel-container">
+          <div class="reel" id="reel-0"><div class="symbol">🤖</div></div>
+          <div class="reel" id="reel-1"><div class="symbol">🧠</div></div>
+          <div class="reel" id="reel-2"><div class="symbol">🔥</div></div>
+        </div>
+        <div class="payline"></div>
+      </div>
+    </div>
+
+    <button id="spin-btn" class="spin-button">
+      <span class="spin-text">GENERATE RESPONSE</span>
+      <span class="spin-subtext">[spin]</span>
+    </button>
+
+    <div id="message-box" class="message-box">
+      <p id="message">Insert tokens and press GENERATE to begin inference...</p>
+    </div>
+
+    <div class="paytable">
+      <h2>/// PAYOUT TABLE ///</h2>
+      <div class="paytable-grid">
+        <div class="pay-row"><span>🤖🤖🤖</span><span>GPT Jackpot — 50x</span></div>
+        <div class="pay-row"><span>🧠🧠🧠</span><span>Neural Overload — 25x</span></div>
+        <div class="pay-row"><span>💰💰💰</span><span>VC Funding Round — 20x</span></div>
+        <div class="pay-row"><span>🔥🔥🔥</span><span>Mixtral Fire — 15x</span></div>
+        <div class="pay-row"><span>📝📝📝</span><span>Prompt Perfection — 10x</span></div>
+        <div class="pay-row"><span>🎰🎰🎰</span><span>Lucky Inference — 10x</span></div>
+        <div class="pay-row"><span>👻👻👻</span><span>Triple Hallucination — 8x</span></div>
+        <div class="pay-row"><span>⚡⚡⚡</span><span>GPU Meltdown — 5x</span></div>
+        <div class="pay-row"><span>Any pair</span><span>Small Refund — 2x</span></div>
+      </div>
+    </div>
+
+    <footer>
+      <p>⚠ This machine has a 99.7% confidence it's fair (±43% hallucination margin)</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

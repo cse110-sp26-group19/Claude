@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token Casino — AI's Favorite Pastime</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="casino-bg">
+    <div class="stars" id="stars"></div>
+
+    <header class="casino-header">
+      <h1 class="casino-title">🎰 TOKEN CASINO 🎰</h1>
+      <p class="casino-subtitle">Where your prompts go to die and your wallet follows</p>
+    </header>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">TOKENS</span>
+        <span class="hud-value" id="balance">1000</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">BET</span>
+        <div class="bet-controls">
+          <button class="bet-btn" id="bet-down">−</button>
+          <span class="hud-value" id="bet">10</span>
+          <button class="bet-btn" id="bet-up">+</button>
+        </div>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">WON</span>
+        <span class="hud-value won" id="total-won">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">LOST</span>
+        <span class="hud-value lost" id="total-lost">0</span>
+      </div>
+    </div>
+
+    <div class="machine-wrap">
+      <div class="machine">
+        <div class="machine-top">
+          <div class="light-row" id="lights-top"></div>
+        </div>
+
+        <div class="machine-body">
+          <div class="reels-frame">
+            <div class="reel-container" id="reel-0">
+              <div class="reel" id="reel-strip-0"></div>
+            </div>
+            <div class="reel-separator"></div>
+            <div class="reel-container" id="reel-1">
+              <div class="reel" id="reel-strip-1"></div>
+            </div>
+            <div class="reel-separator"></div>
+            <div class="reel-container" id="reel-2">
+              <div class="reel" id="reel-strip-2"></div>
+            </div>
+            <div class="payline"></div>
+          </div>
+        </div>
+
+        <div class="machine-bottom">
+          <div class="light-row" id="lights-bottom"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="message-board" id="message-board">
+      <span id="message-text">Insert tokens to begin hallucinating...</span>
+    </div>
+
+    <div class="controls">
+      <button class="spin-btn" id="spin-btn">
+        <span class="spin-icon">⚡</span>
+        <span class="spin-label">SPIN</span>
+        <span class="spin-cost" id="spin-cost">(-10 tokens)</span>
+      </button>
+      <button class="max-bet-btn" id="max-bet-btn">MAX BET</button>
+      <button class="reset-btn" id="reset-btn">REFILL CONTEXT</button>
+    </div>
+
+    <div class="paytable">
+      <h3>PAYTABLE (in tokens, naturally)</h3>
+      <div class="pay-grid" id="paytable"></div>
+    </div>
+
+    <div class="win-overlay" id="win-overlay">
+      <div class="win-content">
+        <div class="win-emoji" id="win-emoji">🎉</div>
+        <div class="win-title" id="win-title">YOU WIN!</div>
+        <div class="win-amount" id="win-amount">+100 tokens</div>
+        <div class="win-quip" id="win-quip"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

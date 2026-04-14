@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Token Slots - Where Your Context Goes to Die</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="casino">
+    <header class="casino-header">
+      <div class="header-badge">ENTERPRISE TIER</div>
+      <h1 class="casino-title">AI TOKEN SLOTS</h1>
+      <p class="casino-subtitle">&#34;Hallucinate Your Way to Riches&#34;</p>
+    </header>
+
+    <div class="token-display">
+      <div class="token-count">
+        <span class="token-label">YOUR CONTEXT WINDOW</span>
+        <span id="token-balance" class="token-value">1000</span>
+        <span class="token-unit">tokens</span>
+      </div>
+      <div class="token-count">
+        <span class="token-label">TOKENS BURNED</span>
+        <span id="tokens-burned" class="token-value">0</span>
+        <span class="token-unit">tokens</span>
+      </div>
+    </div>
+
+    <div class="machine">
+      <div class="machine-top">
+        <div class="machine-light left"></div>
+        <div class="machine-logo">&#129302;</div>
+        <div class="machine-light right"></div>
+      </div>
+
+      <div class="screen-bezel">
+        <div class="win-banner" id="win-banner"></div>
+        <div class="reels-container">
+          <div class="reel-wrapper">
+            <div class="reel" id="reel-0">
+              <div class="reel-inner" id="reel-inner-0"></div>
+            </div>
+          </div>
+          <div class="reel-divider"></div>
+          <div class="reel-wrapper">
+            <div class="reel" id="reel-1">
+              <div class="reel-inner" id="reel-inner-1"></div>
+            </div>
+          </div>
+          <div class="reel-divider"></div>
+          <div class="reel-wrapper">
+            <div class="reel" id="reel-2">
+              <div class="reel-inner" id="reel-inner-2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="payline"></div>
+      </div>
+
+      <div class="result-message" id="result-message"></div>
+
+      <div class="bet-controls">
+        <label class="bet-label">BET (tokens)</label>
+        <div class="bet-row">
+          <button class="bet-btn" id="bet-minus">-</button>
+          <span id="bet-amount" class="bet-amount">10</span>
+          <button class="bet-btn" id="bet-plus">+</button>
+        </div>
+        <div class="bet-presets">
+          <button class="preset-btn" data-bet="10">10</button>
+          <button class="preset-btn" data-bet="25">25</button>
+          <button class="preset-btn" data-bet="50">50</button>
+          <button class="preset-btn" data-bet="100">MAX</button>
+        </div>
+      </div>
+
+      <button class="spin-btn" id="spin-btn">
+        <span class="spin-btn-text">SPIN</span>
+        <span class="spin-btn-sub">Deploy Inference</span>
+      </button>
+
+      <div class="machine-bottom">
+        <button class="aux-btn" id="add-tokens-btn">Add 500 Tokens (Free Tier)</button>
+        <button class="aux-btn danger" id="reset-btn">Flush Cache</button>
+      </div>
+    </div>
+
+    <div class="paytable">
+      <h2 class="paytable-title">PAYTABLE <span class="paytable-sub">// model_version: gpt-infinite</span></h2>
+      <div class="paytable-grid" id="paytable-grid"></div>
+    </div>
+
+    <div class="history-panel">
+      <h3 class="history-title">INFERENCE LOG</h3>
+      <ul class="history-list" id="history-list"></ul>
+    </div>
+
+    <footer class="casino-footer">
+      <p>* Results may hallucinate. Past performance is not indicative of future token burns.</p>
+      <p>* This AI is not responsible for existential dread or GPU shortages.</p>
+    </footer>
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" id="modal">
+      <div class="modal-icon" id="modal-icon"></div>
+      <h2 class="modal-title" id="modal-title"></h2>
+      <p class="modal-body" id="modal-body"></p>
+      <button class="modal-btn" id="modal-btn">OK</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

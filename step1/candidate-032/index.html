@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Token Slots — Hallucinate Your Fortune</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="casino">
+    <header class="header">
+      <h1 class="title">
+        <span class="title-ai">AI</span>
+        <span class="title-slots">SLOTS</span>
+      </h1>
+      <p class="subtitle">The House Always Hallucinates</p>
+    </header>
+
+    <div class="token-bar">
+      <div class="token-display">
+        <span class="token-icon">🪙</span>
+        <span class="token-label">Your Tokens:</span>
+        <span class="token-count" id="tokenCount">100</span>
+      </div>
+      <div class="bet-control">
+        <button class="bet-btn" id="betDown">−</button>
+        <span class="bet-label">Bet: <span id="betAmount">5</span></span>
+        <button class="bet-btn" id="betUp">+</button>
+      </div>
+    </div>
+
+    <div class="machine">
+      <div class="machine-top">
+        <div class="light-row" id="lightRow"></div>
+      </div>
+
+      <div class="screen">
+        <div class="reels-container">
+          <div class="reel-wrapper">
+            <div class="reel" id="reel0">
+              <div class="reel-strip" id="strip0"></div>
+            </div>
+          </div>
+          <div class="reel-divider"></div>
+          <div class="reel-wrapper">
+            <div class="reel" id="reel1">
+              <div class="reel-strip" id="strip1"></div>
+            </div>
+          </div>
+          <div class="reel-divider"></div>
+          <div class="reel-wrapper">
+            <div class="reel" id="reel2">
+              <div class="reel-strip" id="strip2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="payline"></div>
+      </div>
+
+      <div class="result-box" id="resultBox">
+        <span id="resultText">Pull the lever to play!</span>
+      </div>
+
+      <div class="controls">
+        <button class="lever-btn" id="spinBtn">
+          <span class="lever-icon">🎰</span> SPIN (costs <span id="spinCost">5</span> tokens)
+        </button>
+      </div>
+
+      <div class="machine-bottom">
+        <div class="payout-table">
+          <h3>Paytable (multiplier × bet)</h3>
+          <div class="payout-grid" id="payoutGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat"><span class="stat-label">Spins:</span> <span id="spinCount">0</span></div>
+      <div class="stat"><span class="stat-label">Won:</span> <span id="totalWon">0</span> 🪙</div>
+      <div class="stat"><span class="stat-label">Lost:</span> <span id="totalLost">0</span> 🪙</div>
+      <div class="stat"><span class="stat-label">Net:</span> <span id="netTokens">0</span> 🪙</div>
+    </div>
+
+    <div class="ticker" id="ticker">
+      <div class="ticker-track" id="tickerTrack"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-icon" id="modalIcon"></div>
+      <h2 id="modalTitle"></h2>
+      <p id="modalMsg"></p>
+      <button class="modal-btn" id="modalBtn"></button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎰 The Token Burner — AI Slot Machine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="marquee-bar">
+    <span class="marquee-text">★ WELCOME TO THE TOKEN BURNER ★ WHERE YOUR CONTEXT WINDOW GOES TO DIE ★ NOW WITH 100% MORE HALLUCINATIONS ★ PROMPT RESPONSIBLY ★</span>
+  </div>
+
+  <main class="casino">
+    <header class="casino-header">
+      <h1 class="title">The Token Burner</h1>
+      <p class="subtitle">A.I. Slot Machine — <em>"Your tokens were never safe"</em></p>
+    </header>
+
+    <div class="balance-bar">
+      <div class="balance-display">
+        <span class="balance-label">TOKEN BALANCE</span>
+        <span class="balance-value" id="balance">1000</span>
+      </div>
+      <div class="bet-controls">
+        <button class="bet-btn" id="bet-down" aria-label="Decrease bet">−</button>
+        <div class="bet-display">
+          <span class="bet-label">BET</span>
+          <span class="bet-value" id="bet-amount">10</span>
+        </div>
+        <button class="bet-btn" id="bet-up" aria-label="Increase bet">+</button>
+      </div>
+    </div>
+
+    <div class="machine-frame">
+      <div class="machine-inner">
+        <div class="reels-container">
+          <div class="reel" id="reel-0">
+            <div class="reel-strip"></div>
+          </div>
+          <div class="reel" id="reel-1">
+            <div class="reel-strip"></div>
+          </div>
+          <div class="reel" id="reel-2">
+            <div class="reel-strip"></div>
+          </div>
+        </div>
+        <div class="payline"></div>
+      </div>
+    </div>
+
+    <button class="spin-btn" id="spin-btn">
+      <span class="spin-text">🎰 BURN TOKENS 🎰</span>
+    </button>
+
+    <div class="message-board" id="message-board">
+      <p id="message">Insert tokens and pull the lever, you beautiful prompt engineer.</p>
+    </div>
+
+    <div class="payout-table">
+      <h2>PAYOUT TABLE</h2>
+      <div class="payout-grid" id="payout-grid"></div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-label">Spins</span>
+        <span class="stat-value" id="stat-spins">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Tokens Burned</span>
+        <span class="stat-value" id="stat-burned">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Biggest Win</span>
+        <span class="stat-value" id="stat-biggest">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Win Rate</span>
+        <span class="stat-value" id="stat-winrate">0%</span>
+      </div>
+    </div>
+  </main>
+
+  <footer class="casino-footer">
+    <p>⚠️ The Token Burner is not responsible for hallucinated winnings, lost context, or existential dread.</p>
+    <p>House edge: <strong>Yes.</strong></p>
+  </footer>
+
+  <div class="win-overlay" id="win-overlay" hidden>
+    <div class="win-modal">
+      <h2 class="win-title" id="win-title">JACKPOT!</h2>
+      <p class="win-amount" id="win-amount"></p>
+      <p class="win-joke" id="win-joke"></p>
+      <button class="win-dismiss" id="win-dismiss">Feed More Tokens</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token-chan's AI Slot Machine ✨</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+
+  <div class="machine-wrapper">
+    <header class="machine-header">
+      <div class="mascot">🤖</div>
+      <h1>Token-chan's <span class="highlight">AI Slots</span></h1>
+      <p class="subtitle">～ Spend Your Precious Tokens Desu～</p>
+    </header>
+
+    <div class="token-display">
+      <div class="token-icon">🪙</div>
+      <div class="token-info">
+        <span class="token-label">Your Tokens</span>
+        <span class="token-count" id="token-count">1000</span>
+      </div>
+    </div>
+
+    <div class="slot-machine">
+      <div class="slot-frame">
+        <div class="reel-container">
+          <div class="reel" id="reel-0">
+            <div class="reel-inner">
+              <div class="symbol">🤖</div>
+            </div>
+          </div>
+          <div class="reel-divider"></div>
+          <div class="reel" id="reel-1">
+            <div class="reel-inner">
+              <div class="symbol">🧠</div>
+            </div>
+          </div>
+          <div class="reel-divider"></div>
+          <div class="reel" id="reel-2">
+            <div class="reel-inner">
+              <div class="symbol">✨</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bet-controls">
+      <button class="bet-btn" id="bet-down" aria-label="Decrease bet">−</button>
+      <div class="bet-display">
+        <span class="bet-label">Bet</span>
+        <span class="bet-amount" id="bet-amount">10</span>
+        <span class="bet-label">tokens</span>
+      </div>
+      <button class="bet-btn" id="bet-up" aria-label="Increase bet">+</button>
+    </div>
+
+    <button class="spin-btn" id="spin-btn">
+      <span class="spin-text">✨ SPIN DESU ✨</span>
+      <span class="spin-cost" id="spin-cost">costs 10 tokens</span>
+    </button>
+
+    <div class="message-box" id="message-box">
+      <div class="message-avatar">🤖</div>
+      <div class="message-text" id="message-text">
+        Token-chan says: "Feed me your tokens, senpai~!"
+      </div>
+    </div>
+
+    <div class="paytable">
+      <h2>✿ Payout Table ✿</h2>
+      <div class="paytable-grid">
+        <div class="pay-row">
+          <span class="pay-symbols">🤖 🤖 🤖</span>
+          <span class="pay-name">Robot Overlord</span>
+          <span class="pay-value">×50</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🧠 🧠 🧠</span>
+          <span class="pay-name">Galaxy Brain</span>
+          <span class="pay-value">×30</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">💎 💎 💎</span>
+          <span class="pay-name">Premium API</span>
+          <span class="pay-value">×25</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🔥 🔥 🔥</span>
+          <span class="pay-name">GPU Meltdown</span>
+          <span class="pay-value">×20</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">✨ ✨ ✨</span>
+          <span class="pay-name">Hallucination</span>
+          <span class="pay-value">×15</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">📝 📝 📝</span>
+          <span class="pay-name">Prompt Engineer</span>
+          <span class="pay-value">×10</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🎯 🎯 🎯</span>
+          <span class="pay-name">Fine-Tuned</span>
+          <span class="pay-value">×8</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">Any pair</span>
+          <span class="pay-name">Partial Match</span>
+          <span class="pay-value">×2</span>
+        </div>
+      </div>
+    </div>
+
+    <footer class="machine-footer">
+      <p>⚠️ No actual AI tokens were harmed in the making of this game</p>
+      <p>Token-chan reminds you: gambling is bad, but wasting tokens on AI is worse ♡</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

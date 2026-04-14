@@ -1,0 +1,634 @@
+/* ── Reset & Base ────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'PixelFont';
+  src: local('Courier New'), local('Consolas'), local('monospace');
+}
+
+:root {
+  --bg-dark: #0a0a12;
+  --bg-cabinet: #12121f;
+  --bg-screen: #0d0d1a;
+  --neon-green: #39ff14;
+  --neon-pink: #ff2a6d;
+  --neon-cyan: #05d9e8;
+  --neon-yellow: #f5e642;
+  --neon-purple: #b537f2;
+  --text-main: #e0e0e0;
+  --text-dim: #666680;
+  --reel-bg: #08080f;
+  --win-gold: #ffd700;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  background: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Courier New', Consolas, monospace;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+}
+
+/* ── CRT Effect ─────────────────────────────────────── */
+.crt {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 1rem;
+}
+
+.crt::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+  pointer-events: none;
+  z-index: 100;
+}
+
+.scanlines {
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 101;
+}
+
+/* ── Cabinet ────────────────────────────────────────── */
+.cabinet {
+  background: var(--bg-cabinet);
+  border: 2px solid var(--neon-cyan);
+  border-radius: 12px;
+  padding: 1.5rem 1.25rem;
+  box-shadow:
+    0 0 20px rgba(5, 217, 232, 0.15),
+    0 0 60px rgba(5, 217, 232, 0.05),
+    inset 0 0 30px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+/* ── Marquee Header ─────────────────────────────────── */
+.marquee {
+  text-align: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(5, 217, 232, 0.2);
+  margin-bottom: 1rem;
+}
+
+.marquee h1 {
+  font-size: 1.8rem;
+  letter-spacing: 0.15em;
+  color: var(--neon-pink);
+  text-shadow:
+    0 0 10px var(--neon-pink),
+    0 0 30px rgba(255, 42, 109, 0.4);
+  line-height: 1.2;
+}
+
+.marquee h1 .blink {
+  animation: blink-text 1.2s step-end infinite;
+}
+
+@keyframes blink-text {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.subtitle {
+  font-size: 0.7rem;
+  color: var(--neon-cyan);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-top: 0.3rem;
+  text-shadow: 0 0 8px rgba(5, 217, 232, 0.5);
+}
+
+/* ── Screen ─────────────────────────────────────────── */
+.screen {
+  background: var(--bg-screen);
+  border: 1px solid rgba(5, 217, 232, 0.15);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+/* ── Token Display ──────────────────────────────────── */
+.token-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(245, 230, 66, 0.3);
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.token-icon {
+  font-size: 1.3rem;
+  animation: coin-spin 3s linear infinite;
+}
+
+@keyframes coin-spin {
+  0%, 80%, 100% { transform: rotateY(0deg); }
+  90% { transform: rotateY(180deg); }
+}
+
+#token-count {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 10px rgba(245, 230, 66, 0.5);
+  min-width: 4ch;
+  text-align: right;
+  transition: transform 0.2s;
+}
+
+#token-count.bump {
+  transform: scale(1.2);
+}
+
+.token-label {
+  font-size: 0.65rem;
+  color: var(--neon-yellow);
+  letter-spacing: 0.2em;
+  opacity: 0.7;
+}
+
+/* ── Slot Machine / Reels ───────────────────────────── */
+.slot-machine {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.reel-window {
+  background: var(--reel-bg);
+  border: 2px solid rgba(5, 217, 232, 0.25);
+  border-radius: 8px;
+  padding: 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.reel-window::before,
+.reel-window::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 20px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.reel-window::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--reel-bg), transparent);
+}
+
+.reel-window::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--reel-bg), transparent);
+}
+
+.reel-container {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.reel {
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  position: relative;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.reel-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.1s;
+}
+
+.reel-inner .symbol {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.reel.spinning .reel-inner {
+  animation: reel-spin 0.12s linear infinite;
+}
+
+@keyframes reel-spin {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-100px); }
+}
+
+.payline {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--neon-pink);
+  box-shadow: 0 0 8px var(--neon-pink);
+  transform: translateY(-50%);
+  opacity: 0.6;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ── Message Box ────────────────────────────────────── */
+.message-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(5, 217, 232, 0.15);
+  border-radius: 6px;
+  padding: 0.7rem;
+  margin-bottom: 1rem;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+#message {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--neon-green);
+  text-shadow: 0 0 6px rgba(57, 255, 20, 0.3);
+  letter-spacing: 0.05em;
+}
+
+#message.error {
+  color: var(--neon-pink);
+  text-shadow: 0 0 6px rgba(255, 42, 109, 0.3);
+}
+
+#message.win {
+  color: var(--neon-yellow);
+  text-shadow: 0 0 8px rgba(245, 230, 66, 0.5);
+}
+
+/* ── Controls ───────────────────────────────────────── */
+.controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.bet-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.bet-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 3.5rem;
+  padding: 0.3rem 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(5, 217, 232, 0.2);
+  border-radius: 4px;
+}
+
+.bet-label {
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+}
+
+#bet-amount {
+  font-size: 1.1rem;
+  color: var(--neon-cyan);
+  font-weight: bold;
+}
+
+/* ── Buttons ────────────────────────────────────────── */
+.btn {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.15s;
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+.btn-bet {
+  width: 32px;
+  height: 32px;
+  background: rgba(5, 217, 232, 0.1);
+  color: var(--neon-cyan);
+  border: 1px solid rgba(5, 217, 232, 0.3);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-bet:hover {
+  background: rgba(5, 217, 232, 0.2);
+  box-shadow: 0 0 10px rgba(5, 217, 232, 0.2);
+}
+
+.btn-spin {
+  padding: 0.7rem 2rem;
+  background: linear-gradient(180deg, var(--neon-pink), #cc1155);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  font-weight: bold;
+  box-shadow:
+    0 0 15px rgba(255, 42, 109, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.btn-spin:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ff4488, var(--neon-pink));
+  box-shadow:
+    0 0 25px rgba(255, 42, 109, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.btn-spin:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spin-subtext {
+  font-size: 0.55rem;
+  opacity: 0.7;
+  letter-spacing: 0.15em;
+}
+
+.btn-small {
+  padding: 0.4rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-dim);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
+.btn-small:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+
+.paytable-toggle {
+  text-align: center;
+}
+
+/* ── Modal ──────────────────────────────────────────── */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 1rem;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: var(--bg-cabinet);
+  border: 2px solid var(--neon-cyan);
+  border-radius: 10px;
+  padding: 1.5rem;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 0 40px rgba(5, 217, 232, 0.2);
+}
+
+.modal-content h2 {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--neon-cyan);
+  letter-spacing: 0.15em;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 8px rgba(5, 217, 232, 0.4);
+}
+
+.paytable-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.pay-row {
+  display: grid;
+  grid-template-columns: 5rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.pay-row.jackpot {
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.pay-name {
+  color: var(--text-dim);
+  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+}
+
+.pay-mult {
+  color: var(--neon-yellow);
+  font-weight: bold;
+  text-align: right;
+}
+
+.pay-row.jackpot .pay-mult {
+  color: var(--win-gold);
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+}
+
+.modal-content .btn-small {
+  display: block;
+  margin: 0 auto;
+}
+
+/* ── Win Overlay ────────────────────────────────────── */
+.win-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 150;
+  pointer-events: none;
+}
+
+.win-overlay.hidden {
+  display: none;
+}
+
+.win-text {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--win-gold);
+  text-shadow:
+    0 0 20px var(--win-gold),
+    0 0 40px rgba(255, 215, 0, 0.4),
+    0 0 80px rgba(255, 215, 0, 0.2);
+  animation: win-pulse 0.6s ease-in-out infinite alternate;
+  letter-spacing: 0.15em;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+@keyframes win-pulse {
+  from { transform: scale(1); opacity: 0.9; }
+  to { transform: scale(1.1); opacity: 1; }
+}
+
+/* ── Footer ─────────────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding-top: 1rem;
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+
+/* ── Shake animation ────────────────────────────────── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+.shake {
+  animation: shake 0.4s ease;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 440px) {
+  .cabinet {
+    padding: 1rem 0.75rem;
+  }
+
+  .marquee h1 {
+    font-size: 1.3rem;
+  }
+
+  .reel {
+    width: 80px;
+    height: 80px;
+  }
+
+  .reel-inner .symbol {
+    width: 80px;
+    height: 80px;
+    font-size: 2.4rem;
+  }
+
+  @keyframes reel-spin {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-80px); }
+  }
+
+  .btn-spin {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .controls {
+    gap: 0.6rem;
+  }
+
+  .win-text {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .reel {
+    width: 65px;
+    height: 65px;
+  }
+
+  .reel-inner .symbol {
+    width: 65px;
+    height: 65px;
+    font-size: 2rem;
+  }
+
+  @keyframes reel-spin {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-65px); }
+  }
+}
+
+/* ── Particle container ─────────────────────────────── */
+.particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 160;
+  font-size: 1.5rem;
+  animation: particle-fly 1.5s ease-out forwards;
+}
+
+@keyframes particle-fly {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.3);
+  }
+}
