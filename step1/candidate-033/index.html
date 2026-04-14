@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Token Slots — The AI Casino</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+
+  <div class="casino-wrapper">
+    <header class="casino-header">
+      <div class="header-glow"></div>
+      <h1 class="title">
+        <span class="title-ai">AI</span>
+        <span class="title-casino">TOKEN CASINO</span>
+      </h1>
+      <p class="tagline">Hallucinating jackpots since 2023™</p>
+    </header>
+
+    <!-- Token display -->
+    <div class="token-bar">
+      <div class="token-display">
+        <span class="token-icon">🪙</span>
+        <span class="token-label">TOKENS</span>
+        <span class="token-count" id="tokenCount">100</span>
+      </div>
+      <div class="token-display bet-display">
+        <span class="token-icon">🎯</span>
+        <span class="token-label">BET</span>
+        <div class="bet-controls">
+          <button class="bet-btn" id="betDown">−</button>
+          <span class="token-count" id="betAmount">5</span>
+          <button class="bet-btn" id="betUp">+</button>
+        </div>
+      </div>
+      <div class="token-display win-display">
+        <span class="token-icon">💰</span>
+        <span class="token-label">LAST WIN</span>
+        <span class="token-count win-count" id="lastWin">0</span>
+      </div>
+    </div>
+
+    <!-- Slot machine body -->
+    <div class="machine-body">
+      <div class="machine-top-bar">
+        <div class="light-row">
+          <span class="light" id="l1"></span>
+          <span class="light" id="l2"></span>
+          <span class="light" id="l3"></span>
+          <span class="light" id="l4"></span>
+          <span class="light" id="l5"></span>
+          <span class="light" id="l6"></span>
+          <span class="light" id="l7"></span>
+          <span class="light" id="l8"></span>
+        </div>
+      </div>
+
+      <!-- Win line indicator -->
+      <div class="win-line-indicator" id="winLineIndicator">
+        <span>▶ &nbsp; WIN LINE &nbsp; ◀</span>
+      </div>
+
+      <!-- Reels container -->
+      <div class="reels-container">
+        <div class="win-line"></div>
+        <div class="reel-wrapper" id="reelWrapper0">
+          <div class="reel" id="reel0"></div>
+        </div>
+        <div class="reel-divider"></div>
+        <div class="reel-wrapper" id="reelWrapper1">
+          <div class="reel" id="reel1"></div>
+        </div>
+        <div class="reel-divider"></div>
+        <div class="reel-wrapper" id="reelWrapper2">
+          <div class="reel" id="reel2"></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <button class="spin-btn" id="spinBtn">
+          <span class="spin-label">SPIN</span>
+          <span class="spin-cost" id="spinCost">−5 tokens</span>
+        </button>
+        <button class="max-bet-btn" id="maxBetBtn">MAX BET</button>
+      </div>
+    </div>
+
+    <!-- Message board -->
+    <div class="message-board" id="messageBoard">
+      <div class="message-text" id="messageText">Insert tokens. Pull lever. Watch AI hallucinate a jackpot.</div>
+    </div>
+
+    <!-- Paytable -->
+    <div class="paytable">
+      <div class="paytable-title">— PAYTABLE —</div>
+      <div class="paytable-grid" id="paytable"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat"><span class="stat-label">Spins</span><span class="stat-val" id="statSpins">0</span></div>
+      <div class="stat"><span class="stat-label">Tokens Won</span><span class="stat-val" id="statWon">0</span></div>
+      <div class="stat"><span class="stat-label">Tokens Lost</span><span class="stat-val" id="statLost">0</span></div>
+      <div class="stat"><span class="stat-label">Biggest Win</span><span class="stat-val" id="statBig">0</span></div>
+    </div>
+
+    <button class="refill-btn" id="refillBtn" style="display:none">
+      🆘 Out of tokens — Beg the AI for more (free refill)
+    </button>
+  </div>
+
+  <!-- Win animation overlay -->
+  <div class="win-overlay" id="winOverlay">
+    <div class="win-overlay-text" id="winOverlayText"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
