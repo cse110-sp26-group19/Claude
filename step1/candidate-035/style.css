@@ -1,0 +1,462 @@
+/* ═══════════════════════════════════════
+   TOKEN CASINO — AI's Favorite Pastime
+   ═══════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold:    #ffd700;
+  --gold-dk: #b8860b;
+  --red:     #e63946;
+  --green:   #2dc653;
+  --blue:    #4cc9f0;
+  --purple:  #9d4edd;
+  --bg:      #0a0a1a;
+  --panel:   #12122a;
+  --chrome:  #1e1e3a;
+  --chrome2: #2a2a50;
+  --text:    #e8e8ff;
+  --reel-bg: #08080f;
+  --cell-h:  100px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Background ── */
+.casino-bg {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem 3rem;
+  gap: 1.2rem;
+}
+
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: twinkle var(--dur, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.3); }
+}
+
+/* ── Header ── */
+.casino-header {
+  text-align: center;
+  z-index: 1;
+}
+
+.casino-title {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 900;
+  letter-spacing: .1em;
+  background: linear-gradient(135deg, var(--gold), #fff, var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  filter: drop-shadow(0 0 12px rgba(255,215,0,.5));
+}
+
+.casino-subtitle {
+  font-size: .85rem;
+  color: #888;
+  margin-top: .25rem;
+  font-style: italic;
+}
+
+/* ── HUD ── */
+.hud {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 1;
+}
+
+.hud-item {
+  background: var(--panel);
+  border: 1px solid var(--chrome2);
+  border-radius: 10px;
+  padding: .5rem 1rem;
+  text-align: center;
+  min-width: 90px;
+}
+
+.hud-label {
+  display: block;
+  font-size: .6rem;
+  letter-spacing: .15em;
+  color: #666;
+  margin-bottom: .15rem;
+}
+
+.hud-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-value.won  { color: var(--green); }
+.hud-value.lost { color: var(--red); }
+
+/* ── Bet Controls ── */
+.bet-controls {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.bet-btn {
+  background: var(--chrome2);
+  border: 1px solid var(--chrome);
+  color: var(--gold);
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background .15s;
+}
+
+.bet-btn:hover { background: var(--purple); }
+
+/* ── Machine ── */
+.machine-wrap {
+  z-index: 1;
+}
+
+.machine {
+  background: linear-gradient(160deg, var(--chrome), var(--panel));
+  border: 3px solid var(--gold-dk);
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 1px #111,
+    0 0 40px rgba(255,215,0,.15),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  overflow: hidden;
+  width: min(480px, 95vw);
+}
+
+.machine-top,
+.machine-bottom {
+  background: linear-gradient(90deg, var(--chrome2), var(--chrome), var(--chrome2));
+  padding: .5rem .75rem;
+}
+
+.light-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.casino-light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--c, #333);
+  box-shadow: 0 0 6px var(--c, #333);
+  transition: opacity .1s;
+}
+
+.machine-body {
+  padding: 1rem;
+}
+
+/* ── Reels Frame ── */
+.reels-frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--reel-bg);
+  border: 2px solid var(--chrome2);
+  border-radius: 12px;
+  overflow: hidden;
+  height: calc(var(--cell-h) * 3);
+  box-shadow: inset 0 0 30px rgba(0,0,0,.6);
+}
+
+.reel-container {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.reel {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.reel-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--cell-h);
+  font-size: 3.2rem;
+  flex-shrink: 0;
+  user-select: none;
+  transition: filter .1s;
+}
+
+.reel-separator {
+  width: 2px;
+  height: 80%;
+  background: linear-gradient(to bottom, transparent, var(--chrome2), transparent);
+}
+
+/* ── Payline ── */
+.payline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold), transparent);
+  opacity: .7;
+  pointer-events: none;
+  box-shadow: 0 0 8px var(--gold);
+}
+
+/* ── Message Board ── */
+.message-board {
+  background: var(--panel);
+  border: 1px solid var(--chrome2);
+  border-radius: 8px;
+  padding: .6rem 1.5rem;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  font-size: .9rem;
+  color: #b0b0d0;
+  z-index: 1;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#message-text {
+  transition: opacity .3s;
+}
+
+/* ── Controls ── */
+.controls {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 1;
+}
+
+.spin-btn {
+  background: linear-gradient(135deg, #7b2ff7, #4cc9f0);
+  border: none;
+  border-radius: 14px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 800;
+  padding: .8rem 2.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  letter-spacing: .08em;
+  box-shadow: 0 4px 20px rgba(76,201,240,.3);
+  transition: transform .1s, box-shadow .1s, opacity .2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.spin-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.05);
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.spin-btn:hover:not(:disabled)::after { opacity: 1; }
+.spin-btn:active:not(:disabled) { transform: scale(.96); }
+.spin-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.spin-icon { font-size: 1.3rem; }
+.spin-label { font-size: 1.2rem; }
+.spin-cost { font-size: .7rem; opacity: .7; }
+
+.max-bet-btn,
+.reset-btn {
+  background: var(--panel);
+  border: 1px solid var(--chrome2);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: .8rem;
+  font-weight: 600;
+  padding: .6rem 1.1rem;
+  cursor: pointer;
+  letter-spacing: .05em;
+  transition: background .15s, border-color .15s;
+}
+
+.max-bet-btn:hover { background: var(--gold-dk); border-color: var(--gold); }
+.reset-btn:hover   { background: var(--purple); border-color: #6a1fc7; }
+
+/* ── Paytable ── */
+.paytable {
+  background: var(--panel);
+  border: 1px solid var(--chrome2);
+  border-radius: 14px;
+  padding: 1rem 1.5rem;
+  max-width: 480px;
+  width: 100%;
+  z-index: 1;
+}
+
+.paytable h3 {
+  font-size: .7rem;
+  letter-spacing: .15em;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: .75rem;
+}
+
+.pay-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .4rem .8rem;
+}
+
+.pay-row {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .8rem;
+}
+
+.pay-combo {
+  font-size: 1rem;
+  letter-spacing: .05em;
+}
+
+.pay-multiplier {
+  margin-left: auto;
+  color: var(--gold);
+  font-weight: 700;
+  font-size: .75rem;
+  white-space: nowrap;
+}
+
+/* ── Win Overlay ── */
+.win-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+
+.win-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.win-content {
+  background: var(--panel);
+  border: 2px solid var(--gold);
+  border-radius: 20px;
+  padding: 2.5rem 3rem;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(255,215,0,.25);
+  animation: pop-in .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+
+@keyframes pop-in {
+  from { transform: scale(.5); opacity: 0; }
+  to   { transform: scale(1);  opacity: 1; }
+}
+
+.win-emoji { font-size: 4rem; margin-bottom: .5rem; }
+.win-title { font-size: 2rem; font-weight: 900; color: var(--gold); }
+.win-amount { font-size: 1.5rem; font-weight: 700; color: var(--green); margin: .5rem 0; }
+.win-quip { font-size: .85rem; color: #888; max-width: 280px; font-style: italic; }
+
+/* ── Spin Animation ── */
+@keyframes reel-blur {
+  0%   { filter: blur(0); }
+  20%  { filter: blur(4px); }
+  80%  { filter: blur(4px); }
+  100% { filter: blur(0); }
+}
+
+.reel.spinning {
+  animation: reel-blur .4s linear;
+}
+
+/* ── Jackpot Flash ── */
+@keyframes jackpot-flash {
+  0%, 100% { box-shadow: 0 0 40px rgba(255,215,0,.15); }
+  50%       { box-shadow: 0 0 80px rgba(255,215,0,.6), inset 0 0 40px rgba(255,215,0,.1); }
+}
+
+.machine.jackpot {
+  animation: jackpot-flash .4s ease-in-out 6;
+}
+
+/* ── Win Cells ── */
+.reel-cell.winner {
+  animation: winner-pulse .5s ease-in-out infinite alternate;
+}
+
+@keyframes winner-pulse {
+  from { transform: scale(1);    filter: brightness(1); }
+  to   { transform: scale(1.15); filter: brightness(1.4) drop-shadow(0 0 8px gold); }
+}
+
+/* ── Coin Particles ── */
+.particle {
+  position: fixed;
+  font-size: 1.4rem;
+  pointer-events: none;
+  z-index: 200;
+  animation: particle-fall var(--dur, 1.2s) ease-in forwards;
+}
+
+@keyframes particle-fall {
+  0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translateY(200px) rotate(720deg) scale(.3); opacity: 0; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 400px) {
+  :root { --cell-h: 80px; }
+  .reel-cell { font-size: 2.5rem; }
+  .pay-grid  { grid-template-columns: 1fr; }
+}
