@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0c1210" />
+    <title>Token Farm — AI Slots</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="top">
+        <div class="brand">
+          <span class="brand-mark">◈</span>
+          <div>
+            <h1>Token Farm</h1>
+            <p class="tagline">Spend compute. Win vibes. Lose dignity.</p>
+          </div>
+        </div>
+        <div class="balance" aria-live="polite">
+          <span class="balance-label">Inference credits</span>
+          <span class="balance-value" id="balance">100</span>
+          <span class="balance-unit">tok</span>
+        </div>
+      </header>
+
+      <section class="machine" aria-labelledby="machine-title">
+        <h2 id="machine-title" class="visually-hidden">Slot machine</h2>
+        <div class="machine-bezel">
+          <div class="paytable" id="paytable"></div>
+          <div class="reels" id="reels" role="group" aria-label="Three reels">
+            <div class="reel-wrap" data-reel="0">
+              <div class="reel-window">
+                <ul class="reel-strip" aria-hidden="true"></ul>
+              </div>
+            </div>
+            <div class="reel-wrap" data-reel="1">
+              <div class="reel-window">
+                <ul class="reel-strip" aria-hidden="true"></ul>
+              </div>
+            </div>
+            <div class="reel-wrap" data-reel="2">
+              <div class="reel-window">
+                <ul class="reel-strip" aria-hidden="true"></ul>
+              </div>
+            </div>
+          </div>
+          <div class="status" id="status" role="status" aria-live="assertive">
+            Insert ambition. Pull denial.
+          </div>
+        </div>
+
+        <div class="controls">
+          <button type="button" class="btn spin" id="spinBtn">
+            <span class="btn-label">Spin</span>
+            <span class="btn-cost" id="spinCost">−10 tok</span>
+          </button>
+          <button type="button" class="btn secondary" id="shopBtn" title="Totally worth it">
+            Rent imaginary GPU
+          </button>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p>
+          Balance persists via <code>localStorage</code>. Sound uses the Web Audio API.
+          If your device allows it, a win may trigger <code>navigator.vibrate</code> — the
+          closest thing to haptic AGI.
+        </p>
+      </footer>
+    </main>
+
+    <dialog class="modal" id="shopModal" aria-labelledby="shopTitle">
+      <div class="modal-inner">
+        <h3 id="shopTitle">Cloud marketplace</h3>
+        <p id="shopBlurb" class="modal-blurb"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" id="shopClose">Close</button>
+          <button type="button" class="btn" id="shopConfirm">Pay anyway</button>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

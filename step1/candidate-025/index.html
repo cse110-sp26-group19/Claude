@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Token Farm — Premium Inference Entertainment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand-mark">◈</span>
+        <div>
+          <h1>Token Farm™</h1>
+          <p class="tagline">You wouldn’t download a gradient descent</p>
+        </div>
+      </div>
+      <div class="wallet" role="status" aria-live="polite">
+        <span class="wallet-label">Inference credits</span>
+        <span class="wallet-value" id="balance">0</span>
+        <span class="wallet-unit">tok</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="machine" aria-labelledby="machine-title">
+        <h2 id="machine-title" class="visually-hidden">Slot machine</h2>
+        <div class="machine-frame">
+          <div class="machine-header">
+            <span class="blink">●</span> LIVE TRAINING (NOT REALLY)
+          </div>
+          <div class="reels" id="reels">
+            <div class="reel" data-reel="0" aria-hidden="true">
+              <div class="reel-strip" data-strip></div>
+            </div>
+            <div class="reel" data-reel="1" aria-hidden="true">
+              <div class="reel-strip" data-strip></div>
+            </div>
+            <div class="reel" data-reel="2" aria-hidden="true">
+              <div class="reel-strip" data-strip></div>
+            </div>
+          </div>
+          <div class="payline" aria-hidden="true"></div>
+          <p class="result" id="result" role="status" aria-live="assertive">
+            Insert ambition. Receive numerics.
+          </p>
+          <div class="controls">
+            <button type="button" class="btn spin" id="spinBtn">
+              Spin (−<span id="spinCost">25</span> tok)
+            </button>
+            <p class="fine-print">
+              Each spin burns tokens like a VC deck burns attention. Odds are
+              “industry standard.”
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <section class="panel">
+          <h3>Spend tokens (value™)</h3>
+          <ul class="shop" id="shop"></ul>
+        </section>
+        <section class="panel payout">
+          <h3>Payout table</h3>
+          <dl class="payout-list" id="payoutTable"></dl>
+        </section>
+        <section class="panel quotes" aria-label="Motivational">
+          <blockquote id="quote"></blockquote>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Not financial advice. Not medical advice. Not even good advice. Tokens
+        are fake; your coping mechanism is real.
+      </p>
+    </footer>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

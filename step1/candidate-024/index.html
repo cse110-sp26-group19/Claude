@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Token Farm — AI Slots</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand-mark">◈</span>
+        <h1>Token Farm</h1>
+        <p class="tagline">Where intelligence is optional but billing isn’t</p>
+      </div>
+      <div class="balance-panel" role="status" aria-live="polite">
+        <span class="balance-label">Inference wallet</span>
+        <span id="balance" class="balance-value">0</span>
+        <span class="balance-unit">tok</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="machine" aria-labelledby="machine-title">
+        <h2 id="machine-title" class="visually-hidden">Slot machine</h2>
+        <div class="machine-header">
+          <span class="neon-badge">GPU WARMING</span>
+          <p class="machine-sub">Spin costs <strong id="spin-cost-display">25</strong> tokens · outcomes may hallucinate</p>
+        </div>
+
+        <div class="reel-window" role="group" aria-label="Three reels">
+          <div class="reel-col">
+            <div id="reel-0" class="reel-strip" data-reel="0"></div>
+          </div>
+          <div class="reel-col">
+            <div id="reel-1" class="reel-strip" data-reel="1"></div>
+          </div>
+          <div class="reel-col">
+            <div id="reel-2" class="reel-strip" data-reel="2"></div>
+          </div>
+          <div class="payline" aria-hidden="true"></div>
+        </div>
+
+        <div class="controls">
+          <button type="button" id="spin-btn" class="btn-spin">
+            <span class="btn-spin-inner">Pull the prompt</span>
+          </button>
+          <p id="result-msg" class="result-msg" role="status" aria-live="assertive"></p>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <section class="card paytable">
+          <h3>Payouts (if reality cooperates)</h3>
+          <ul id="paytable-list" class="paytable-list"></ul>
+        </section>
+
+        <section class="card shop">
+          <h3>Spend tokens (totally worth it)</h3>
+          <ul class="shop-list" id="shop-list"></ul>
+          <p class="shop-footnote">Purchases are stored locally. Like your model weights: nobody’s auditing this.</p>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Not financial advice. Not coding advice. Not even good advice.
+        <span class="footer-kicker">Powered by vibes + <code>localStorage</code></span>
+      </p>
+    </footer>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

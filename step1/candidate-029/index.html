@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Context Casino — Token Slots</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand-mark">◈</span>
+        <div>
+          <h1>Context Casino</h1>
+          <p class="tagline">Spin responsibly. Hallucinations are features.</p>
+        </div>
+      </div>
+      <div class="wallet" aria-live="polite">
+        <span class="wallet-label">Context tokens</span>
+        <span class="wallet-value" id="tokenBalance">0</span>
+      </div>
+    </header>
+
+    <main class="stage">
+      <section class="machine" aria-labelledby="machine-title">
+        <h2 id="machine-title" class="visually-hidden">Slot machine</h2>
+        <div class="machine-header">
+          <span class="badge">Fine-tuned on vibes</span>
+          <span class="sub-badge">RNG certified by nobody</span>
+        </div>
+
+        <div class="reel-window" role="group" aria-label="Three reels">
+          <div class="reels" id="reels">
+            <!-- Reels injected by JS -->
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="cost-row">
+            <span>Spin cost</span>
+            <strong id="spinCost">10</strong>
+            <span class="muted">tokens</span>
+          </div>
+          <button type="button" class="spin-btn" id="spinBtn">
+            <span class="spin-label">Burn compute</span>
+            <span class="spin-sub">(spin)</span>
+          </button>
+          <p class="fine-print" id="statusMsg">Welcome. Your context window thanks you.</p>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <section class="panel">
+          <h3>Last spin</h3>
+          <p class="result-line" id="resultLine">—</p>
+        </section>
+        <section class="panel">
+          <h3>Payout table</h3>
+          <ul class="payout-list" id="payoutList"></ul>
+        </section>
+        <section class="panel stats">
+          <h3>Session</h3>
+          <dl>
+            <div>
+              <dt>Spins</dt>
+              <dd id="statSpins">0</dd>
+            </div>
+            <div>
+              <dt>Net tokens</dt>
+              <dd id="statNet">0</dd>
+            </div>
+          </dl>
+          <button type="button" class="ghost-btn" id="resetBtn">Reset bank (local)</button>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Uses <code>localStorage</code> to remember your questionable choices.
+        <span class="sep">·</span>
+        If your device supports it, wins may buzz briefly (<code>navigator.vibrate</code>).
+      </p>
+    </footer>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

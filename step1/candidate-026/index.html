@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Token Farm — The Slot Machine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="crt-overlay" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+
+    <header class="top-bar">
+      <div class="brand">
+        <span class="brand-mark">◈</span>
+        <div>
+          <h1>Token Farm</h1>
+          <p class="tagline">Spend compute. Win vibes. Definitely not gambling.</p>
+        </div>
+      </div>
+      <div class="balance-pill" aria-live="polite">
+        <span class="label">Tokens</span>
+        <span class="value" id="balance">0</span>
+      </div>
+    </header>
+
+    <main class="stage">
+      <section class="machine" aria-labelledby="machine-title">
+        <h2 id="machine-title" class="sr-only">Slot machine reels</h2>
+
+        <div class="marquee" id="marquee" role="status" aria-live="assertive">
+          Insert optimism and pull the lever of destiny.
+        </div>
+
+        <div class="reel-window">
+          <div class="reel-col" data-reel="0">
+            <div class="strip" data-strip></div>
+          </div>
+          <div class="reel-col" data-reel="1">
+            <div class="strip" data-strip></div>
+          </div>
+          <div class="reel-col" data-reel="2">
+            <div class="strip" data-strip></div>
+          </div>
+          <div class="payline" aria-hidden="true"></div>
+        </div>
+
+        <div class="controls">
+          <div class="cost">
+            <span>Cost / spin</span>
+            <strong id="spin-cost">10</strong>
+            <span class="unit">tokens</span>
+          </div>
+          <button type="button" class="spin-btn" id="spin-btn">
+            <span class="spin-label">Train Weights</span>
+            <span class="spin-sub">(spin)</span>
+          </button>
+        </div>
+      </section>
+
+      <aside class="side-panel">
+        <section class="card hype-shop">
+          <h3>Hype Shop</h3>
+          <p class="card-desc">Burn tokens on intangible value. Peak AI.</p>
+          <ul class="shop-list" id="shop-list"></ul>
+        </section>
+
+        <section class="card ledger">
+          <h3>Ledger</h3>
+          <ul class="log" id="event-log" aria-live="polite"></ul>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Uses your browser only:
+        <code>localStorage</code> for your token balance,
+        <code>Web Audio</code> for beeps,
+        <code>navigator.vibrate</code> when available.
+      </p>
+    </footer>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

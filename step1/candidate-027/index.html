@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Token Bandit — AI Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,500&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+    <main class="app">
+      <header class="hero">
+        <p class="kicker">Vanilla JS · zero frameworks · maximum cope</p>
+        <h1>Token Bandit</h1>
+        <p class="tagline">
+          Spin the reels. Win imaginary tokens. Spend real attention. It’s just like
+          using an LLM, but with worse odds and better lighting.
+        </p>
+      </header>
+
+      <section class="hud" aria-live="polite">
+        <div class="stat">
+          <span class="stat-label">Context balance</span>
+          <span class="stat-value" id="balance">500</span>
+          <span class="stat-unit">tok</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Spin cost</span>
+          <span class="stat-value" id="cost">25</span>
+          <span class="stat-unit">tok</span>
+        </div>
+        <div class="stat stat--wide">
+          <span class="stat-label">Last outcome</span>
+          <span class="stat-msg" id="message">Insert ambition and click Spin.</span>
+        </div>
+      </section>
+
+      <section class="machine" aria-label="Slot machine">
+        <div class="machine-top">
+          <span class="bulb" aria-hidden="true"></span>
+          <span class="bulb" aria-hidden="true"></span>
+          <span class="bulb" aria-hidden="true"></span>
+        </div>
+        <div class="machine-body">
+          <div class="reel-col">
+            <span class="reel-label">Reel A</span>
+            <div class="reel-window" id="reel-window-0"></div>
+          </div>
+          <div class="reel-col">
+            <span class="reel-label">Reel B</span>
+            <div class="reel-window" id="reel-window-1"></div>
+          </div>
+          <div class="reel-col">
+            <span class="reel-label">Reel C</span>
+            <div class="reel-window" id="reel-window-2"></div>
+          </div>
+        </div>
+        <div class="machine-actions">
+          <button type="button" class="btn btn--spin" id="spinBtn">
+            Spin (−<span id="spinCostBtn">25</span> tok)
+          </button>
+          <button type="button" class="btn btn--ghost" id="buyBtn" title="Completely fair, we promise">
+            Mint more tokens (free)
+          </button>
+        </div>
+      </section>
+
+      <section class="paytable" aria-labelledby="paytitle">
+        <h2 id="paytitle">Paytable &amp; disclaimers</h2>
+        <ul class="pay-list">
+          <li><strong>TOK · TOK · TOK</strong> — Full alignment. +120 tok. (Still wrong on dates.)</li>
+          <li><strong>GPT · GPT · GPT</strong> — Brand loyalty. +90 tok. Your vendor thanks you.</li>
+          <li><strong>??? · ??? · ???</strong> — Hallucination jackpot. +400 tok. “Citations available upon request.”</li>
+          <li><strong>Any two matching</strong> — Partial reward. +18 tok. Like a confident wrong answer.</li>
+          <li><strong>No match</strong> — Training loss. You paid for compute emotionally.</li>
+        </ul>
+        <p class="fineprint">
+          Not financial advice. Not medical advice. Not even coding advice. Tokens are stored in
+          <code>localStorage</code> and your heart.
+        </p>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
