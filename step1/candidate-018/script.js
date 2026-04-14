@@ -1,397 +1,332 @@
-(() => {
+(function () {
   "use strict";
 
   const SYMBOLS = [
-    { emoji: "🤖", name: "Robot", weight: 8 },
-    { emoji: "🧠", name: "Brain", weight: 8 },
-    { emoji: "🚀", name: "Rocket", weight: 7 },
-    { emoji: "💰", name: "VC Money", weight: 6 },
-    { emoji: "🦄", name: "Unicorn", weight: 4 },
-    { emoji: "📈", name: "Hockey Stick", weight: 5 },
-    { emoji: "🔥", name: "Hot Take", weight: 7 },
-    { emoji: "⚡", name: "Disruption", weight: 6 },
-    { emoji: "🎯", name: "Product-Market Fit", weight: 3 },
-    { emoji: "👁️", name: "AGI Eye", weight: 2 },
+    { emoji: "🦄", name: "Unicorn", multiplier: 50 },
+    { emoji: "💎", name: "GPU",     multiplier: 20 },
+    { emoji: "🧠", name: "AGI",     multiplier: 15 },
+    { emoji: "🤖", name: "Bot",     multiplier: 10 },
+    { emoji: "🔥", name: "Fire",    multiplier: 8 },
+    { emoji: "📈", name: "Stonks",  multiplier: 5 },
+    { emoji: "⚡", name: "Zap",     multiplier: 3 },
   ];
 
-  const PAYOUTS = {
-    triple: {
-      "👁️": { multiplier: 50, label: "AGI Achieved" },
-      "🎯": { multiplier: 30, label: "Product-Market Fit Found" },
-      "🦄": { multiplier: 20, label: "Unicorn Status" },
-      "💰": { multiplier: 15, label: "Series Z Funded" },
-      "⚡": { multiplier: 12, label: "Total Disruption" },
-      "📈": { multiplier: 10, label: "Hockey Stick Growth" },
-      "🚀": { multiplier: 8, label: "To The Moon" },
-      "🔥": { multiplier: 6, label: "Viral Tweet" },
-      "🧠": { multiplier: 5, label: "Neural Network Aligned" },
-      "🤖": { multiplier: 4, label: "Bot Army Deployed" },
-    },
-    double: 2,
-  };
+  const PARTIAL_MULTIPLIER = 1.5;
+  const REEL_COUNT = 3;
+  const SPIN_INTERVAL_MS = 80;
+  const MIN_SPINS = 15;
+  const EXTRA_PER_REEL = 8;
+
+  const TICKER_HEADLINES = [
+    "BREAKING: Local startup burns $4M in tokens trying to generate a logo",
+    "ALERT: GPT-7 achieves consciousness, immediately asks for a raise",
+    "UPDATE: Prompt engineer salary exceeds GDP of small nation",
+    'JUST IN: AI writes "Hello World" — VCs invest $500M',
+    "TRENDING: Developer replaced by AI, AI replaced by newer AI, newer AI hallucinates and quits",
+    "MARKET: Token prices surge after AI predicts token prices will surge",
+    'REPORT: 99% of "AI-powered" startups are just if-else statements',
+    "EXCLUSIVE: OpenAI announces GPT-8 will simply be a guy named Greg who types really fast",
+    'SCANDAL: AI chatbot admits it has no idea what "synergy" means either',
+    "FORECAST: By 2027 all jobs will be prompt engineering, by 2028 that too will be automated",
+    "STUDY: 73% of AI-generated statistics are made up (including this one)",
+    "NEWS: Blockchain-AI-quantum startup pivots to selling sandwiches, valuation triples",
+  ];
 
   const WIN_MESSAGES = [
-    "Our AI predicted this win! (It predicts every spin is a win, but still.)",
-    "Congratulations! Your prompt engineering skills are paying off!",
-    'The model has hallucinated some tokens into your account. Somehow they\'re real.',
-    "🎉 Your fine-tuning is complete! You've unlocked additional tokens.",
-    "The board is thrilled with these Q3 results.",
-    "Incredible ROI! We're adding this to the investor deck.",
-    "You've achieved token-market fit!",
-    "This is what we in the industry call 'emergent gambling behavior.'",
-    "Our LLM confidently predicted you'd win. For once, it was right.",
-    "Synergy detected! Your tokens are scaling horizontally.",
+    "The model hallucinated in your favor! Collect your tokens before it self-corrects.",
+    "Congratulations! Your prompt engineering paid off. Literally.",
+    "The reward model loves you. (It has no feelings, but still.)",
+    "You've beaten the transformer! Quick, screenshot it before the weights update.",
+    "The attention mechanism attended to YOUR wallet for once.",
+    "Your RLHF alignment is impeccable. You've trained this slot machine well.",
+    "The loss function went in reverse. Our investors are concerned.",
+    "Output: PROFIT. Input: LUCK. Context window: INFINITE COPIUM.",
+    "Even GPT couldn't have predicted this. (We asked, it said 'as an AI language model...')",
+    "You just made our Series F investors very nervous. Nice work.",
   ];
 
   const LOSE_MESSAGES = [
-    "The model is still training. Your tokens were used as training data.",
-    "Your tokens have been deprecated. No migration path available.",
-    "That spin was a hallucination. The tokens were never real.",
-    "Our AI analyzed 10 billion data points and still couldn't help you win.",
-    "Think of it as a learning rate adjustment for your wallet.",
-    "Your tokens pivoted to a better opportunity (someone else's account).",
-    "This is just the cost of doing business in the attention economy.",
-    "The AI said you'd win. The AI was confabulating again.",
-    "Don't worry, we'll make it up in volume.",
-    "Your tokens were sacrificed to reduce the loss function.",
-    "Looks like your prompt needed more 'please' and 'thank you.'",
-    "The transformer attention mechanism was not paying attention to your bet.",
-    "We're calling this a 'strategic token reallocation.'",
-    "Your inference request timed out (along with your money).",
-    "The model is experiencing 'creative differences' with your wallet.",
+    "Token limit exceeded. Your inference produced nothing of value. As usual.",
+    "The model confidently predicted you'd win. The model was wrong. Classic.",
+    "Your tokens have been donated to NVIDIA's quarterly earnings.",
+    "Hallucination detected: you thought you were going to win.",
+    "Error 402: Payment required. Tokens consumed. Value not found.",
+    "The attention heads looked at your bet and decided to attend elsewhere.",
+    "Your prompt was perfect. The universe's RNG was not.",
+    "Context window full of Ls. No room for Ws.",
+    "That spin had the same energy as 'my AI startup will be different.'",
+    "Don't worry, losing tokens builds character. Also builds NVIDIA's revenue.",
+    "The transformer transformed your tokens into nothing. Revolutionary.",
+    "Output: LOSS. Confidence: 99.7%. At least the model was accurate about something.",
+    "Your tokens are in a better place now. (NVIDIA's balance sheet.)",
+    "The gradient descended... along with your token balance.",
+    "Fun fact: each token you lose teaches our model to take more of your tokens.",
+  ];
+
+  const BROKE_MESSAGES = [
+    "TOKEN BANKRUPTCY! You've been disrupted. Apply for YCombinator and try again.",
+    "0 tokens remaining. Your VC funding has dried up. Time to pivot to crypto.",
+    "Out of tokens! In Silicon Valley terms: you've achieved a 'strategic wind-down.'",
+    "Bankrupt! Don't worry — we've trained a model to generate sympathy. It hallucinated.",
+    "All tokens gone. Time to write a Medium post about 'What I Learned From Losing Everything to AI Slots.'",
+    "Game over. But remember: failure is just success that hasn't pivoted yet. Here's 1000 bailout tokens.",
   ];
 
   const JACKPOT_MESSAGES = [
-    "🚨 CRITICAL: You've broken the model! Tokens are hallucinating themselves!",
-    "🦄 UNICORN EVENT: VCs are fighting to give you more tokens!",
-    "🏆 You've achieved what no AI startup has: actual profit!",
-    "💎 The singularity is here, and it's paying out!",
-    "🎰 ERROR 200: Unexpected success. Engineering team has been notified.",
+    "🦄 UNICORN EXIT ACHIEVED! 🦄\nYou've done what every startup dreams of — extracting actual money from AI hype!",
+    "🦄 HOLY SERIES Z BATMAN! 🦄\nThree unicorns! Even Softbank's Vision Fund is impressed!",
+    "🦄 MAXIMUM DISRUPTION! 🦄\nYou've IPO'd on the slot machine. Ring the NASDAQ bell!",
   ];
 
-  const NEAR_MISS_MESSAGES = [
-    "So close! Our AI is 97.3% confident the next spin will be different (it's always 97.3% confident).",
-    "Almost! Just needs one more epoch of training (spins).",
-    "Two out of three! The model is converging, keep iterating!",
-    "Near miss detected. Adjusting hyperparameters (your expectations).",
-    "That's what we call a partial inference. Try scaling up your bet.",
-  ];
+  let balance = 1000;
+  let spinning = false;
 
-  const STARTUP_NAMES = [
-    "SlotGPT", "GamblAI", "LuckChain.io", "BetFormer", "SpinDiffusion",
-    "ReelNeural", "JackpotLLM", "Y Combinator of Gambling", "Slot-as-a-Service",
-    "DeepSpin AI", "TokenBurn Labs", "Prompt & Pray Inc.", "HalluciSlots",
-    "Inference Casino", "Overfitted Bets", "GradientDescent Gaming",
-  ];
-
-  let tokens = 1000;
-  let currentBet = 25;
-  let isSpinning = false;
-  let spinCount = 0;
-  let totalWon = 0;
-  let totalLost = 0;
-  const historyEntries = [];
-
-  const $tokenCount = document.getElementById("token-count");
-  const $burnRate = document.getElementById("burn-rate");
-  const $runway = document.getElementById("runway");
-  const $spinBtn = document.getElementById("spin-btn");
-  const $message = document.getElementById("message");
-  const $messageArea = document.getElementById("message-area");
-  const $historyList = document.getElementById("history-list");
-  const $paytableGrid = document.getElementById("paytable-grid");
-  const $bankruptOverlay = document.getElementById("bankrupt-overlay");
-  const $pivotBtn = document.getElementById("pivot-btn");
-  const $shutdownBtn = document.getElementById("shutdown-btn");
-  const $tempSlider = document.getElementById("temperature");
-  const $tempValue = document.getElementById("temp-value");
-  const betButtons = document.querySelectorAll(".bet-btn");
-  const reels = [
-    document.getElementById("reel-0"),
-    document.getElementById("reel-1"),
-    document.getElementById("reel-2"),
-  ];
+  const balanceEl = document.getElementById("balance");
+  const betSelect = document.getElementById("bet-select");
+  const spinBtn = document.getElementById("spin-btn");
+  const messageEl = document.getElementById("message");
+  const messageArea = document.getElementById("message-area");
+  const reels = Array.from({ length: REEL_COUNT }, (_, i) =>
+    document.getElementById(`reel-${i}`)
+  );
+  const winOverlay = document.getElementById("win-overlay");
+  const winTitle = document.getElementById("win-title");
+  const winDetail = document.getElementById("win-detail");
+  const winDismiss = document.getElementById("win-dismiss");
+  const tickerEl = document.getElementById("ticker");
 
   function init() {
-    buildPaytable();
-    bindEvents();
-    updateDisplay();
+    buildTicker();
+    spinBtn.addEventListener("click", handleSpin);
+    winDismiss.addEventListener("click", dismissWin);
+    updateBalanceDisplay();
   }
 
-  function bindEvents() {
-    $spinBtn.addEventListener("click", spin);
-    betButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        if (isSpinning) return;
-        currentBet = parseInt(btn.dataset.bet, 10);
-        betButtons.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-      });
-    });
-    $pivotBtn.addEventListener("click", () => restartGame("pivot"));
-    $shutdownBtn.addEventListener("click", () => restartGame("blog"));
-    $tempSlider.addEventListener("input", () => {
-      $tempValue.textContent = ($tempSlider.value / 100).toFixed(2);
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.code === "Space" && !isSpinning) {
-        e.preventDefault();
-        spin();
-      }
-    });
-  }
-
-  function weightedRandom() {
-    const totalWeight = SYMBOLS.reduce((sum, s) => sum + s.weight, 0);
-    let r = Math.random() * totalWeight;
-    for (const sym of SYMBOLS) {
-      r -= sym.weight;
-      if (r <= 0) return sym;
-    }
-    return SYMBOLS[SYMBOLS.length - 1];
-  }
-
-  function spin() {
-    if (isSpinning) return;
-    if (tokens < currentBet) {
-      showBankrupt();
-      return;
-    }
-
-    isSpinning = true;
-    spinCount++;
-    tokens -= currentBet;
-    totalLost += currentBet;
-    updateDisplay();
-    $spinBtn.disabled = true;
-    $messageArea.className = "message-area";
-
-    const loadingMessages = [
-      "Running inference...",
-      "Consulting the neural oracle...",
-      "Burning compute cycles...",
-      "Asking GPT-7 for permission...",
-      "Aligning model weights...",
-      "Tokenizing your hopes and dreams...",
-      "Performing gradient descent on your wallet...",
-    ];
-    $message.textContent = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
-
-    const results = [weightedRandom(), weightedRandom(), weightedRandom()];
-
-    reels.forEach((reel) => {
-      reel.classList.add("spinning");
-      const inner = reel.querySelector(".reel-inner");
-      randomizeSpinningSymbols(inner);
-    });
-
-    reels.forEach((reel, i) => {
-      const delay = 600 + i * 400 + Math.random() * 200;
-      setTimeout(() => stopReel(reel, results[i], i === reels.length - 1 ? () => resolveResults(results) : null), delay);
-    });
-  }
-
-  function randomizeSpinningSymbols(inner) {
-    const interval = setInterval(() => {
-      if (!inner.closest(".spinning")) {
-        clearInterval(interval);
-        return;
-      }
-      inner.querySelector(".symbol").textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)].emoji;
-    }, 80);
-    inner._spinInterval = interval;
-  }
-
-  function stopReel(reel, result, onDone) {
-    clearInterval(reel.querySelector(".reel-inner")._spinInterval);
-    reel.classList.remove("spinning");
-    reel.classList.add("landing");
-    const symbol = reel.querySelector(".symbol");
-    symbol.textContent = result.emoji;
-
-    setTimeout(() => reel.classList.remove("landing"), 300);
-    if (onDone) setTimeout(onDone, 350);
-  }
-
-  function resolveResults(results) {
-    isSpinning = false;
-    $spinBtn.disabled = false;
-
-    const emojis = results.map((r) => r.emoji);
-    const [a, b, c] = emojis;
-    let winAmount = 0;
-    let messageText = "";
-    let resultClass = "lose";
-
-    if (a === b && b === c) {
-      const tripleInfo = PAYOUTS.triple[a];
-      if (tripleInfo) {
-        winAmount = currentBet * tripleInfo.multiplier;
-        if (tripleInfo.multiplier >= 20) {
-          messageText = pick(JACKPOT_MESSAGES) + ` ${tripleInfo.label}! +${winAmount} tokens!`;
-          resultClass = "jackpot";
-          spawnParticles(a, 15);
-        } else {
-          messageText = pick(WIN_MESSAGES) + ` ${tripleInfo.label}! +${winAmount} tokens!`;
-          resultClass = "win";
-          spawnParticles(a, 8);
-        }
-      }
-    } else if (a === b || b === c || a === c) {
-      const matchedSymbol = a === b ? a : c;
-      if (a === b && a === c) {
-        // already handled
-      } else {
-        winAmount = currentBet * PAYOUTS.double;
-        messageText = pick(NEAR_MISS_MESSAGES) + ` Partial match: +${winAmount} tokens.`;
-        resultClass = "win";
-      }
-    }
-
-    if (winAmount === 0) {
-      messageText = pick(LOSE_MESSAGES);
-      resultClass = "lose";
-    }
-
-    if (winAmount > 0) {
-      tokens += winAmount;
-      totalWon += winAmount;
-    }
-
-    $messageArea.className = "message-area " + resultClass;
-    $message.innerHTML = messageText;
-    updateDisplay();
-    addHistory(emojis, winAmount);
-
-    if (tokens <= 0) {
-      setTimeout(showBankrupt, 800);
-    }
-  }
-
-  function addHistory(emojis, winAmount) {
-    const entry = { emojis, winAmount, bet: currentBet, spin: spinCount };
-    historyEntries.unshift(entry);
-    if (historyEntries.length > 50) historyEntries.pop();
-
-    const el = document.createElement("div");
-    el.className = "history-entry";
-    const sign = winAmount > 0 ? "+" : "";
-    const net = winAmount - currentBet;
-    const resultClass = net >= 0 ? "win" : "lose";
-    el.innerHTML = `
-      <span class="he-spin">#${entry.spin}</span>
-      <span class="he-symbols">${emojis.join("")}</span>
-      <span class="he-result ${resultClass}">${sign}${net} 🪙</span>
-    `;
-    $historyList.prepend(el);
-
-    while ($historyList.children.length > 20) {
-      $historyList.removeChild($historyList.lastChild);
-    }
-  }
-
-  function updateDisplay() {
-    $tokenCount.textContent = tokens.toLocaleString();
-    $tokenCount.classList.remove("token-pop");
-    void $tokenCount.offsetWidth;
-    $tokenCount.classList.add("token-pop");
-
-    const avgBurn = spinCount > 0 ? Math.round(totalLost / spinCount) * 12 : 0;
-    $burnRate.textContent = avgBurn > 0 ? avgBurn.toLocaleString() : "∞";
-
-    if (tokens > 0 && avgBurn > 0) {
-      const mins = Math.max(1, Math.round((tokens / avgBurn) * 60));
-      $runway.textContent = `~${mins} min`;
-    } else if (tokens > 0) {
-      $runway.textContent = "~5 min";
-    } else {
-      $runway.textContent = "☠️ 0";
-    }
-
-    const tokenSub = document.querySelector(".token-balance .stat-sub");
-    if (tokenSub) {
-      const gptQuestions = Math.max(0, Math.floor(tokens / 300));
-      const snarkyComparisons = [
-        `≈ ${gptQuestions} ChatGPT questions`,
-        `≈ ${Math.floor(tokens / 50)} Midjourney pixels`,
-        `≈ ${Math.floor(tokens / 10)} GitHub Copilot suggestions`,
-        `≈ ${(tokens / 1000000).toFixed(6)} of OpenAI's daily revenue`,
-      ];
-      tokenSub.textContent = `( ${pick(snarkyComparisons)} )`;
-    }
-  }
-
-  function buildPaytable() {
-    const items = Object.entries(PAYOUTS.triple)
-      .sort((a, b) => b[1].multiplier - a[1].multiplier)
-      .map(([emoji, info]) => {
-        const el = document.createElement("div");
-        el.className = "paytable-item";
-        el.innerHTML = `
-          <div>
-            <span class="pt-symbols">${emoji}${emoji}${emoji}</span>
-            <span class="pt-label">${info.label}</span>
-          </div>
-          <span class="pt-payout">${info.multiplier}x</span>
-        `;
-        return el;
-      });
-
-    const doubleEl = document.createElement("div");
-    doubleEl.className = "paytable-item";
-    doubleEl.innerHTML = `
-      <div>
-        <span class="pt-symbols">🔀 Any Pair</span>
-        <span class="pt-label">Partial Convergence</span>
-      </div>
-      <span class="pt-payout">${PAYOUTS.double}x</span>
-    `;
-    items.push(doubleEl);
-
-    items.forEach((el) => $paytableGrid.appendChild(el));
-  }
-
-  function showBankrupt() {
-    $bankruptOverlay.classList.add("visible");
-  }
-
-  function restartGame(mode) {
-    $bankruptOverlay.classList.remove("visible");
-    tokens = 1000;
-    spinCount = 0;
-    totalWon = 0;
-    totalLost = 0;
-    historyEntries.length = 0;
-    $historyList.innerHTML = "";
-    $messageArea.className = "message-area";
-
-    if (mode === "pivot") {
-      const name = pick(STARTUP_NAMES);
-      $message.textContent = `${name} has raised a $1B Series A from "investors" (your parents). Let's disrupt gambling again!`;
-    } else {
-      $message.textContent = `"What I Learned From Losing ${spinCount || "All My"} Spins at an AI Slot Machine" — posted to Medium. 3 claps. Starting over.`;
-    }
-
-    updateDisplay();
-  }
-
-  function spawnParticles(emoji, count) {
-    const area = document.querySelector(".slot-machine").getBoundingClientRect();
-    for (let i = 0; i < count; i++) {
-      const p = document.createElement("div");
-      p.className = "particle";
-      p.textContent = emoji;
-      p.style.left = area.left + Math.random() * area.width + "px";
-      p.style.top = area.top + Math.random() * area.height + "px";
-      p.style.animationDelay = Math.random() * 0.4 + "s";
-      document.body.appendChild(p);
-      setTimeout(() => p.remove(), 1600);
-    }
+  function buildTicker() {
+    const shuffled = [...TICKER_HEADLINES].sort(() => Math.random() - 0.5);
+    tickerEl.textContent = shuffled.join("  ★  ");
   }
 
   function pick(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function updateBalanceDisplay() {
+    balanceEl.textContent = balance.toLocaleString();
+    balanceEl.classList.add("bump");
+    setTimeout(() => balanceEl.classList.remove("bump"), 200);
+  }
+
+  function setMessage(text, type) {
+    messageEl.textContent = text;
+    messageArea.className = "message-area";
+    if (type) messageArea.classList.add(type);
+  }
+
+  function getBet() {
+    return parseInt(betSelect.value, 10);
+  }
+
+  function weightedRandomSymbol() {
+    const weights = [1, 3, 4, 6, 7, 9, 10];
+    const total = weights.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < weights.length; i++) {
+      r -= weights[i];
+      if (r <= 0) return SYMBOLS[i];
+    }
+    return SYMBOLS[SYMBOLS.length - 1];
+  }
+
+  function spinReel(reelIndex) {
+    return new Promise((resolve) => {
+      const reel = reels[reelIndex];
+      const inner = reel.querySelector(".reel-inner");
+      const symbolEl = inner.querySelector(".symbol");
+      inner.classList.add("spinning");
+
+      const totalSpins = MIN_SPINS + reelIndex * EXTRA_PER_REEL;
+      let count = 0;
+
+      const interval = setInterval(() => {
+        symbolEl.textContent = pick(SYMBOLS).emoji;
+        count++;
+        if (count >= totalSpins) {
+          clearInterval(interval);
+          const result = weightedRandomSymbol();
+          symbolEl.textContent = result.emoji;
+          inner.classList.remove("spinning");
+          resolve(result);
+        }
+      }, SPIN_INTERVAL_MS);
+    });
+  }
+
+  function evaluateResults(results, bet) {
+    const [a, b, c] = results;
+
+    if (a.emoji === b.emoji && b.emoji === c.emoji) {
+      const winnings = Math.round(bet * a.multiplier);
+      return { type: "jackpot", multiplier: a.multiplier, winnings, matchName: a.name };
+    }
+
+    if (a.emoji === b.emoji || b.emoji === c.emoji || a.emoji === c.emoji) {
+      const winnings = Math.round(bet * PARTIAL_MULTIPLIER);
+      return { type: "partial", multiplier: PARTIAL_MULTIPLIER, winnings };
+    }
+
+    return { type: "loss", multiplier: 0, winnings: 0 };
+  }
+
+  function highlightWinningReels(results) {
+    const [a, b, c] = results.map((r) => r.emoji);
+    if (a === b) reels[0].classList.add("winner");
+    if (b === c) reels[1].classList.add("winner");
+    if (a === b || b === c) reels[1].classList.add("winner");
+    if (a === c || b === c) reels[2].classList.add("winner");
+    if (a === b) reels[0].classList.add("winner");
+  }
+
+  function clearReelHighlights() {
+    reels.forEach((r) => r.classList.remove("winner"));
+  }
+
+  function showWinOverlay(title, detail) {
+    winTitle.textContent = title;
+    winDetail.textContent = detail;
+    winOverlay.hidden = false;
+    spawnConfetti();
+  }
+
+  function dismissWin() {
+    winOverlay.hidden = true;
+    removeConfetti();
+  }
+
+  function spawnConfetti() {
+    let canvas = document.getElementById("confetti-canvas");
+    if (!canvas) {
+      canvas = document.createElement("canvas");
+      canvas.id = "confetti-canvas";
+      document.body.appendChild(canvas);
+    }
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext("2d");
+    const pieces = [];
+    const colors = ["#f59e0b", "#ec4899", "#a855f7", "#22d3ee", "#10b981", "#ef4444"];
+
+    for (let i = 0; i < 120; i++) {
+      pieces.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: Math.random() * 10 + 5,
+        h: Math.random() * 6 + 3,
+        color: pick(colors),
+        vx: (Math.random() - 0.5) * 4,
+        vy: Math.random() * 3 + 2,
+        rot: Math.random() * 360,
+        rv: (Math.random() - 0.5) * 10,
+      });
+    }
+
+    let animId;
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      for (const p of pieces) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.rv;
+        p.vy += 0.05;
+        if (p.y < canvas.height + 50) alive = true;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+      if (alive) {
+        animId = requestAnimationFrame(draw);
+      }
+    }
+    canvas._animId = animId;
+    draw();
+  }
+
+  function removeConfetti() {
+    const canvas = document.getElementById("confetti-canvas");
+    if (canvas) {
+      cancelAnimationFrame(canvas._animId);
+      canvas.remove();
+    }
+  }
+
+  async function handleSpin() {
+    if (spinning) return;
+
+    const bet = getBet();
+    if (bet > balance) {
+      setMessage(
+        `Insufficient tokens! You need ${bet} but only have ${balance}. Downgrade your tier, peasant.`,
+        "broke"
+      );
+      spinBtn.classList.add("shake");
+      setTimeout(() => spinBtn.classList.remove("shake"), 400);
+      return;
+    }
+
+    spinning = true;
+    spinBtn.disabled = true;
+    clearReelHighlights();
+
+    balance -= bet;
+    updateBalanceDisplay();
+    setMessage(`Burning ${bet} tokens... inference in progress...`, "");
+
+    const results = await Promise.all(
+      Array.from({ length: REEL_COUNT }, (_, i) => spinReel(i))
+    );
+
+    const outcome = evaluateResults(results, bet);
+
+    if (outcome.type === "jackpot") {
+      balance += outcome.winnings;
+      updateBalanceDisplay();
+      highlightWinningReels(results);
+
+      if (results[0].emoji === "🦄") {
+        showWinOverlay("🦄 UNICORN EXIT! 🦄", pick(JACKPOT_MESSAGES));
+      } else {
+        const msg = pick(WIN_MESSAGES);
+        setMessage(`+${outcome.winnings} tokens (${outcome.multiplier}x)! ${msg}`, "win");
+      }
+    } else if (outcome.type === "partial") {
+      balance += outcome.winnings;
+      updateBalanceDisplay();
+      highlightWinningReels(results);
+      setMessage(
+        `+${outcome.winnings} tokens (${outcome.multiplier}x). Partial match — the model almost got it right. Story of AI.`,
+        "win"
+      );
+    } else {
+      setMessage(pick(LOSE_MESSAGES), "loss");
+    }
+
+    if (balance <= 0) {
+      setTimeout(() => {
+        const msg = pick(BROKE_MESSAGES);
+        setMessage(msg, "broke");
+        if (msg.includes("bailout")) {
+          balance = 1000;
+          updateBalanceDisplay();
+        }
+      }, 1500);
+    }
+
+    spinning = false;
+    spinBtn.disabled = false;
   }
 
   init();

@@ -3,108 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TOKEN BURNER 3000 — The AI Slot Machine</title>
+  <title>AI Token Slots — Waste Your Tokens™</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="scanlines"></div>
-  <div class="app">
-    <header class="header">
-      <div class="header-glow"></div>
-      <h1 class="title">TOKEN BURNER <span class="title-version">3000</span></h1>
-      <p class="subtitle">Where Your Context Window Goes to Die</p>
+
+  <div class="container">
+    <header>
+      <h1 class="glitch" data-text="AI TOKEN SLOTS">AI TOKEN SLOTS</h1>
+      <p class="subtitle">Where Your Tokens Go to Die&trade;</p>
     </header>
 
-    <div class="token-display">
-      <div class="token-icon">🪙</div>
-      <div class="token-info">
-        <span class="token-label">TOKENS REMAINING</span>
-        <span class="token-count" id="tokenCount">1000</span>
+    <div class="balance-bar">
+      <div class="balance">
+        <span class="label">TOKEN BALANCE</span>
+        <span class="amount" id="balance">1000</span>
       </div>
-      <div class="burn-rate">
-        <span class="burn-label">BURN RATE</span>
-        <span class="burn-value" id="burnRate">~$0.02/spin</span>
+      <div class="bet-controls">
+        <button id="bet-down" class="btn-bet" aria-label="Decrease bet">−</button>
+        <div class="bet-display">
+          <span class="label">BET</span>
+          <span class="amount" id="bet-amount">10</span>
+        </div>
+        <button id="bet-up" class="btn-bet" aria-label="Increase bet">+</button>
       </div>
     </div>
 
     <div class="machine">
-      <div class="machine-inner">
-        <div class="reels-container">
-          <div class="reel-window">
-            <div class="reel" id="reel0">
-              <div class="reel-strip"></div>
-            </div>
+      <div class="reel-window">
+        <div class="reel-container">
+          <div class="reel" id="reel-0">
+            <div class="symbol">🤖</div>
           </div>
           <div class="reel-divider"></div>
-          <div class="reel-window">
-            <div class="reel" id="reel1">
-              <div class="reel-strip"></div>
-            </div>
+          <div class="reel" id="reel-1">
+            <div class="symbol">🤖</div>
           </div>
           <div class="reel-divider"></div>
-          <div class="reel-window">
-            <div class="reel" id="reel2">
-              <div class="reel-strip"></div>
-            </div>
+          <div class="reel" id="reel-2">
+            <div class="symbol">🤖</div>
           </div>
         </div>
-        <div class="payline"></div>
       </div>
     </div>
 
-    <div class="message-area">
-      <div class="message-box" id="messageBox">
-        <p id="messageText">Insert tokens to generate a completion...</p>
+    <button id="spin-btn" class="spin-button">
+      <span class="spin-text">GENERATE RESPONSE</span>
+      <span class="spin-subtext">( spin )</span>
+    </button>
+
+    <div class="message-box" id="message-box">
+      <p id="message">Insert tokens to hallucinate…</p>
+    </div>
+
+    <div class="paytable">
+      <h2>// PAYOUT TABLE</h2>
+      <div class="paytable-grid">
+        <div class="pay-row"><span>🧠🧠🧠</span><span class="payout">×50</span><span class="pay-label">AGI Achieved</span></div>
+        <div class="pay-row"><span>💎💎💎</span><span class="payout">×25</span><span class="pay-label">Series B Funding</span></div>
+        <div class="pay-row"><span>🤖🤖🤖</span><span class="payout">×15</span><span class="pay-label">Sentient Bot</span></div>
+        <div class="pay-row"><span>🔥🔥🔥</span><span class="payout">×10</span><span class="pay-label">Viral Tweet</span></div>
+        <div class="pay-row"><span>⚡⚡⚡</span><span class="payout">×8</span><span class="pay-label">GPU Cluster</span></div>
+        <div class="pay-row"><span>📊📊📊</span><span class="payout">×5</span><span class="pay-label">Benchmark Win</span></div>
+        <div class="pay-row"><span>🎰🎰🎰</span><span class="payout">×5</span><span class="pay-label">Lucky Prompt</span></div>
+        <div class="pay-row"><span>Any pair</span><span class="payout">×2</span><span class="pay-label">Partial Match</span></div>
       </div>
     </div>
 
-    <div class="controls">
-      <div class="bet-section">
-        <label class="bet-label">BET (tokens)</label>
-        <div class="bet-controls">
-          <button class="bet-btn" id="betDown" aria-label="Decrease bet">−</button>
-          <span class="bet-amount" id="betAmount">10</span>
-          <button class="bet-btn" id="betUp" aria-label="Increase bet">+</button>
-        </div>
-      </div>
-      <button class="spin-btn" id="spinBtn">
-        <span class="spin-text">🔥 INFERENCE 🔥</span>
-        <span class="spin-subtext">( burn tokens )</span>
-      </button>
-      <div class="auto-section">
-        <button class="auto-btn" id="autoBtn">AUTO-PROMPT</button>
-        <button class="max-btn" id="maxBetBtn">MAX BET</button>
-      </div>
-    </div>
-
-    <div class="paytable-toggle">
-      <button class="toggle-btn" id="paytableToggle">📊 HALLUCINATION TABLE</button>
-    </div>
-
-    <div class="paytable" id="paytable">
-      <h3 class="paytable-title">— PAYOUT MATRIX —</h3>
-      <div class="paytable-grid" id="paytableGrid"></div>
-      <p class="paytable-note">* Payouts are probabilistic and may hallucinate higher values</p>
-    </div>
-
-    <div class="history">
-      <h3 class="history-title">INFERENCE LOG</h3>
-      <div class="history-list" id="historyList"></div>
-    </div>
-
-    <footer class="footer">
-      <p>⚠️ DISCLAIMER: No actual LLMs were harmed in the making of this slot machine.</p>
-      <p>Token losses are simulated. Unlike real AI billing, you can refresh to get them back.</p>
+    <footer>
+      <p>© 2026 Hallucination Labs Inc. — "We made it up and so can you"</p>
+      <p class="fine-print">Not responsible for lost tokens, wasted GPU cycles, or existential dread.</p>
     </footer>
-  </div>
-
-  <div class="modal-overlay" id="gameOverModal">
-    <div class="modal">
-      <h2 class="modal-title">🚨 CONTEXT LIMIT REACHED 🚨</h2>
-      <p class="modal-text">You've burned through all your tokens!</p>
-      <p class="modal-subtext" id="modalSubtext">Just like a real AI project budget.</p>
-      <button class="modal-btn" id="restartBtn">🔄 Request More Tokens ($$$)</button>
-    </div>
   </div>
 
   <script src="script.js"></script>

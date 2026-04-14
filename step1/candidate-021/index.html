@@ -3,109 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Token Casino Royale ✨</title>
+  <title>🎰 The Token Burner — AI Slot Machine</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="sparkle-container" id="sparkleContainer"></div>
+  <div class="marquee-bar">
+    <span class="marquee-text">★ WELCOME TO THE TOKEN BURNER ★ WHERE YOUR CONTEXT WINDOW GOES TO DIE ★ NOW WITH 100% MORE HALLUCINATIONS ★ PROMPT RESPONSIBLY ★</span>
+  </div>
 
-  <div class="casino-frame">
+  <main class="casino">
     <header class="casino-header">
-      <div class="vip-badge" id="vipBadge">🥉 FREE TIER</div>
-      <h1 class="casino-title">
-        <span class="title-accent">✦</span>
-        AI TOKEN CASINO
-        <span class="title-accent">✦</span>
-      </h1>
-      <p class="casino-subtitle">Premium AI-Powered Luxury Gaming Experience™</p>
-      <p class="casino-tagline" id="tagline">"Where Every Spin is a Hallucination of Wealth"</p>
+      <h1 class="title">The Token Burner</h1>
+      <p class="subtitle">A.I. Slot Machine — <em>"Your tokens were never safe"</em></p>
     </header>
 
-    <div class="token-display">
-      <div class="token-icon">🪙</div>
-      <div class="token-info">
-        <span class="token-label">YOUR TOKENS</span>
-        <span class="token-amount" id="tokenAmount">1000</span>
+    <div class="balance-bar">
+      <div class="balance-display">
+        <span class="balance-label">TOKEN BALANCE</span>
+        <span class="balance-value" id="balance">1000</span>
       </div>
-      <div class="token-icon">🪙</div>
+      <div class="bet-controls">
+        <button class="bet-btn" id="bet-down" aria-label="Decrease bet">−</button>
+        <div class="bet-display">
+          <span class="bet-label">BET</span>
+          <span class="bet-value" id="bet-amount">10</span>
+        </div>
+        <button class="bet-btn" id="bet-up" aria-label="Increase bet">+</button>
+      </div>
     </div>
 
-    <div class="machine-body">
-      <div class="machine-top-accent"></div>
-
-      <div class="reels-window">
-        <div class="reel-container">
-          <div class="reel" id="reel0">
-            <div class="reel-strip">
-              <div class="symbol">🤖</div>
-            </div>
+    <div class="machine-frame">
+      <div class="machine-inner">
+        <div class="reels-container">
+          <div class="reel" id="reel-0">
+            <div class="reel-strip"></div>
           </div>
-          <div class="reel" id="reel1">
-            <div class="reel-strip">
-              <div class="symbol">🧠</div>
-            </div>
+          <div class="reel" id="reel-1">
+            <div class="reel-strip"></div>
           </div>
-          <div class="reel" id="reel2">
-            <div class="reel-strip">
-              <div class="symbol">⚡</div>
-            </div>
+          <div class="reel" id="reel-2">
+            <div class="reel-strip"></div>
           </div>
         </div>
         <div class="payline"></div>
       </div>
-
-      <div class="controls">
-        <div class="bet-section">
-          <label class="bet-label">BET</label>
-          <div class="bet-controls">
-            <button class="bet-btn" id="betDown" aria-label="Decrease bet">−</button>
-            <span class="bet-amount" id="betAmount">10</span>
-            <button class="bet-btn" id="betUp" aria-label="Increase bet">+</button>
-          </div>
-        </div>
-
-        <button class="spin-btn" id="spinBtn">
-          <span class="spin-text">SPIN</span>
-          <span class="spin-subtext">Use AI Tokens™</span>
-        </button>
-
-        <button class="max-bet-btn" id="maxBetBtn">MAX BET<br><small>Go Bankrupt Faster™</small></button>
-      </div>
     </div>
 
-    <div class="message-board">
-      <div class="message-text" id="messageText">Welcome, valued token holder! Insert tokens to experience premium AI-generated luck.</div>
+    <button class="spin-btn" id="spin-btn">
+      <span class="spin-text">🎰 BURN TOKENS 🎰</span>
+    </button>
+
+    <div class="message-board" id="message-board">
+      <p id="message">Insert tokens and pull the lever, you beautiful prompt engineer.</p>
     </div>
 
-    <div class="paytable">
-      <h3 class="paytable-title">✦ AI PAYOUT TABLE ✦</h3>
-      <div class="paytable-grid" id="paytableGrid"></div>
-      <p class="paytable-disclaimer">* Payouts determined by our proprietary GPT-powered RNG (Random Nonsense Generator)</p>
+    <div class="payout-table">
+      <h2>PAYOUT TABLE</h2>
+      <div class="payout-grid" id="payout-grid"></div>
     </div>
 
     <div class="stats-bar">
       <div class="stat">
         <span class="stat-label">Spins</span>
-        <span class="stat-value" id="spinCount">0</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Wins</span>
-        <span class="stat-value" id="winCount">0</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">Biggest Win</span>
-        <span class="stat-value" id="biggestWin">0</span>
+        <span class="stat-value" id="stat-spins">0</span>
       </div>
       <div class="stat">
         <span class="stat-label">Tokens Burned</span>
-        <span class="stat-value" id="tokensBurned">0</span>
+        <span class="stat-value" id="stat-burned">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Biggest Win</span>
+        <span class="stat-value" id="stat-biggest">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Win Rate</span>
+        <span class="stat-value" id="stat-winrate">0%</span>
       </div>
     </div>
+  </main>
 
-    <footer class="casino-footer">
-      <p>🎰 AI Token Casino Royale™ — Not responsible for hallucinated winnings</p>
-      <p class="footer-small">Powered by 100% organic, free-range neural networks. No actual AI was consulted in the making of this casino.</p>
-    </footer>
+  <footer class="casino-footer">
+    <p>⚠️ The Token Burner is not responsible for hallucinated winnings, lost context, or existential dread.</p>
+    <p>House edge: <strong>Yes.</strong></p>
+  </footer>
+
+  <div class="win-overlay" id="win-overlay" hidden>
+    <div class="win-modal">
+      <h2 class="win-title" id="win-title">JACKPOT!</h2>
+      <p class="win-amount" id="win-amount"></p>
+      <p class="win-joke" id="win-joke"></p>
+      <button class="win-dismiss" id="win-dismiss">Feed More Tokens</button>
+    </div>
   </div>
 
   <script src="script.js"></script>

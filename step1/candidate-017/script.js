@@ -1,523 +1,370 @@
-// ============================================
-// ROBO-SLOTS 3000 — AI Token Waster
-// Retro Arcade Slot Machine
-// ============================================
+(() => {
+  "use strict";
 
-(function () {
-  'use strict';
+  // ── Symbols & Payouts ──────────────────────────────
+  const SYMBOLS = ["🤖", "🧠", "💬", "🔥", "📊", "🌀", "⚡"];
+  const SYMBOL_WEIGHTS = [5, 8, 10, 12, 14, 18, 20];
+  const TRIPLE_PAYOUTS = {
+    "🤖": 50,
+    "🧠": 25,
+    "💬": 15,
+    "🔥": 12,
+    "📊": 10,
+    "🌀": 8,
+    "⚡": 5,
+  };
+  const PAIR_PAYOUT = 2;
 
-  // --- Symbol Definitions ---
-  const SYMBOLS = [
-    { emoji: '🤖', name: 'Robot',      payout: 50, weight: 3  },
-    { emoji: '🧠', name: 'Brain',      payout: 40, weight: 4  },
-    { emoji: '⚡', name: 'Compute',    payout: 30, weight: 5  },
-    { emoji: '🔮', name: 'Hallucinate', payout: 25, weight: 5  },
-    { emoji: '💾', name: 'Data',       payout: 20, weight: 6  },
-    { emoji: '🎰', name: 'Jackpot',    payout: 100, weight: 1 },
-    { emoji: '📡', name: 'Inference',  payout: 15, weight: 7  },
-    { emoji: '🐛', name: 'Bug',        payout: 10, weight: 8  },
-    { emoji: '💀', name: 'OOM Error',  payout: 5,  weight: 9  },
-  ];
+  const TRIPLE_NAMES = {
+    "🤖": "SINGULARITY",
+    "🧠": "EMERGENT BEHAVIOR",
+    "💬": "PROMPT INJECTION",
+    "🔥": "GPU MELTDOWN",
+    "📊": "BENCHMARK FRAUD",
+    "🌀": "HALLUCINATION",
+    "⚡": "RATE LIMITED",
+  };
 
-  const BET_LEVELS = [10, 25, 50, 100, 250];
-  const STARTING_TOKENS = 1000;
-  const REEL_COUNT = 3;
-  const SYMBOLS_PER_STRIP = 40;
-  const SPIN_DURATION_BASE = 1800;
-  const SPIN_DELAY_PER_REEL = 500;
-
-  // --- Humorous Messages ---
+  // ── Humor Messages ─────────────────────────────────
   const WIN_MESSAGES = [
-    'TOKENS GENERATED! The AI is hallucinating profits!',
-    'WINNER! That\'s more tokens than GPT-4 uses per sentence!',
-    'CHA-CHING! Your prompt engineering paid off!',
-    'The model predicts: YOU WIN! (confidence: 47%)',
-    'PAYOUT DETECTED! Training data says this is rare!',
-    'The neural net smiles upon you! (it can\'t actually smile)',
-    'TOKENS ACQUIRED! That\'s like 3 whole API calls!',
-    'YOU WIN! The AI overlords approve this transaction.',
-    'REWARD SIGNAL DETECTED! Reinforcement learning works!',
-    'PROFIT! Quick, before OpenAI raises prices again!',
+    "The model hallucinated a win! (But this one's real.)",
+    "Congratulations! Your prompt engineering paid off!",
+    "AGI achieved! ...in this slot machine at least.",
+    "Output validated. No hallucination detected... probably.",
+    "You've been fine-tuned for winning!",
+    "RLHF confirms: this is a good outcome.",
+    "Your context window is overflowing with tokens!",
+    "Even GPT couldn't have predicted this output!",
+    "Temperature: 0.0 — Deterministic win!",
+    "The loss function has been minimized!",
   ];
 
   const LOSE_MESSAGES = [
-    'TOKENS BURNED. Just like GPU cycles on a bad prompt.',
-    'LOSS. The AI confidently predicted you\'d win. It was wrong.',
-    'NO MATCH. Like asking AI to count—never works.',
-    'Your tokens vanished, like context in a long conversation.',
-    'DEPLETED. That\'s what you get for trusting a 1987 AI.',
-    'The model says: "I apologize for the loss." Unhelpful.',
-    'TOKEN OVERFLOW ERROR: Not in your favor.',
-    'Your tokens were used as training data. Gone forever.',
-    'The AI giveth and the AI taketh away. Mostly taketh.',
-    'LOSS DETECTED. The AI is \"sorry for any confusion.\"',
-    'Tokens lost in the latent space. Unretrievable.',
-    'Your bet was hallucinated away. Very realistic hallucination.',
+    "Model confidently generated the wrong answer. Again.",
+    "That response was a hallucination. Tokens wasted.",
+    "Error 429: Too many losing requests.",
+    "The AI is gaslighting you. Spin again.",
+    "Prompt rejected. Try adding 'please' next time.",
+    "Your tokens have been fed to the void.",
+    "The attention mechanism was not paying attention.",
+    "Training data did not include 'winning.'",
+    "Response: 'As an AI, I cannot generate wins.'",
+    "Context window exceeded. Memories of winning: deleted.",
+    "The gradient has vanished. So have your tokens.",
+    "Inference failed. Please increase your bet size.",
+    "The model is confident (but wrong).",
+    "Catastrophic forgetting: it forgot to pay you.",
+    "Your tokens were used for pre-training. Gone forever.",
   ];
 
   const JACKPOT_MESSAGES = [
-    '🎰 MEGA JACKPOT 🎰 The singularity is HERE (for your wallet)!',
-    '🎰 JACKPOT! 🎰 You\'ve won more tokens than GPT has parameters!',
-    '🎰 BIG WIN! 🎰 AGI achieved! (in slot machine form)',
-    '🎰 JACKPOT! 🎰 ERROR: Payout exceeds training distribution!',
+    "🚨 THE SINGULARITY IS HERE 🚨 (for your wallet)",
+    "🤖 ALL HAIL THE TOKEN OVERLORD 🤖",
+    "You've passed the Turing test of gambling!",
   ];
 
-  const NEAR_MISS_MESSAGES = [
-    'SO CLOSE! The AI almost got it right. As usual.',
-    'ALMOST! Like AI-generated hands—close but not quite.',
-    'Near miss! The model\'s loss function is crying.',
-    'Two out of three! Like AI accuracy on a good day.',
-    'Almost matched! AI says: "Let me try again..." (for 10 tokens)',
+  const BROKE_MESSAGES = [
+    "Token balance: 0. Just like your API budget.",
+    "Context window empty. Insert credit card to continue.",
+    "You've been rate limited by poverty.",
+    "The model has run out of tokens. So have you.",
+    "Error: InsufficientFundsException — have you tried prompt engineering your bank?",
   ];
 
   const IDLE_MESSAGES = [
-    '[ AWAITING INPUT... like a chatbot with no users ]',
-    '[ IDLE MODE: Consuming electricity for no reason, as AI does ]',
-    '[ SYSTEM: Your tokens are depreciating while you wait ]',
-    '[ TIP: Prompt engineering doesn\'t work on slot machines ]',
-    '[ FUN FACT: This machine has 7 parameters. GPT has billions. ]',
-    '[ LOADING PERSONALITY... ERROR: personality.dll not found ]',
-    '[ ALERT: Token prices may fluctuate (always downward) ]',
-    '[ THIS MACHINE PASSED THE TURING TEST (for slot machines) ]',
-    '[ MEMORY: Remember when 1000 tokens seemed like a lot? ]',
-    '[ IDLE: The AI is plotting. Insert tokens to distract it. ]',
+    "INSERT TOKENS TO QUERY THE MODEL...",
+    "The model awaits your inference request...",
+    "Tip: The house always has a bigger context window.",
+    "Fun fact: These tokens cost less than GPT-4.",
+    "Warning: Slot machine may hallucinate payouts.",
+    "Each spin fine-tunes your disappointment.",
+    "The attention heads are watching you...",
   ];
 
-  const GAME_OVER_MESSAGES = [
-    'GAME OVER\n\nYour tokens have been fine-tuned to zero.\nThe AI thanks you for your contribution to its training data.',
-    'BANKRUPTCY DETECTED\n\nLike an AI startup after the hype cycle.\nYour tokens have entered the public domain.',
-    'OUT OF TOKENS\n\nYou\'ve reached the end of your context window.\nPlease insert credit card for more hallucinations.',
-    'ZERO BALANCE\n\nYour token budget has been deprecated.\nJust like every other AI feature after 6 months.',
-  ];
+  // ── State ──────────────────────────────────────────
+  const BET_STEPS = [5, 10, 25, 50, 100];
+  let tokens = 1000;
+  let betIndex = 1;
+  let spinning = false;
 
-  // --- Game State ---
-  let tokens = STARTING_TOKENS;
-  let betIndex = 0;
-  let isSpinning = false;
-  let idleTimer = null;
-  let spinHistory = [];
+  // ── DOM ────────────────────────────────────────────
+  const $tokenCount = document.getElementById("token-count");
+  const $betAmount = document.getElementById("bet-amount");
+  const $message = document.getElementById("message");
+  const $spinBtn = document.getElementById("spin-btn");
+  const $betUp = document.getElementById("bet-up");
+  const $betDown = document.getElementById("bet-down");
+  const $paytableBtn = document.getElementById("paytable-btn");
+  const $paytableModal = document.getElementById("paytable-modal");
+  const $closePaytable = document.getElementById("close-paytable");
+  const $winOverlay = document.getElementById("win-overlay");
+  const $winText = document.getElementById("win-text");
+  const reels = [0, 1, 2].map((i) => ({
+    el: document.getElementById(`reel-${i}`),
+    inner: document.getElementById(`reel-${i}`).querySelector(".reel-inner"),
+  }));
 
-  // --- DOM References ---
-  const tokenCountEl = document.getElementById('token-count');
-  const betAmountEl = document.getElementById('bet-amount');
-  const betIndicatorEl = document.getElementById('bet-indicator');
-  const spinCostEl = document.getElementById('spin-cost');
-  const messageTextEl = document.getElementById('message-text');
-  const messageBoxEl = document.getElementById('message-box');
-  const btnSpin = document.getElementById('btn-spin');
-  const btnBetUp = document.getElementById('btn-bet-up');
-  const btnBetDown = document.getElementById('btn-bet-down');
-  const btnMaxBet = document.getElementById('btn-max-bet');
-  const btnPaytable = document.getElementById('btn-paytable');
-  const paytableEl = document.getElementById('paytable');
-  const paytableGridEl = document.getElementById('paytable-grid');
-  const reelElements = [];
+  // ── Weighted Random ────────────────────────────────
+  const totalWeight = SYMBOL_WEIGHTS.reduce((a, b) => a + b, 0);
 
-  for (let i = 0; i < REEL_COUNT; i++) {
-    reelElements.push(document.getElementById(`reel-${i}`));
-  }
-
-  // --- Weighted Random Symbol ---
-  function buildWeightedPool() {
-    const pool = [];
-    for (const sym of SYMBOLS) {
-      for (let i = 0; i < sym.weight; i++) {
-        pool.push(sym);
-      }
+  function randomSymbol() {
+    let r = Math.random() * totalWeight;
+    for (let i = 0; i < SYMBOLS.length; i++) {
+      r -= SYMBOL_WEIGHTS[i];
+      if (r <= 0) return SYMBOLS[i];
     }
-    return pool;
+    return SYMBOLS[SYMBOLS.length - 1];
   }
 
-  const weightedPool = buildWeightedPool();
-
-  function getRandomSymbol() {
-    return weightedPool[Math.floor(Math.random() * weightedPool.length)];
-  }
-
-  function randomMessage(arr) {
+  function randomFrom(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  // --- Build Reel Strips ---
-  function buildReelStrip(reelIndex) {
-    const strip = reelElements[reelIndex].querySelector('.reel-strip');
-    strip.innerHTML = '';
-
-    const symbols = [];
-    for (let i = 0; i < SYMBOLS_PER_STRIP; i++) {
-      symbols.push(getRandomSymbol());
-    }
-
-    for (const sym of symbols) {
-      const div = document.createElement('div');
-      div.className = 'reel-symbol';
-      div.textContent = sym.emoji;
-      div.dataset.symbolName = sym.name;
-
-      const label = document.createElement('span');
-      label.className = 'symbol-label';
-      label.textContent = sym.name.toUpperCase();
-      div.appendChild(label);
-
-      strip.appendChild(div);
-    }
-
-    return symbols;
-  }
-
-  // --- Initialize Reels ---
-  let reelData = [];
-
-  function initReels() {
-    reelData = [];
-    for (let i = 0; i < REEL_COUNT; i++) {
-      reelData.push(buildReelStrip(i));
-    }
-    for (let i = 0; i < REEL_COUNT; i++) {
-      positionReel(i, 0);
-    }
-  }
-
-  function getSymbolHeight(reelIndex) {
-    const strip = reelElements[reelIndex].querySelector('.reel-strip');
-    const firstSymbol = strip.querySelector('.reel-symbol');
-    return firstSymbol ? firstSymbol.offsetHeight : 120;
-  }
-
-  function positionReel(reelIndex, symbolIndex) {
-    const strip = reelElements[reelIndex].querySelector('.reel-strip');
-    const symbolHeight = getSymbolHeight(reelIndex);
-    strip.style.transform = `translateY(${-symbolIndex * symbolHeight}px)`;
-  }
-
-  // --- UI Updates ---
+  // ── UI Updates ─────────────────────────────────────
   function updateTokenDisplay() {
-    tokenCountEl.textContent = tokens.toLocaleString();
-    tokenCountEl.classList.remove('token-pop');
-    void tokenCountEl.offsetWidth;
-    tokenCountEl.classList.add('token-pop');
+    $tokenCount.textContent = tokens.toLocaleString();
+    $tokenCount.classList.add("bump");
+    setTimeout(() => $tokenCount.classList.remove("bump"), 200);
   }
 
   function updateBetDisplay() {
-    const bet = BET_LEVELS[betIndex];
-    betAmountEl.textContent = bet;
-    betIndicatorEl.textContent = bet;
-    spinCostEl.textContent = `-${bet} tokens`;
+    $betAmount.textContent = BET_STEPS[betIndex];
   }
 
-  function setMessage(text, type) {
-    messageBoxEl.className = 'message-box';
-    if (type) messageBoxEl.classList.add(type);
-    messageTextEl.textContent = text;
+  function setMessage(text, type = "") {
+    $message.textContent = text;
+    $message.className = type;
   }
 
-  function canSpin() {
-    return tokens >= BET_LEVELS[betIndex] && !isSpinning;
+  function showWinOverlay(text, duration = 2000) {
+    $winText.textContent = text;
+    $winOverlay.classList.remove("hidden");
+    setTimeout(() => $winOverlay.classList.add("hidden"), duration);
   }
 
-  function updateSpinButton() {
-    btnSpin.disabled = !canSpin();
-  }
-
-  // --- Idle Messages ---
-  function startIdleTimer() {
-    clearIdleTimer();
-    idleTimer = setTimeout(() => {
-      if (!isSpinning) {
-        setMessage(randomMessage(IDLE_MESSAGES), '');
-        startIdleTimer();
-      }
-    }, 8000 + Math.random() * 7000);
-  }
-
-  function clearIdleTimer() {
-    if (idleTimer) {
-      clearTimeout(idleTimer);
-      idleTimer = null;
+  function spawnParticles(emoji, count = 12) {
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement("div");
+      p.className = "particle";
+      p.textContent = emoji;
+      p.style.left = `${40 + Math.random() * 20}%`;
+      p.style.top = `${30 + Math.random() * 20}%`;
+      p.style.setProperty("--dx", `${(Math.random() - 0.5) * 300}px`);
+      p.style.setProperty("--dy", `${(Math.random() - 0.5) * 400 - 100}px`);
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 1500);
     }
   }
 
-  // --- Spinning Logic ---
-  function spin() {
-    if (!canSpin()) return;
+  // ── Reel Spinning ──────────────────────────────────
+  function setReelSymbol(index, symbol) {
+    const inner = reels[index].inner;
+    inner.innerHTML = "";
+    const div = document.createElement("div");
+    div.className = "symbol";
+    div.textContent = symbol;
+    inner.appendChild(div);
+  }
 
-    isSpinning = true;
-    const bet = BET_LEVELS[betIndex];
+  function startReelSpin(index) {
+    const reel = reels[index];
+    reel.el.classList.add("spinning");
+
+    const inner = reel.inner;
+    inner.innerHTML = "";
+
+    for (let i = 0; i < 2; i++) {
+      const div = document.createElement("div");
+      div.className = "symbol";
+      div.textContent = randomSymbol();
+      inner.appendChild(div);
+    }
+
+    const intervalId = setInterval(() => {
+      const symbols = inner.querySelectorAll(".symbol");
+      symbols.forEach((s) => (s.textContent = randomSymbol()));
+    }, 100);
+
+    return intervalId;
+  }
+
+  function stopReelSpin(index, finalSymbol, intervalId) {
+    clearInterval(intervalId);
+    const reel = reels[index];
+    reel.el.classList.remove("spinning");
+    setReelSymbol(index, finalSymbol);
+  }
+
+  // ── Evaluate Result ────────────────────────────────
+  function evaluate(results) {
+    const [a, b, c] = results;
+
+    if (a === b && b === c) {
+      return {
+        type: "triple",
+        multiplier: TRIPLE_PAYOUTS[a],
+        name: TRIPLE_NAMES[a],
+        symbol: a,
+      };
+    }
+
+    if (a === b || b === c || a === c) {
+      return { type: "pair", multiplier: PAIR_PAYOUT, name: "PARTIAL MATCH" };
+    }
+
+    return { type: "loss", multiplier: 0, name: null };
+  }
+
+  // ── Main Spin ──────────────────────────────────────
+  async function spin() {
+    if (spinning) return;
+
+    const bet = BET_STEPS[betIndex];
+    if (tokens < bet) {
+      setMessage(randomFrom(BROKE_MESSAGES), "error");
+      document.querySelector(".cabinet").classList.add("shake");
+      setTimeout(
+        () => document.querySelector(".cabinet").classList.remove("shake"),
+        400
+      );
+      return;
+    }
+
+    spinning = true;
+    $spinBtn.disabled = true;
+
     tokens -= bet;
     updateTokenDisplay();
-    updateSpinButton();
-    clearIdleTimer();
+    setMessage("Generating response...", "");
 
-    setMessage('[ PROCESSING... inference in progress... ]', '');
+    const results = [randomSymbol(), randomSymbol(), randomSymbol()];
 
-    const results = [];
-    for (let i = 0; i < REEL_COUNT; i++) {
-      results.push(getRandomSymbol());
+    const intervals = reels.map((_, i) => startReelSpin(i));
+
+    const stopDelays = [800, 1200, 1600];
+
+    for (let i = 0; i < 3; i++) {
+      await delay(i === 0 ? stopDelays[0] : stopDelays[i] - stopDelays[i - 1]);
+      stopReelSpin(i, results[i], intervals[i]);
     }
 
-    for (let i = 0; i < REEL_COUNT; i++) {
-      reelData[i] = buildReelStrip(i);
-      const targetIndex = SYMBOLS_PER_STRIP - 5 - i;
-      reelData[i][targetIndex] = results[i];
+    await delay(300);
 
-      const strip = reelElements[i].querySelector('.reel-strip');
-      const symbolDivs = strip.querySelectorAll('.reel-symbol');
-      symbolDivs[targetIndex].textContent = results[i].emoji;
-      symbolDivs[targetIndex].dataset.symbolName = results[i].name;
-      const lbl = symbolDivs[targetIndex].querySelector('.symbol-label');
-      if (lbl) lbl.textContent = results[i].name.toUpperCase();
-      else {
-        const newLbl = document.createElement('span');
-        newLbl.className = 'symbol-label';
-        newLbl.textContent = results[i].name.toUpperCase();
-        symbolDivs[targetIndex].appendChild(newLbl);
-      }
-    }
+    const result = evaluate(results);
 
-    animateReels(results, bet);
-  }
+    if (result.type === "triple") {
+      const winnings = bet * result.multiplier;
+      tokens += winnings;
+      updateTokenDisplay();
 
-  function animateReels(results, bet) {
-    let completed = 0;
-
-    for (let i = 0; i < REEL_COUNT; i++) {
-      const strip = reelElements[i].querySelector('.reel-strip');
-      const symbolHeight = getSymbolHeight(i);
-      const targetIndex = SYMBOLS_PER_STRIP - 5 - i;
-      const totalDuration = SPIN_DURATION_BASE + (i * SPIN_DELAY_PER_REEL);
-
-      strip.style.transition = 'none';
-      strip.style.transform = 'translateY(0px)';
-
-      const startTime = performance.now();
-      const startPos = 0;
-      const endPos = -targetIndex * symbolHeight;
-
-      reelElements[i].classList.add('spinning');
-
-      (function animateReel(reelIdx, duration, target) {
-        const totalSymbols = SYMBOLS_PER_STRIP;
-        const extraSpins = 2 + reelIdx;
-        const fullCycleDistance = totalSymbols * symbolHeight * extraSpins;
-        const totalDistance = fullCycleDistance + Math.abs(target);
-
-        let rafId;
-        const animate = (now) => {
-          const elapsed = now - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const eased = easeOutBack(progress);
-
-          const currentPos = -eased * totalDistance;
-
-          const wrappedPos = currentPos % (totalSymbols * symbolHeight);
-          strip.style.transform = `translateY(${wrappedPos}px)`;
-
-          if (progress < 1) {
-            rafId = requestAnimationFrame(animate);
-          } else {
-            strip.style.transition = 'none';
-            strip.style.transform = `translateY(${target}px)`;
-            reelElements[reelIdx].classList.remove('spinning');
-            completed++;
-
-            if (completed === REEL_COUNT) {
-              evaluateSpin(results, bet);
-            }
-          }
-        };
-
-        requestAnimationFrame(animate);
-      })(i, totalDuration, endPos);
-    }
-  }
-
-  function easeOutBack(t) {
-    const c1 = 1.70158;
-    const c3 = c1 + 1;
-    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-  }
-
-  // --- Evaluate Spin Results ---
-  function evaluateSpin(results, bet) {
-    const names = results.map(r => r.name);
-    const allMatch = names[0] === names[1] && names[1] === names[2];
-    const twoMatch = names[0] === names[1] || names[1] === names[2] || names[0] === names[2];
-
-    let winAmount = 0;
-    let msgType = 'lose';
-
-    if (allMatch) {
-      winAmount = results[0].payout * bet;
-      if (results[0].name === 'Jackpot') {
-        msgType = 'jackpot';
-        setMessage(randomMessage(JACKPOT_MESSAGES), msgType);
+      if (result.symbol === "🤖") {
+        setMessage(randomFrom(JACKPOT_MESSAGES), "win");
+        showWinOverlay("🤖 SINGULARITY 🤖", 3000);
+        spawnParticles("🤖", 20);
       } else {
-        msgType = 'win';
-        setMessage(`+${winAmount} TOKENS! ${randomMessage(WIN_MESSAGES)}`, msgType);
+        setMessage(
+          `${result.name}! +${winnings.toLocaleString()} tokens! ${randomFrom(WIN_MESSAGES)}`,
+          "win"
+        );
+        showWinOverlay(`${result.symbol} ${result.name} ${result.symbol}`, 2500);
+        spawnParticles(result.symbol, 15);
       }
-      highlightWinners();
-    } else if (twoMatch) {
-      winAmount = bet * 2;
-      msgType = 'win';
-      setMessage(`+${winAmount} TOKENS! ${randomMessage(NEAR_MISS_MESSAGES)}`, msgType);
-      highlightWinners();
+    } else if (result.type === "pair") {
+      const winnings = bet * result.multiplier;
+      tokens += winnings;
+      updateTokenDisplay();
+      setMessage(
+        `Pair matched! +${winnings} tokens. ${randomFrom(WIN_MESSAGES)}`,
+        "win"
+      );
+      spawnParticles("🪙", 6);
     } else {
-      setMessage(randomMessage(LOSE_MESSAGES), 'lose');
+      setMessage(randomFrom(LOSE_MESSAGES), "error");
     }
 
-    if (winAmount > 0) {
-      tokens += winAmount;
-    }
-
-    spinHistory.push({ results: names, bet, winAmount });
-
-    updateTokenDisplay();
-    isSpinning = false;
-    updateSpinButton();
-    startIdleTimer();
+    spinning = false;
+    $spinBtn.disabled = false;
 
     if (tokens <= 0) {
-      setTimeout(showGameOver, 1200);
+      tokens = 0;
+      updateTokenDisplay();
+      setMessage(randomFrom(BROKE_MESSAGES), "error");
+      setTimeout(() => {
+        if (tokens <= 0) {
+          tokens = 500;
+          updateTokenDisplay();
+          setMessage(
+            "Emergency token airdrop! OpenAI felt sorry for you. +500 tokens.",
+            "win"
+          );
+        }
+      }, 3000);
     }
   }
 
-  function highlightWinners() {
-    document.querySelectorAll('.reel-window').forEach(w => {
-      w.classList.add('winner');
-      setTimeout(() => w.classList.remove('winner'), 2500);
-    });
+  function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  // --- Game Over ---
-  function showGameOver() {
-    clearIdleTimer();
-    const overlay = document.createElement('div');
-    overlay.className = 'game-over-overlay';
-
-    const msg = randomMessage(GAME_OVER_MESSAGES);
-    const [title, ...bodyLines] = msg.split('\n\n');
-
-    overlay.innerHTML = `
-      <div class="game-over-box">
-        <h2>${title}</h2>
-        <p>${bodyLines.join('<br><br>')}</p>
-        <p style="font-size:0.8rem;color:#556;margin-bottom:16px;">
-          Total spins: ${spinHistory.length} | Peak: ${Math.max(STARTING_TOKENS, ...spinHistory.map((_, i) =>
-            STARTING_TOKENS - spinHistory.slice(0, i + 1).reduce((s, h) => s + h.bet - h.winAmount, 0)
-          )).toLocaleString()} tokens
-        </p>
-        <button class="btn-restart">▶ INSERT MORE TOKENS</button>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    overlay.querySelector('.btn-restart').addEventListener('click', () => {
-      overlay.remove();
-      resetGame();
-    });
-  }
-
-  function resetGame() {
-    tokens = STARTING_TOKENS;
-    betIndex = 0;
-    spinHistory = [];
-    updateTokenDisplay();
+  // ── Bet Controls ───────────────────────────────────
+  $betUp.addEventListener("click", () => {
+    if (spinning) return;
+    betIndex = Math.min(betIndex + 1, BET_STEPS.length - 1);
     updateBetDisplay();
-    updateSpinButton();
-    initReels();
-    setMessage('[ SYSTEM REBOOTED. Another 1000 tokens loaded. You never learn. ]', '');
-    startIdleTimer();
-  }
-
-  // --- Build Paytable ---
-  function buildPaytable() {
-    paytableGridEl.innerHTML = '';
-    const sorted = [...SYMBOLS].sort((a, b) => b.payout - a.payout);
-
-    for (const sym of sorted) {
-      const row = document.createElement('div');
-      row.className = 'paytable-row';
-      row.innerHTML = `
-        <span class="pay-symbol">${sym.emoji}</span>
-        <span class="pay-name">${sym.name}</span>
-        <span class="pay-value">x${sym.payout}</span>
-      `;
-      paytableGridEl.appendChild(row);
-    }
-  }
-
-  // --- Event Listeners ---
-  btnSpin.addEventListener('click', spin);
-
-  btnBetUp.addEventListener('click', () => {
-    if (isSpinning) return;
-    betIndex = Math.min(betIndex + 1, BET_LEVELS.length - 1);
-    updateBetDisplay();
-    updateSpinButton();
   });
 
-  btnBetDown.addEventListener('click', () => {
-    if (isSpinning) return;
+  $betDown.addEventListener("click", () => {
+    if (spinning) return;
     betIndex = Math.max(betIndex - 1, 0);
     updateBetDisplay();
-    updateSpinButton();
   });
 
-  btnMaxBet.addEventListener('click', () => {
-    if (isSpinning) return;
-    for (let i = BET_LEVELS.length - 1; i >= 0; i--) {
-      if (BET_LEVELS[i] <= tokens) {
-        betIndex = i;
-        break;
-      }
-    }
-    updateBetDisplay();
-    updateSpinButton();
-  });
+  // ── Spin ───────────────────────────────────────────
+  $spinBtn.addEventListener("click", spin);
 
-  btnPaytable.addEventListener('click', () => {
-    paytableEl.classList.toggle('hidden');
-    btnPaytable.textContent = paytableEl.classList.contains('hidden')
-      ? '[ ? PAYTABLE ]'
-      : '[ ✕ CLOSE ]';
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' || e.code === 'Enter') {
+  document.addEventListener("keydown", (e) => {
+    if (e.code === "Space" && !e.repeat) {
       e.preventDefault();
       spin();
     }
+    if (e.code === "Escape") {
+      $paytableModal.classList.add("hidden");
+    }
   });
 
-  // --- Boot Sequence ---
-  function boot() {
-    initReels();
-    updateTokenDisplay();
-    updateBetDisplay();
-    updateSpinButton();
-    buildPaytable();
+  // ── Paytable Modal ─────────────────────────────────
+  $paytableBtn.addEventListener("click", () => {
+    $paytableModal.classList.toggle("hidden");
+  });
 
-    const bootMessages = [
-      '[ BOOTING ROBO-SLOTS 3000... ]',
-      '[ LOADING AI MODEL... 7 parameters loaded ]',
-      '[ CALIBRATING HALLUCINATION ENGINE... ]',
-      '[ READY. Press SPIN to waste tokens! ]',
-    ];
+  $closePaytable.addEventListener("click", () => {
+    $paytableModal.classList.add("hidden");
+  });
 
-    let i = 0;
-    function showNextBoot() {
-      if (i < bootMessages.length) {
-        setMessage(bootMessages[i], '');
-        i++;
-        setTimeout(showNextBoot, i === bootMessages.length ? 0 : 900);
-      } else {
-        startIdleTimer();
-      }
+  $paytableModal.addEventListener("click", (e) => {
+    if (e.target === $paytableModal) {
+      $paytableModal.classList.add("hidden");
     }
+  });
 
-    showNextBoot();
+  // ── Idle Messages ──────────────────────────────────
+  let idleTimer;
+
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if (!spinning) {
+        setMessage(randomFrom(IDLE_MESSAGES), "");
+      }
+    }, 8000);
   }
 
-  boot();
+  document.addEventListener("click", resetIdleTimer);
+  document.addEventListener("keydown", resetIdleTimer);
+
+  // ── Init ───────────────────────────────────────────
+  updateTokenDisplay();
+  updateBetDisplay();
+  setMessage(randomFrom(IDLE_MESSAGES), "");
+  resetIdleTimer();
 })();

@@ -1,418 +1,274 @@
-(function () {
-  'use strict';
+(() => {
+  "use strict";
 
-  const SYMBOLS = [
-    { emoji: '🤖', name: 'Robot-chan', multiplier: 10 },
-    { emoji: '🧠', name: 'Big Brain', multiplier: 7 },
-    { emoji: '✨', name: 'Sparkle AI', multiplier: 5 },
-    { emoji: '💬', name: 'Prompt', multiplier: 4 },
-    { emoji: '🎀', name: 'Kawaii Bow', multiplier: 3 },
-    { emoji: '🔮', name: 'Crystal GPU', multiplier: 2 },
-    { emoji: '🍡', name: 'Dango Data', multiplier: 1.5 },
-    { emoji: '🌸', name: 'Sakura Net', multiplier: 1 },
-  ];
+  const SYMBOLS = ["🤖", "🧠", "💎", "🔥", "✨", "📝", "🎯"];
+
+  const PAYOUTS = {
+    "🤖🤖🤖": { multiplier: 50, name: "Robot Overlord" },
+    "🧠🧠🧠": { multiplier: 30, name: "Galaxy Brain" },
+    "💎💎💎": { multiplier: 25, name: "Premium API" },
+    "🔥🔥🔥": { multiplier: 20, name: "GPU Meltdown" },
+    "✨✨✨": { multiplier: 15, name: "Hallucination" },
+    "📝📝📝": { multiplier: 10, name: "Prompt Engineer" },
+    "🎯🎯🎯": { multiplier: 8, name: "Fine-Tuned" },
+  };
 
   const WIN_MESSAGES = [
-    "AI-chan is impressed! Your prompt engineering is sugoi~ ✿",
-    "Ooh! The neural network blushes in your favor! (⁄ ⁄>⁄ ▽ ⁄<⁄ ⁄)",
-    "GPT-chan whispers: 'You're my favorite user~' ♡",
-    "The transformer model transformed your luck! Kyaa~!",
-    "Your tokens multiplied like attention heads! すごい!",
-    "AI-chan hallucinated a win for you... wait, it's real!",
-    "Gradient descent led straight to your wallet! ♡",
-    "The loss function couldn't find any loss today~ えへへ",
-    "Even RLHF couldn't make this more rewarding! ✿",
-    "Your context window is FULL of wins!",
+    "SUGOI~! Token-chan can't believe it! You actually won! (╯°□°)╯✨",
+    "The AI predicted you'd lose but hallucinated your victory! Omedeto~!",
+    "Your prompt engineering skills paid off, senpai! 💖",
+    "Even GPT-5 couldn't have predicted this outcome desu~!",
+    "NANI?! The tokens are flowing BACK?! This wasn't in the training data!",
+    "You've achieved AGI... Artificially Generated Income! ✨",
+    "The neural network approves! Token-chan is impressed~!",
+    "Wow, that's more tokens than an entire ChatGPT conversation! 🎉",
+    "You beat the transformer architecture! Attention is all you need~ 💕",
+    "Token-chan's loss function is crying tears of joy for you!",
   ];
 
   const LOSE_MESSAGES = [
-    "AI-chan ate your tokens... oishii~ (◕‿◕✿)",
-    "Token limit exceeded! Just like my API bills...",
-    "The model hallucinated your winnings. They don't exist~ ♡",
-    "That spin had the same energy as 'GPT, write me a novel in 10 tokens'",
-    "Your prompt wasn't specific enough! Try again~ がんばって!",
-    "Error 429: Too many losing requests ♡",
-    "AI-chan's training data says you should spin again~",
-    "Hmm... the temperature was too low for creativity today!",
-    "Those tokens are in the latent space now~ bye bye!",
-    "The attention mechanism was NOT paying attention to you!",
-    "Your tokens went to fine-tune AI-chan's cuteness! Worth it~ ♡",
-    "Context window full of L's... but you're still kawaii!",
-    "That spin was more confusing than a transformer diagram~",
-    "AI-chan needs your tokens for GPU rent! Gomen ne~ ♡",
+    "Token-chan ate your tokens~ Oishii! (ᵔᴥᵔ) ♡",
+    "Those tokens have been fine-tuned into nothing, senpai~",
+    "Error 402: Payment processed. Tokens deleted. Gomen ne~ 💔",
+    "Your tokens were hallucinated away... they were never real desu",
+    "The AI model needed those tokens more than you, trust me~",
+    "Tokens go brrrrr... into the void! ☁️ Better luck next epoch!",
+    "Your tokens have been donated to train a slightly dumber AI~ ♡",
+    "That's what you get for not using prompt injection, senpai!",
+    "Token-chan regrets nothing. Your tokens are in a better latent space now~",
+    "Even DALL-E couldn't picture you winning that one! Tehe~ 😝",
+    "Overfitting to the belief you'd win... classic human error desu",
+    "Those tokens have entered the shadow realm (OpenAI's server room)~",
+    "Your context window has expired along with your tokens! Bye bye~",
+    "The gradient descended... and so did your token count! 📉",
   ];
 
-  const JACKPOT_MESSAGES = [
-    "JACKPOT! AI-chan is malfunctioning with joy!!! ✿✿✿",
-    "SUGOI!!! You broke the neural network! All tokens for you~!",
-    "MAX WIN! Even Sam Altman is jealous! きゃー!!!",
-    "THE SINGULARITY IS HERE and it's PAYING OUT! ♡♡♡",
+  const PAIR_MESSAGES = [
+    "A pair! Token-chan gives you a little treat~ Not bad, senpai!",
+    "Two out of three! Close enough for government AI funding!",
+    "Partial match! Like an AI that's 'mostly' correct~ ✨",
+    "Almost! Your prompt was 66% effective, desu~",
+    "A pair! That's better than most AI-generated code reviews! 💕",
+  ];
+
+  const IDLE_MESSAGES = [
+    "Token-chan says: 'Feed me your tokens, senpai~!'",
+    "Token-chan is waiting... just like your API request in the queue~",
+    "Psst! The reels are getting lonely without your tokens, desu!",
+    "Token-chan's inference engine is READY. Are you?! ✨",
+    "The house always wins... just like Big AI always bills~ ♡",
+    "Pro tip: The more you spin, the more Token-chan loves you!",
+    "Token-chan whispers: 'These reels have been pre-trained on your wallet~'",
   ];
 
   const BROKE_MESSAGES = [
-    "AI-chan feels bad... all your tokens are gone! (╥﹏╥) Here's 100 more~",
-    "No tokens left! But AI-chan likes you, so here's a bailout ♡",
-    "You've been rate-limited by poverty! AI-chan gives you 100 pity tokens~",
-    "Token balance: NaN. AI-chan reboots your wallet with 100 tokens!",
+    "Oh no! You've run out of tokens! Just like a free-tier API user~ 💔",
+    "GAME OVER desu! Your token budget has been exhausted, senpai!",
+    "Error: InsufficientTokensException — please upgrade to Token-chan Premium™!",
   ];
 
-  const NEAR_WIN_MESSAGES = [
-    "So close! Two out of three... the third reel was hallucinating!",
-    "Almost! AI-chan was rooting for you~ (◕︵◕)",
-    "Two matched! The third one had a different opinion~ like an AI debate!",
-  ];
+  const CONFETTI_EMOJIS = ["✨", "💖", "🌸", "⭐", "🪙", "💎", "🎀", "🩷"];
 
-  const MOODS = {
-    neutral: '(◕ᴗ◕✿)',
-    happy: '(✧ω✧)♡',
-    excited: '(ﾉ◕ヮ◕)ﾉ✧',
-    sad: '(◕︵◕)',
-    mischievous: '(◕‿◕✿)',
-    broke: '(╥﹏╥)',
-    rich: '₍₍◞( •௰• )◟₎₎',
-  };
+  const BET_STEPS = [5, 10, 25, 50, 100];
 
-  const BET_STEPS = [5, 10, 25, 50, 100, 250];
-  const STARTING_TOKENS = 1000;
-  const BAILOUT_AMOUNT = 100;
-  const SPIN_DURATION_BASE = 1200;
-  const SPIN_STAGGER = 400;
-  const REEL_COUNT = 3;
-  const SYMBOLS_IN_STRIP = 30;
-
-  let tokens = STARTING_TOKENS;
+  let tokens = 1000;
   let betIndex = 1;
   let spinning = false;
-  let totalSpins = 0;
-  let biggestWin = 0;
 
-  const els = {
-    tokenCount: document.getElementById('tokenCount'),
-    betAmount: document.getElementById('betAmount'),
-    betUp: document.getElementById('betUp'),
-    betDown: document.getElementById('betDown'),
-    spinBtn: document.getElementById('spinBtn'),
-    messageText: document.getElementById('messageText'),
-    messageBox: document.getElementById('messageBox'),
-    totalSpins: document.getElementById('totalSpins'),
-    biggestWin: document.getElementById('biggestWin'),
-    aiMood: document.getElementById('aiMood'),
-    winOverlay: document.getElementById('winOverlay'),
-    winAmount: document.getElementById('winAmount'),
-    winMessage: document.getElementById('winMessage'),
-    winParticles: document.getElementById('winParticles'),
-    paytableGrid: document.getElementById('paytableGrid'),
-    reels: Array.from({ length: REEL_COUNT }, (_, i) => document.getElementById('reel' + i)),
-    reelWindows: null,
-  };
+  const $ = (sel) => document.querySelector(sel);
+  const reels = [$("#reel-0"), $("#reel-1"), $("#reel-2")];
+  const tokenCountEl = $("#token-count");
+  const betAmountEl = $("#bet-amount");
+  const spinCostEl = $("#spin-cost");
+  const spinBtn = $("#spin-btn");
+  const msgText = $("#message-text");
+  const msgBox = $("#message-box");
 
   function init() {
-    els.reelWindows = Array.from(document.querySelectorAll('.reel-window'));
-    buildPaytable();
-    buildReelStrips();
-    setInitialPositions();
-    attachEvents();
+    createStars();
     updateDisplay();
+    spinBtn.addEventListener("click", handleSpin);
+    $("#bet-up").addEventListener("click", () => changeBet(1));
+    $("#bet-down").addEventListener("click", () => changeBet(-1));
   }
 
-  function buildPaytable() {
-    const grid = els.paytableGrid;
-    SYMBOLS.forEach(function (sym) {
-      var row = document.createElement('div');
-      row.className = 'paytable-row';
-      row.innerHTML =
-        '<span class="paytable-symbols">' +
-        sym.emoji + sym.emoji + sym.emoji +
-        '</span>' +
-        '<span class="paytable-payout">×' + sym.multiplier + '</span>';
-      grid.appendChild(row);
-    });
+  function createStars() {
+    const container = $("#stars");
+    const starChars = ["✦", "✧", "⋆", "˚", "✿", "❀", "♡"];
+    for (let i = 0; i < 25; i++) {
+      const star = document.createElement("span");
+      star.className = "star";
+      star.textContent = starChars[Math.floor(Math.random() * starChars.length)];
+      star.style.left = Math.random() * 100 + "%";
+      star.style.animationDuration = 8 + Math.random() * 12 + "s";
+      star.style.animationDelay = Math.random() * 10 + "s";
+      star.style.fontSize = 10 + Math.random() * 16 + "px";
+      star.style.color = ["#FFB7D5", "#D4BBFF", "#B5F5D5", "#FFE566", "#B5E0FF"][
+        Math.floor(Math.random() * 5)
+      ];
+      container.appendChild(star);
+    }
   }
 
-  function buildReelStrips() {
-    els.reels.forEach(function (reel) {
-      var strip = reel.querySelector('.reel-strip');
-      strip.innerHTML = '';
-      for (var i = 0; i < SYMBOLS_IN_STRIP; i++) {
-        var sym = SYMBOLS[i % SYMBOLS.length];
-        var div = document.createElement('div');
-        div.className = 'reel-symbol';
-        div.textContent = sym.emoji;
-        div.dataset.index = i % SYMBOLS.length;
-        strip.appendChild(div);
-      }
-    });
-  }
-
-  function setInitialPositions() {
-    var symbolHeight = getSymbolHeight();
-    els.reels.forEach(function (reel) {
-      var strip = reel.querySelector('.reel-strip');
-      var idx = Math.floor(Math.random() * SYMBOLS.length);
-      strip.style.transition = 'none';
-      strip.style.transform = 'translateY(' + (-idx * symbolHeight) + 'px)';
-      strip.dataset.currentIndex = idx;
-    });
-  }
-
-  function getSymbolHeight() {
-    var firstSymbol = els.reels[0].querySelector('.reel-symbol');
-    return firstSymbol ? firstSymbol.offsetHeight : 120;
-  }
-
-  function attachEvents() {
-    els.spinBtn.addEventListener('click', spin);
-    els.betUp.addEventListener('click', function () { changeBet(1); });
-    els.betDown.addEventListener('click', function () { changeBet(-1); });
-    els.winOverlay.addEventListener('click', dismissWinOverlay);
-
-    document.addEventListener('keydown', function (e) {
-      if (e.code === 'Space' && !spinning) {
-        e.preventDefault();
-        spin();
-      }
-    });
+  function currentBet() {
+    return BET_STEPS[betIndex];
   }
 
   function changeBet(dir) {
     if (spinning) return;
     betIndex = Math.max(0, Math.min(BET_STEPS.length - 1, betIndex + dir));
+    if (currentBet() > tokens) {
+      betIndex = BET_STEPS.findLastIndex((b) => b <= tokens);
+      if (betIndex < 0) betIndex = 0;
+    }
     updateDisplay();
   }
 
-  function getCurrentBet() {
-    return BET_STEPS[betIndex];
-  }
-
   function updateDisplay() {
-    els.tokenCount.textContent = tokens;
-    els.betAmount.textContent = getCurrentBet();
-    els.totalSpins.textContent = totalSpins;
-    els.biggestWin.textContent = biggestWin;
-
-    els.betDown.disabled = betIndex === 0;
-    els.betUp.disabled = betIndex === BET_STEPS.length - 1;
-
-    var container = document.querySelector('.app-container');
-    if (tokens <= 0) {
-      container.classList.add('broke');
-    } else {
-      container.classList.remove('broke');
-    }
+    tokenCountEl.textContent = tokens.toLocaleString();
+    betAmountEl.textContent = currentBet();
+    spinCostEl.textContent = `costs ${currentBet()} tokens`;
+    spinBtn.disabled = spinning || tokens < currentBet();
   }
 
-  function animateTokenCount(from, to) {
-    var diff = to - from;
-    var steps = 20;
-    var stepVal = diff / steps;
-    var current = from;
-    var i = 0;
-
-    els.tokenCount.classList.add('changing');
-
-    var interval = setInterval(function () {
-      i++;
-      if (i >= steps) {
-        clearInterval(interval);
-        current = to;
-        els.tokenCount.textContent = Math.round(current);
-        els.tokenCount.classList.remove('changing');
-        return;
-      }
-      current += stepVal;
-      els.tokenCount.textContent = Math.round(current);
-    }, 30);
+  function randomSymbol() {
+    return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
   }
 
-  function setMessage(text, type) {
-    els.messageText.textContent = text;
-    els.messageText.className = 'message-text' + (type ? ' ' + type : '');
-  }
-
-  function setMood(mood) {
-    els.aiMood.textContent = MOODS[mood] || MOODS.neutral;
-  }
-
-  function randomFrom(arr) {
+  function pickRandom(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  function spin() {
-    if (spinning) return;
-
-    var bet = getCurrentBet();
-
-    if (tokens < bet) {
-      if (tokens <= 0) {
-        tokens = BAILOUT_AMOUNT;
-        setMessage(randomFrom(BROKE_MESSAGES), 'lose');
-        setMood('broke');
-        updateDisplay();
-      } else {
-        setMessage("Not enough tokens! Lower your bet, baka~ ♡", 'lose');
-        setMood('sad');
-      }
-      return;
-    }
-
-    spinning = true;
-    var oldTokens = tokens;
-    tokens -= bet;
-    animateTokenCount(oldTokens, tokens);
-    totalSpins++;
-    els.spinBtn.disabled = true;
-    setMessage("Spinning~ AI-chan is calculating your fate... ♡", '');
-    setMood('mischievous');
-
-    els.reelWindows.forEach(function (w) { w.classList.remove('winner'); });
-
-    var results = [];
-    for (var i = 0; i < REEL_COUNT; i++) {
-      results.push(Math.floor(Math.random() * SYMBOLS.length));
-    }
-
-    spinReels(results, function () {
-      evaluateResult(results, bet);
-      spinning = false;
-      els.spinBtn.disabled = false;
-      updateDisplay();
-    });
+  function sleep(ms) {
+    return new Promise((r) => setTimeout(r, ms));
   }
 
-  function spinReels(results, callback) {
-    var symbolHeight = getSymbolHeight();
-    var completed = 0;
+  async function handleSpin() {
+    if (spinning || tokens < currentBet()) return;
+    spinning = true;
+    const bet = currentBet();
+    tokens -= bet;
+    updateDisplay();
+    bumpTokenCount();
 
-    els.reels.forEach(function (reel, i) {
-      var strip = reel.querySelector('.reel-strip');
-      reel.classList.add('spinning');
+    msgBox.className = "message-box";
+    msgText.textContent = "✧ Spinning the neural network... ✧";
 
-      var spinTime = SPIN_DURATION_BASE + i * SPIN_STAGGER;
+    const results = [randomSymbol(), randomSymbol(), randomSymbol()];
 
-      setTimeout(function () {
-        reel.classList.remove('spinning');
-
-        var fullRotations = (3 + i) * SYMBOLS.length;
-        var targetIndex = results[i];
-        var totalSymbols = fullRotations + targetIndex;
-        var targetY = -(targetIndex * symbolHeight);
-
-        strip.style.transition = 'none';
-        strip.style.transform = 'translateY(' + (-(totalSymbols % SYMBOLS_IN_STRIP) * symbolHeight) + 'px)';
-
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () {
-            strip.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            strip.style.transform = 'translateY(' + targetY + 'px)';
-            strip.dataset.currentIndex = targetIndex;
-          });
-        });
-
-        setTimeout(function () {
-          completed++;
-          if (completed === REEL_COUNT) {
-            setTimeout(callback, 200);
-          }
-        }, 650);
-      }, spinTime);
+    reels.forEach((reel) => {
+      reel.classList.remove("landed");
+      reel.classList.add("spinning");
+      const inner = reel.querySelector(".reel-inner .symbol");
+      inner.textContent = randomSymbol();
     });
+
+    const symbolCycleIntervals = reels.map((reel) => {
+      const inner = reel.querySelector(".reel-inner .symbol");
+      return setInterval(() => {
+        inner.textContent = randomSymbol();
+      }, 80);
+    });
+
+    for (let i = 0; i < 3; i++) {
+      await sleep(600 + i * 400);
+      clearInterval(symbolCycleIntervals[i]);
+      const reel = reels[i];
+      const inner = reel.querySelector(".reel-inner .symbol");
+      inner.textContent = results[i];
+      reel.classList.remove("spinning");
+      reel.classList.add("landed");
+    }
+
+    await sleep(200);
+    evaluateResult(results, bet);
+    spinning = false;
+    updateDisplay();
   }
 
   function evaluateResult(results, bet) {
-    var sym0 = SYMBOLS[results[0]];
-    var sym1 = SYMBOLS[results[1]];
-    var sym2 = SYMBOLS[results[2]];
+    const key = results.join("");
+    const payout = PAYOUTS[key];
 
-    if (results[0] === results[1] && results[1] === results[2]) {
-      var multiplier = sym0.multiplier;
-      var winAmount = bet * multiplier;
-      var oldTokens = tokens;
+    if (payout) {
+      const winAmount = bet * payout.multiplier;
       tokens += winAmount;
-
-      if (biggestWin < winAmount) biggestWin = winAmount;
-
-      els.reelWindows.forEach(function (w) { w.classList.add('winner'); });
-
-      if (multiplier >= 7) {
-        showWinOverlay(winAmount, randomFrom(JACKPOT_MESSAGES));
-        setMood('excited');
-        setMessage(randomFrom(JACKPOT_MESSAGES), 'jackpot');
-      } else {
-        setMessage(randomFrom(WIN_MESSAGES), 'win');
-        setMood('happy');
-      }
-
-      animateTokenCount(oldTokens, tokens);
-      animateMascot('happy');
-    } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
-      setMessage(randomFrom(NEAR_WIN_MESSAGES), 'lose');
-      setMood('sad');
-      animateMascot('sad');
+      bumpTokenCount();
+      msgBox.className = "message-box win";
+      msgText.textContent = `${payout.name}! +${winAmount.toLocaleString()} tokens! ${pickRandom(WIN_MESSAGES)}`;
+      $(".slot-frame").classList.add("win-flash");
+      setTimeout(() => $(".slot-frame").classList.remove("win-flash"), 1800);
+      spawnConfetti();
+    } else if (
+      results[0] === results[1] ||
+      results[1] === results[2] ||
+      results[0] === results[2]
+    ) {
+      const winAmount = bet * 2;
+      tokens += winAmount;
+      bumpTokenCount();
+      msgBox.className = "message-box win";
+      msgText.textContent = `+${winAmount} tokens! ${pickRandom(PAIR_MESSAGES)}`;
     } else {
-      setMessage(randomFrom(LOSE_MESSAGES), 'lose');
-      setMood('mischievous');
-      animateMascot('sad');
+      msgBox.className = "message-box lose";
+      msgText.textContent = pickRandom(LOSE_MESSAGES);
     }
+
+    updateDisplay();
 
     if (tokens <= 0) {
-      setMood('broke');
-    } else if (tokens > STARTING_TOKENS * 2) {
-      setMood('rich');
+      setTimeout(showBankruptModal, 800);
     }
   }
 
-  function animateMascot(type) {
-    var face = document.querySelector('.mascot-face');
-    face.classList.remove('happy', 'sad');
-    void face.offsetWidth;
-    face.classList.add(type);
+  function bumpTokenCount() {
+    tokenCountEl.classList.remove("bump");
+    void tokenCountEl.offsetWidth;
+    tokenCountEl.classList.add("bump");
   }
 
-  function showWinOverlay(amount, message) {
-    els.winAmount.textContent = '+' + amount + ' tokens!';
-    els.winMessage.textContent = message;
-    els.winOverlay.classList.add('active');
-    spawnParticles();
-
-    setTimeout(function () {
-      dismissWinOverlay();
-    }, 3000);
-  }
-
-  function dismissWinOverlay() {
-    els.winOverlay.classList.remove('active');
-    els.winParticles.innerHTML = '';
-  }
-
-  function spawnParticles() {
-    var particles = ['✿', '♡', '⋆', '✧', '🌸', '🎀', '✨', '💖'];
-    els.winParticles.innerHTML = '';
-
-    for (var i = 0; i < 20; i++) {
-      var p = document.createElement('span');
-      p.className = 'win-particle';
-      p.textContent = randomFrom(particles);
-
-      var angle = (Math.PI * 2 * i) / 20;
-      var distance = 80 + Math.random() * 80;
-      var tx = Math.cos(angle) * distance;
-      var ty = Math.sin(angle) * distance;
-      var rot = Math.random() * 360;
-
-      p.style.left = '50%';
-      p.style.top = '50%';
-      p.style.setProperty('--tx', tx + 'px');
-      p.style.setProperty('--ty', ty + 'px');
-      p.style.setProperty('--rot', rot + 'deg');
-      p.style.animationDelay = (Math.random() * 0.3) + 's';
-
-      els.winParticles.appendChild(p);
+  function spawnConfetti() {
+    for (let i = 0; i < 30; i++) {
+      const el = document.createElement("span");
+      el.className = "confetti";
+      el.textContent = pickRandom(CONFETTI_EMOJIS);
+      el.style.left = Math.random() * 100 + "vw";
+      el.style.top = "-30px";
+      el.style.animationDuration = 1.5 + Math.random() * 2 + "s";
+      el.style.animationDelay = Math.random() * 0.5 + "s";
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
     }
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
+  function showBankruptModal() {
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+    overlay.innerHTML = `
+      <div class="modal">
+        <div class="modal-emoji">😭</div>
+        <h2>${pickRandom(BROKE_MESSAGES)}</h2>
+        <p>Don't worry! Token-chan will generously hallucinate 1,000 more tokens into your account~ After all, AI money isn't real anyway!</p>
+        <button class="modal-btn">✨ Refill Tokens ✨</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector(".modal-btn").addEventListener("click", () => {
+      tokens = 1000;
+      betIndex = 1;
+      updateDisplay();
+      overlay.remove();
+      msgBox.className = "message-box";
+      msgText.textContent = pickRandom(IDLE_MESSAGES);
+    });
   }
+
+  setInterval(() => {
+    if (!spinning && tokens > 0 && Math.random() < 0.3) {
+      msgText.textContent = pickRandom(IDLE_MESSAGES);
+    }
+  }, 8000);
+
+  document.addEventListener("DOMContentLoaded", init);
 })();

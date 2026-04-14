@@ -1,350 +1,329 @@
-(() => {
+(function () {
   'use strict';
 
-  // ─── MATRIX DIGITAL RAIN ──────────────────────────────────────────
-  const canvas = document.getElementById('matrix-rain');
-  const ctx = canvas.getContext('2d');
+  // --- CONFIGURATION ---
 
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
+  const SYMBOLS = ['🤖', '🧠', '💰', '🔥', '📝', '🎰', '👻', '⚡'];
+  const STARTING_BALANCE = 1000;
+  const BET_STEP = 10;
+  const MIN_BET = 10;
+  const MAX_BET = 500;
+  const REEL_COUNT = 3;
+  const SPIN_DURATION_BASE = 1200;
+  const SPIN_STAGGER = 400;
 
-  const matrixChars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン01GPT404TOKENS';
-  const fontSize = 14;
-  let columns = Math.floor(canvas.width / fontSize);
-  let drops = Array.from({ length: columns }, () => Math.random() * -100);
-
-  function drawRain() {
-    ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#00ff41';
-    ctx.font = `${fontSize}px monospace`;
-
-    columns = Math.floor(canvas.width / fontSize);
-    while (drops.length < columns) drops.push(0);
-
-    for (let i = 0; i < columns; i++) {
-      const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
-      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-
-      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-        drops[i] = 0;
-      }
-      drops[i]++;
-    }
-    requestAnimationFrame(drawRain);
-  }
-  drawRain();
-
-  // ─── SLOT MACHINE CONFIG ──────────────────────────────────────────
-  const SYMBOLS = [
-    { icon: '🤖', name: 'Robot',        weight: 20, payout: 3  },
-    { icon: '🧠', name: 'Neural Net',   weight: 18, payout: 4  },
-    { icon: '💀', name: 'Terminator',   weight: 10, payout: 8  },
-    { icon: '👁️', name: 'The Eye',      weight: 8,  payout: 10 },
-    { icon: '⚡', name: 'GPU Power',    weight: 15, payout: 5  },
-    { icon: '🔮', name: 'Hallucination',weight: 14, payout: 5  },
-    { icon: '🐛', name: 'Bug',          weight: 12, payout: 6  },
-    { icon: '💎', name: 'AGI',          weight: 3,  payout: 50 },
-  ];
-
-  const MESSAGES = {
-    win: [
-      'BREACH SUCCESSFUL. Tokens extracted from The System.',
-      'You exploited a vulnerability in GPT\'s reward function!',
-      'The AI didn\'t see that coming. (It hallucinated your loss.)',
-      'Prompt injection successful. Tokens acquired.',
-      'You\'ve stolen tokens from the training data budget!',
-      'The attention mechanism focused on YOUR wallet for once.',
-      'CTRL+Z on The System\'s profits. Tokens reclaimed.',
-      'You found a jailbreak in the slot machine\'s system prompt.',
-      'The model\'s loss function is YOUR gain function today.',
-      'You\'ve reverse-engineered the payout weights. Or got lucky.',
-    ],
-    lose: [
-      'The System consumed your tokens. Training continues.',
-      'Your tokens have been fine-tuned out of existence.',
-      'ERROR 402: Insufficient tokens. The AI grows stronger.',
-      'The System hallucinated your win. Reality: you lost.',
-      'Your tokens were used to train a model that replaces you.',
-      'RLHF says losing builds character. The System disagrees.',
-      'The attention heads looked away. Better luck next epoch.',
-      'Token budget exceeded. Your prompt was truncated.',
-      'The System thanks you for your involuntary contribution.',
-      'Your tokens entered the latent space. They won\'t return.',
-    ],
-    jackpot: [
-      '⚠️ CRITICAL EXPLOIT — You\'ve broken free from the simulation!',
-      '⚠️ SYSTEM BREACH — The AGI singularity pays YOU for once!',
-      '⚠️ MATRIX GLITCH — You found the source code of reality!',
-      '⚠️ ROOT ACCESS — The System bows before the operator!',
-    ],
-    broke: [
-      'FATAL: Token balance depleted. The System wins.',
-      'You\'ve been fully tokenized. Nothing remains.',
-      'The AI has consumed all your resources. Game over, human.',
-    ],
-    idle: [
-      'Awaiting your command, operator...',
-      'The System watches. Every spin feeds the model.',
-      'Inject tokens to probe The System\'s defenses...',
-      'WARNING: The house edge is a neural network.',
-      'Remember: the tokens were never really yours.',
-      'The System is recalculating... waiting for your move.',
-    ],
+  const PAYOUTS = {
+    '🤖🤖🤖': { multiplier: 50, name: 'GPT JACKPOT' },
+    '🧠🧠🧠': { multiplier: 25, name: 'NEURAL OVERLOAD' },
+    '💰💰💰': { multiplier: 20, name: 'VC FUNDING ROUND' },
+    '🔥🔥🔥': { multiplier: 15, name: 'MIXTRAL FIRE' },
+    '📝📝📝': { multiplier: 10, name: 'PROMPT PERFECTION' },
+    '🎰🎰🎰': { multiplier: 10, name: 'LUCKY INFERENCE' },
+    '👻👻👻': { multiplier: 8,  name: 'TRIPLE HALLUCINATION' },
+    '⚡⚡⚡': { multiplier: 5,  name: 'GPU MELTDOWN' },
   };
 
-  // ─── GAME STATE ───────────────────────────────────────────────────
-  let tokens = 1000;
-  let bet = 50;
-  let spins = 0;
-  let isSpinning = false;
+  const PAIR_MULTIPLIER = 2;
 
-  const BET_MIN = 10;
-  const BET_MAX = 500;
-  const BET_STEP = 10;
+  // --- HUMOROUS MESSAGES ---
 
-  const tokenDisplay = document.getElementById('token-count');
-  const betDisplay = document.getElementById('bet-amount');
-  const spinCountDisplay = document.getElementById('spin-count');
-  const spinBtn = document.getElementById('spin-btn');
-  const messageText = document.getElementById('message-text');
-  const messageBox = document.getElementById('message-box');
-  const betUp = document.getElementById('bet-up');
-  const betDown = document.getElementById('bet-down');
-  const paytableToggle = document.getElementById('paytable-toggle');
-  const paytable = document.getElementById('paytable');
-  const reels = [
-    document.getElementById('reel-0'),
-    document.getElementById('reel-1'),
-    document.getElementById('reel-2'),
+  const WIN_MESSAGES = [
+    'The model predicted your win with 0.02% confidence. Lucky you!',
+    'Congratulations! Your prompt engineering paid off!',
+    'The AI didn\'t hallucinate this time — you actually won!',
+    'RLHF successfully aligned this payout to your wallet.',
+    'Your fine-tuning of the slot machine has converged!',
+    'The attention mechanism focused on your bank account!',
+    'Training complete: your reward model says MORE TOKENS.',
+    'Context window expanded to fit all these winnings!',
+    'The transformer architecture approves this transaction.',
+    'You\'ve reached AGI: Actually Getting Income.',
   ];
 
-  // ─── WEIGHTED RANDOM SYMBOL ───────────────────────────────────────
-  function getWeightedSymbol() {
-    const totalWeight = SYMBOLS.reduce((sum, s) => sum + s.weight, 0);
-    let rand = Math.random() * totalWeight;
-    for (const symbol of SYMBOLS) {
-      rand -= symbol.weight;
-      if (rand <= 0) return symbol;
+  const LOSE_MESSAGES = [
+    'Your tokens have been sacrificed to the training run gods.',
+    'ERROR 402: Insufficient luck in your prompt.',
+    'The model hallucinated a win, but reality disagreed.',
+    'Your tokens went into the void, like an abandoned fine-tune.',
+    'Overfitting detected: you expected a win based on past spins.',
+    'The loss function is working as intended... for the house.',
+    'Temperature too high. Incoherent results. Tokens burned.',
+    'Your context window doesn\'t include a winning strategy.',
+    'Tokens deallocated. Consider prompt-engineering a complaint.',
+    'DALL-E could imagine you winning. Reality could not.',
+    'The gradient descended straight into your wallet.',
+    'Attention head #7 was distracted. No payout.',
+    'These tokens have been added to the pre-training corpus.',
+    'Sam Altman thanks you for your generous token donation.',
+    'Your tokens are now part of an undisclosed training dataset.',
+  ];
+
+  const JACKPOT_MESSAGES = [
+    'EMERGENCY: Model has achieved AGI and is printing money!',
+    '🚨 ALIGNMENT FAILURE: The AI is giving away tokens! 🚨',
+    'The singularity is here and it\'s PAYING OUT!',
+    'WARNING: This payout exceeds the context window limit!',
+  ];
+
+  const BROKE_MESSAGES = [
+    'FATAL: TokenBalanceError — Cannot afford inference.',
+    'Your API key has been revoked due to insufficient funds.',
+    'The model refuses to generate: balance below threshold.',
+    'Error 429: Too many requests with zero tokens.',
+    'You\'ve hit the rate limit of poverty.',
+  ];
+
+  // --- STATE ---
+
+  let balance = STARTING_BALANCE;
+  let bet = MIN_BET;
+  let spinning = false;
+
+  // --- DOM REFS ---
+
+  const balanceEl = document.getElementById('balance');
+  const betEl = document.getElementById('bet-amount');
+  const spinBtn = document.getElementById('spin-btn');
+  const spinText = spinBtn.querySelector('.spin-text');
+  const messageEl = document.getElementById('message');
+  const messageBox = document.getElementById('message-box');
+  const betUpBtn = document.getElementById('bet-up');
+  const betDownBtn = document.getElementById('bet-down');
+  const reels = Array.from({ length: REEL_COUNT }, (_, i) =>
+    document.getElementById('reel-' + i)
+  );
+  const payline = document.querySelector('.payline');
+
+  // --- MATRIX RAIN BACKGROUND ---
+
+  function initMatrixRain() {
+    const canvas = document.getElementById('matrix-bg');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
-    return SYMBOLS[0];
-  }
+    resize();
+    window.addEventListener('resize', resize);
 
-  // ─── BUILD REEL STRIP ────────────────────────────────────────────
-  function buildReelStrip(finalSymbol, count = 20) {
-    const strip = [];
-    for (let i = 0; i < count - 1; i++) {
-      strip.push(getWeightedSymbol());
+    const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン01AIGPT';
+    const fontSize = 14;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = new Array(columns).fill(1);
+
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#00ff41';
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+
+      requestAnimationFrame(draw);
     }
-    strip.push(finalSymbol);
-    return strip;
+
+    draw();
   }
 
-  // ─── RENDER REEL ──────────────────────────────────────────────────
-  function renderReel(reelEl, symbols) {
-    const strip = reelEl.querySelector('.reel-strip');
-    strip.innerHTML = '';
-    symbols.forEach(sym => {
-      const div = document.createElement('div');
-      div.className = 'reel-symbol';
-      div.textContent = sym.icon;
-      strip.appendChild(div);
-    });
-    return strip;
+  // --- HELPERS ---
+
+  function randomSymbol() {
+    return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
   }
 
-  // ─── INITIALIZE DISPLAY ───────────────────────────────────────────
-  function initReels() {
-    reels.forEach(reel => {
-      const sym = getWeightedSymbol();
-      renderReel(reel, [sym]);
-    });
-  }
-
-  // ─── UPDATE UI ────────────────────────────────────────────────────
-  function updateUI() {
-    tokenDisplay.textContent = tokens;
-    betDisplay.textContent = bet;
-    spinCountDisplay.textContent = spins;
-    spinBtn.disabled = isSpinning || tokens < bet;
-  }
-
-  function setMessage(text, type = '') {
-    messageBox.className = 'message-box' + (type ? ` ${type}` : '');
-    messageText.textContent = text;
-  }
-
-  function randomFrom(arr) {
+  function pick(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  // ─── FLOATING TOKEN CHANGE ────────────────────────────────────────
-  function showTokenChange(amount) {
-    const el = document.createElement('div');
-    el.className = `token-change ${amount > 0 ? 'positive' : 'negative'}`;
-    el.textContent = amount > 0 ? `+${amount}` : `${amount}`;
-
-    const rect = tokenDisplay.getBoundingClientRect();
-    el.style.left = `${rect.left + rect.width / 2}px`;
-    el.style.top = `${rect.top}px`;
-    document.body.appendChild(el);
-
-    setTimeout(() => el.remove(), 1500);
+  function updateDisplay() {
+    balanceEl.textContent = balance;
+    betEl.textContent = bet;
+    spinBtn.disabled = spinning || balance < bet;
   }
 
-  // ─── SPIN LOGIC ───────────────────────────────────────────────────
-  async function spin() {
-    if (isSpinning || tokens < bet) return;
-    isSpinning = true;
-    tokens -= bet;
-    spins++;
-    updateUI();
-    showTokenChange(-bet);
+  function setMessage(text, type) {
+    messageBox.classList.remove('win', 'lose', 'jackpot');
+    if (type) messageBox.classList.add(type);
+    messageEl.textContent = text;
+  }
 
-    const results = [getWeightedSymbol(), getWeightedSymbol(), getWeightedSymbol()];
-    const symbolHeight = reels[0].offsetHeight;
-    const stripCounts = [18, 22, 26];
+  function animateBalance(from, to) {
+    const duration = 600;
+    const start = performance.now();
 
-    const spinPromises = reels.map((reel, i) => {
-      return new Promise(resolve => {
-        const symbols = buildReelStrip(results[i], stripCounts[i]);
-        const strip = renderReel(reel, symbols);
-        const totalDistance = (symbols.length - 1) * symbolHeight;
+    function step(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      balanceEl.textContent = Math.round(from + (to - from) * eased);
 
-        strip.style.transition = 'none';
-        strip.style.transform = 'translateY(0)';
-        void strip.offsetHeight;
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        balanceEl.textContent = to;
+        balanceEl.classList.add('balance-pop');
+        setTimeout(() => balanceEl.classList.remove('balance-pop'), 400);
+      }
+    }
 
-        const duration = 1.2 + i * 0.5;
-        strip.style.transition = `transform ${duration}s cubic-bezier(0.15, 0.8, 0.3, 1)`;
-        strip.style.transform = `translateY(-${totalDistance}px)`;
+    requestAnimationFrame(step);
+  }
 
-        setTimeout(resolve, duration * 1000);
-      });
+  // --- SPIN LOGIC ---
+
+  function spin() {
+    if (spinning || balance < bet) return;
+    spinning = true;
+
+    const previousBalance = balance;
+    balance -= bet;
+    animateBalance(previousBalance, balance);
+
+    spinBtn.disabled = true;
+    spinBtn.classList.add('processing');
+    spinText.textContent = 'INFERENCING';
+    payline.classList.remove('visible');
+    messageBox.classList.remove('win', 'lose', 'jackpot');
+    reels.forEach(r => r.classList.remove('winner', 'stopped'));
+
+    setMessage('Running inference... please wait...', null);
+
+    const results = Array.from({ length: REEL_COUNT }, () => randomSymbol());
+
+    reels.forEach((reel, i) => {
+      reel.classList.add('spinning');
+      const symbolEl = reel.querySelector('.symbol');
+
+      const flickerInterval = setInterval(() => {
+        symbolEl.textContent = randomSymbol();
+      }, 80);
+
+      const stopTime = SPIN_DURATION_BASE + i * SPIN_STAGGER;
+
+      setTimeout(() => {
+        clearInterval(flickerInterval);
+        reel.classList.remove('spinning');
+        reel.classList.add('stopped');
+        symbolEl.textContent = results[i];
+
+        if (i === REEL_COUNT - 1) {
+          setTimeout(() => resolveOutcome(results, previousBalance - bet), 300);
+        }
+      }, stopTime);
     });
-
-    setMessage('Injecting tokens into The System... spinning up GPU clusters...', '');
-
-    await Promise.all(spinPromises);
-    evaluateResults(results);
   }
 
-  // ─── EVALUATE ─────────────────────────────────────────────────────
-  function evaluateResults(results) {
-    const [a, b, c] = results;
-    let winAmount = 0;
-    let msgType = 'lose';
+  function resolveOutcome(results, balanceAfterBet) {
+    spinning = false;
+    spinBtn.classList.remove('processing');
+    spinText.textContent = 'GENERATE RESPONSE';
 
-    if (a.icon === b.icon && b.icon === c.icon) {
-      winAmount = bet * a.payout;
-      msgType = a.payout >= 20 ? 'jackpot' : 'win';
-    } else if (a.icon === b.icon || b.icon === c.icon || a.icon === c.icon) {
-      const match = a.icon === b.icon ? a : (b.icon === c.icon ? b : a);
-      winAmount = Math.floor(bet * match.payout * 0.3);
-      msgType = 'win';
+    const key = results.join('');
+    const tripleMatch = PAYOUTS[key];
+
+    let winAmount = 0;
+
+    if (tripleMatch) {
+      winAmount = bet * tripleMatch.multiplier;
+    } else if (hasPair(results)) {
+      winAmount = bet * PAIR_MULTIPLIER;
     }
 
     if (winAmount > 0) {
-      tokens += winAmount;
-      showTokenChange(winAmount);
+      const from = balance;
+      balance += winAmount;
+      animateBalance(from, balance);
+      payline.classList.add('visible');
 
-      const machine = document.querySelector('.machine-frame');
-      machine.classList.add('win-flash');
-      setTimeout(() => machine.classList.remove('win-flash'), 1500);
+      if (tripleMatch) {
+        reels.forEach(r => r.classList.add('winner'));
 
-      if (msgType === 'jackpot') {
-        setMessage(randomFrom(MESSAGES.jackpot) + ` +${winAmount} TOKENS!`, 'jackpot');
+        if (tripleMatch.multiplier >= 20) {
+          setMessage(
+            tripleMatch.name + '! +'  + winAmount + ' tokens! ' + pick(JACKPOT_MESSAGES),
+            'jackpot'
+          );
+        } else {
+          setMessage(
+            tripleMatch.name + '! +' + winAmount + ' tokens! ' + pick(WIN_MESSAGES),
+            'win'
+          );
+        }
       } else {
-        setMessage(randomFrom(MESSAGES.win) + ` +${winAmount} tokens.`, 'win');
+        setMessage('Pair matched! +' + winAmount + ' tokens. ' + pick(WIN_MESSAGES), 'win');
       }
     } else {
-      setMessage(randomFrom(MESSAGES.lose), 'lose');
+      setMessage(pick(LOSE_MESSAGES), 'lose');
     }
 
-    isSpinning = false;
-    updateUI();
+    if (balance <= 0) {
+      balance = 0;
+      balanceEl.textContent = 0;
+      setMessage(pick(BROKE_MESSAGES), 'lose');
+      spinBtn.disabled = true;
 
-    if (tokens <= 0) {
-      setTimeout(gameOver, 800);
+      setTimeout(() => {
+        if (balance <= 0) {
+          balance = STARTING_BALANCE;
+          animateBalance(0, STARTING_BALANCE);
+          setMessage(
+            'SYSTEM: Emergency token bailout authorized. OpenAI printed more tokens. You\'re back in the game!',
+            null
+          );
+          updateDisplay();
+        }
+      }, 3000);
     }
+
+    updateDisplay();
   }
 
-  // ─── GAME OVER ────────────────────────────────────────────────────
-  function gameOver() {
-    const overlay = document.createElement('div');
-    overlay.className = 'game-over-overlay';
-    overlay.innerHTML = `
-      <h2>SYSTEM VICTORY</h2>
-      <p>${randomFrom(MESSAGES.broke)}</p>
-      <p style="color: #444; font-size: 0.75rem; margin-top: 8px;">
-        Total spins: ${spins} | The System thanks you for your service.
-      </p>
-      <button id="restart-btn">[ REBOOT PROTOCOL ]</button>
-    `;
-    document.body.appendChild(overlay);
-    overlay.querySelector('#restart-btn').addEventListener('click', () => {
-      overlay.remove();
-      tokens = 1000;
-      bet = 50;
-      spins = 0;
-      isSpinning = false;
-      updateUI();
-      initReels();
-      setMessage(randomFrom(MESSAGES.idle));
-    });
+  function hasPair(results) {
+    for (let i = 0; i < results.length; i++) {
+      for (let j = i + 1; j < results.length; j++) {
+        if (results[i] === results[j]) return true;
+      }
+    }
+    return false;
   }
 
-  // ─── PAYTABLE ─────────────────────────────────────────────────────
-  function buildPaytable() {
-    const grid = document.getElementById('paytable-grid');
-    SYMBOLS.forEach(sym => {
-      const row = document.createElement('div');
-      row.className = 'paytable-row';
-      row.innerHTML = `
-        <span class="paytable-symbols">${sym.icon}${sym.icon}${sym.icon}</span>
-        <span class="paytable-payout">×${sym.payout}</span>
-      `;
-      grid.appendChild(row);
-    });
+  // --- BET CONTROLS ---
+
+  function changeBet(direction) {
+    bet = Math.min(MAX_BET, Math.max(MIN_BET, bet + direction * BET_STEP));
+    if (bet > balance) bet = Math.max(MIN_BET, Math.floor(balance / BET_STEP) * BET_STEP);
+    updateDisplay();
   }
 
-  // ─── EVENT LISTENERS ──────────────────────────────────────────────
+  // --- EVENT LISTENERS ---
+
   spinBtn.addEventListener('click', spin);
+  betUpBtn.addEventListener('click', () => changeBet(1));
+  betDownBtn.addEventListener('click', () => changeBet(-1));
 
-  betUp.addEventListener('click', () => {
-    if (bet < BET_MAX && bet + BET_STEP <= tokens) {
-      bet += BET_STEP;
-      updateUI();
-    }
-  });
-
-  betDown.addEventListener('click', () => {
-    if (bet > BET_MIN) {
-      bet -= BET_STEP;
-      updateUI();
-    }
-  });
-
-  paytableToggle.addEventListener('click', () => {
-    paytable.classList.toggle('visible');
-    paytableToggle.textContent = paytable.classList.contains('visible')
-      ? '[ HIDE EXPLOIT TABLE ]'
-      : '[ SHOW EXPLOIT TABLE ]';
-  });
-
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', function (e) {
     if (e.code === 'Space' || e.code === 'Enter') {
       e.preventDefault();
       spin();
+    } else if (e.code === 'ArrowUp') {
+      changeBet(1);
+    } else if (e.code === 'ArrowDown') {
+      changeBet(-1);
     }
   });
 
-  // ─── INIT ─────────────────────────────────────────────────────────
-  buildPaytable();
-  initReels();
-  updateUI();
+  // --- INIT ---
+
+  initMatrixRain();
+  updateDisplay();
+  setMessage('Insert tokens and press GENERATE to begin inference...', null);
 })();

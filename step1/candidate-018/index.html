@@ -3,149 +3,129 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SlotGPT™ — Disrupting Luck with AI</title>
+  <title>TokenBurn™ — The AI Slot Machine</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="ticker-bar">
-    <div class="ticker-content">
-      <span>🚀 SlotGPT raises $4.2B Series Z at $900B valuation</span>
-      <span>📈 "We're not a slot machine, we're a luck-as-a-service platform" — CEO</span>
-      <span>🤖 BREAKING: SlotGPT achieves AGI (Artificial Gambling Intelligence)</span>
-      <span>💰 VCs confirm: slot machines are the new large language models</span>
-      <span>🧠 SlotGPT pivots to blockchain-powered neural slot architecture</span>
-      <span>📊 Analysts: "This changes everything about everything"</span>
-      <span>🦄 SlotGPT valued higher than GDP of most countries</span>
-      <span>🚀 SlotGPT raises $4.2B Series Z at $900B valuation</span>
-      <span>📈 "We're not a slot machine, we're a luck-as-a-service platform" — CEO</span>
-      <span>🤖 BREAKING: SlotGPT achieves AGI (Artificial Gambling Intelligence)</span>
-      <span>💰 VCs confirm: slot machines are the new large language models</span>
-      <span>🧠 SlotGPT pivots to blockchain-powered neural slot architecture</span>
-      <span>📊 Analysts: "This changes everything about everything"</span>
-      <span>🦄 SlotGPT valued higher than GDP of most countries</span>
-    </div>
+  <div class="ticker-bar" aria-live="polite">
+    <span class="ticker-text" id="ticker"></span>
   </div>
 
   <header>
     <div class="logo-area">
-      <div class="logo">🎰</div>
-      <h1>SlotGPT<sup>™</sup></h1>
-      <p class="tagline">Disrupting the Gambling Industry with Generative Pre-trained Tokenomics</p>
-    </div>
-    <div class="investor-badge">
-      <span class="badge-label">Backed by</span>
-      <span class="badge-names">Andreessen Hallucinate • Sequoia Capitalized • Y Combinator of Regret</span>
+      <h1>Token<span class="burn">Burn</span><sup>™</sup></h1>
+      <p class="tagline">Disrupting Gambling With Generative AI — Series F Funded</p>
     </div>
   </header>
 
   <main>
-    <div class="dashboard">
-      <div class="stat-card token-balance">
-        <div class="stat-icon">🪙</div>
-        <div class="stat-info">
-          <span class="stat-label">Token Balance</span>
-          <span class="stat-value" id="token-count">1000</span>
-          <span class="stat-sub">( ≈ 3 ChatGPT questions )</span>
-        </div>
+    <section class="balance-bar">
+      <div class="balance-display">
+        <span class="balance-label">Your Token Balance</span>
+        <span class="balance-amount" id="balance">1000</span>
+        <span class="balance-unit">tokens</span>
       </div>
-      <div class="stat-card burn-rate">
-        <div class="stat-icon">🔥</div>
-        <div class="stat-info">
-          <span class="stat-label">Burn Rate</span>
-          <span class="stat-value" id="burn-rate">∞</span>
-          <span class="stat-sub">tokens / hour</span>
-        </div>
+      <div class="bet-controls">
+        <label for="bet-select">Burn Rate:</label>
+        <select id="bet-select">
+          <option value="10">10 tokens (Free Tier)</option>
+          <option value="25">25 tokens (Pro)</option>
+          <option value="50" selected>50 tokens (Enterprise)</option>
+          <option value="100">100 tokens (Unlimited*)</option>
+          <option value="250">250 tokens (AGI Mode)</option>
+        </select>
       </div>
-      <div class="stat-card runway">
-        <div class="stat-icon">🛫</div>
-        <div class="stat-info">
-          <span class="stat-label">Runway</span>
-          <span class="stat-value" id="runway">~5 min</span>
-          <span class="stat-sub">until pivot to crypto</span>
-        </div>
-      </div>
-    </div>
+    </section>
 
-    <div class="bet-controls">
-      <span class="bet-label">Inference Cost per Spin:</span>
-      <button class="bet-btn" data-bet="10">10 🪙</button>
-      <button class="bet-btn active" data-bet="25">25 🪙</button>
-      <button class="bet-btn" data-bet="50">50 🪙</button>
-      <button class="bet-btn" data-bet="100">100 🪙</button>
-    </div>
-
-    <div class="machine-wrapper">
-      <div class="machine-header">
-        <span class="model-version">Model v4.20-turbo-max-ultra-pro</span>
-      </div>
-      <div class="slot-machine">
-        <div class="reel-container">
-          <div class="reel" id="reel-0">
-            <div class="reel-inner">
-              <div class="symbol">🤖</div>
-            </div>
-          </div>
-          <div class="reel" id="reel-1">
-            <div class="reel-inner">
-              <div class="symbol">🧠</div>
-            </div>
-          </div>
-          <div class="reel" id="reel-2">
-            <div class="reel-inner">
-              <div class="symbol">🚀</div>
-            </div>
+    <section class="machine-frame">
+      <div class="machine-top-label">⚡ INFERENCE ENGINE ⚡</div>
+      <div class="reels-container">
+        <div class="reel" id="reel-0">
+          <div class="reel-inner">
+            <div class="symbol">🤖</div>
           </div>
         </div>
-        <div class="payline"></div>
-      </div>
-      <div class="machine-footer">
-        <div class="temperature-control">
-          <label>Temperature: <span id="temp-value">0.7</span></label>
-          <input type="range" id="temperature" min="0" max="100" value="70" class="temp-slider">
-          <span class="temp-hint">(Does absolutely nothing)</span>
+        <div class="reel" id="reel-1">
+          <div class="reel-inner">
+            <div class="symbol">🧠</div>
+          </div>
+        </div>
+        <div class="reel" id="reel-2">
+          <div class="reel-inner">
+            <div class="symbol">💎</div>
+          </div>
         </div>
       </div>
-    </div>
+      <div class="payline"></div>
+    </section>
 
-    <button class="spin-btn" id="spin-btn">
-      <span class="spin-text">🎲 Run Inference</span>
-      <span class="spin-subtext">( aka "spin" for non-technical stakeholders )</span>
+    <button class="spin-button" id="spin-btn">
+      <span class="spin-text">🎰 Run Inference</span>
+      <span class="spin-subtext">( spend tokens )</span>
     </button>
 
-    <div class="message-area" id="message-area">
-      <p class="message" id="message">Welcome to SlotGPT™. We're like ChatGPT, but instead of answering questions, we take your money. So basically the same thing.</p>
-    </div>
+    <section class="message-area" id="message-area">
+      <p id="message">Insert tokens and pull the lever. Your VCs are watching.</p>
+    </section>
 
-    <div class="history-section">
-      <h3>📋 Inference Logs <span class="hist-sub">(for compliance & investor deck)</span></h3>
-      <div class="history-list" id="history-list"></div>
-    </div>
-
-    <div class="paytable">
-      <h3>📊 Payout Matrix <span class="paytable-sub">(peer-reviewed, probably)</span></h3>
-      <div class="paytable-grid" id="paytable-grid"></div>
-    </div>
+    <section class="paytable">
+      <h2>📊 Payout Model <span class="fine-print">(not a hallucination, probably)</span></h2>
+      <div class="paytable-grid">
+        <div class="pay-row jackpot">
+          <span class="pay-symbols">🦄 🦄 🦄</span>
+          <span class="pay-label">UNICORN EXIT</span>
+          <span class="pay-amount">50x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">💎 💎 💎</span>
+          <span class="pay-label">GPU Cluster</span>
+          <span class="pay-amount">20x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🧠 🧠 🧠</span>
+          <span class="pay-label">AGI Achieved</span>
+          <span class="pay-amount">15x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🤖 🤖 🤖</span>
+          <span class="pay-label">Sentient Model</span>
+          <span class="pay-amount">10x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🔥 🔥 🔥</span>
+          <span class="pay-label">Training Run</span>
+          <span class="pay-amount">8x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">📈 📈 📈</span>
+          <span class="pay-label">Hockey Stick</span>
+          <span class="pay-amount">5x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">⚡ ⚡ ⚡</span>
+          <span class="pay-label">Prompt Injected</span>
+          <span class="pay-amount">3x</span>
+        </div>
+        <div class="pay-row partial">
+          <span class="pay-symbols">Any 2 match</span>
+          <span class="pay-label">Partial Hallucination</span>
+          <span class="pay-amount">1.5x</span>
+        </div>
+      </div>
+      <p class="disclaimer">* Payouts are AI-generated and may not reflect reality. Past performance does not guarantee future inference. TokenBurn™ is not responsible for existential dread caused by losing all your tokens. "Unlimited" is limited to 250 tokens per spin. By spinning you agree to our 847-page Terms of Service that our AI wrote and no human has read.</p>
+    </section>
   </main>
 
   <footer>
-    <div class="footer-links">
-      <a href="#">Privacy Policy (LOL)</a>
-      <a href="#">Terms of Hallucination</a>
-      <a href="#">Responsible AI Gambling</a>
-      <a href="#">Investor Relations (please)</a>
-    </div>
-    <p class="disclaimer">SlotGPT™ is not responsible for any tokens lost, dreams shattered, or VCs disappointed. Past performance does not predict future results, but neither does our AI. "AI-powered" means we used Math.random(). © 2026 SlotGPT Inc. — A Delaware C-Corp that should probably be a therapy practice.</p>
+    <p>© 2026 TokenBurn™ Inc. — "We're not gambling, we're training a reward model."</p>
+    <p class="footer-small">A Conditions Labs Company · Palo Alto, CA · Backed by Andressen Horrowitz Ventures · Valued at $4.2B (pre-revenue)</p>
   </footer>
 
-  <div class="bankrupt-overlay" id="bankrupt-overlay">
-    <div class="bankrupt-modal">
-      <h2>🪦 TOKEN BANKRUPTCY</h2>
-      <p class="bankrupt-sub">Your startup has run out of runway.</p>
-      <div class="bankrupt-options">
-        <button class="bankrupt-btn pivot-btn" id="pivot-btn">🔄 Pivot & Raise Another Round<br><span class="btn-hint">(get 1000 tokens from gullible VCs)</span></button>
-        <button class="bankrupt-btn shutdown-btn" id="shutdown-btn">📝 Write a "Lessons Learned" Blog Post<br><span class="btn-hint">(and quietly restart)</span></button>
-      </div>
-      <p class="bankrupt-quote">"We didn't fail. We just found 1,000 ways that don't generate revenue." — Every AI startup</p>
+  <div class="win-overlay" id="win-overlay" hidden>
+    <div class="win-content">
+      <h2 id="win-title">JACKPOT!</h2>
+      <p id="win-detail"></p>
+      <button id="win-dismiss">Collect & Pivot</button>
     </div>
   </div>
 

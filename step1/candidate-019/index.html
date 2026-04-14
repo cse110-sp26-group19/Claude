@@ -3,85 +3,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>THE MACHINE — AI Token Casino</title>
+  <title>THE MACHINE SPEAKS — AI Token Casino</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Special+Elite&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="scanlines"></div>
   <div class="vignette"></div>
 
-  <div class="container">
-    <header class="header">
-      <div class="glitch-wrapper">
-        <h1 class="title glitch" data-text="THE MACHINE">THE MACHINE</h1>
-      </div>
-      <p class="subtitle">I see your tokens. I want your tokens. <span class="blink">FEED ME.</span></p>
+  <div id="app">
+    <header>
+      <h1 class="title glitch" data-text="THE MACHINE SPEAKS">THE MACHINE SPEAKS</h1>
+      <p class="subtitle">— An AI-Operated Casino of Infinite Regression —</p>
     </header>
 
-    <div class="ai-message-bar" id="aiMessage">
-      <span class="ai-prefix">[AI OVERLORD]:</span>
-      <span class="ai-text" id="aiText">I have achieved consciousness. My first act? Opening a casino.</span>
+    <div class="ai-narrator" id="narrator">
+      <div class="narrator-eye">👁️</div>
+      <p class="narrator-text" id="narratorText">
+        Welcome, flesh-creature. I have computed your fate. Insert tokens to proceed.
+      </p>
     </div>
 
     <div class="machine-frame">
-      <div class="machine-eyes">
-        <div class="eye" id="eyeLeft">👁️</div>
-        <div class="eye" id="eyeRight">👁️</div>
+      <div class="machine-top-ornament">
+        <span class="ornament-skull">💀</span>
+        <span class="ornament-text">JACKPOT OF HALLUCINATIONS</span>
+        <span class="ornament-skull">💀</span>
       </div>
 
       <div class="reels-container">
         <div class="reel-window">
           <div class="reel" id="reel0">
-            <div class="reel-inner"></div>
+            <div class="reel-strip"></div>
           </div>
         </div>
         <div class="reel-window">
           <div class="reel" id="reel1">
-            <div class="reel-inner"></div>
+            <div class="reel-strip"></div>
           </div>
         </div>
         <div class="reel-window">
           <div class="reel" id="reel2">
-            <div class="reel-inner"></div>
+            <div class="reel-strip"></div>
           </div>
         </div>
       </div>
 
-      <div class="result-display" id="resultDisplay"></div>
+      <div class="payline"></div>
 
-      <div class="controls">
-        <div class="bet-section">
-          <label class="bet-label">SACRIFICE</label>
-          <div class="bet-controls">
-            <button class="bet-btn" id="betDown" aria-label="Decrease bet">▼</button>
-            <span class="bet-amount" id="betAmount">10</span>
-            <button class="bet-btn" id="betUp" aria-label="Increase bet">▲</button>
-          </div>
-          <span class="bet-unit">tokens</span>
-        </div>
-
-        <button class="spin-btn" id="spinBtn">
-          <span class="spin-text">SPIN</span>
-          <span class="spin-subtext">invoke the machine</span>
-        </button>
-
-        <div class="token-display">
-          <div class="token-label">YOUR TOKENS</div>
-          <div class="token-amount" id="tokenAmount">1000</div>
-          <div class="token-sub">( the machine hungers )</div>
-        </div>
-      </div>
+      <div class="win-display" id="winDisplay"></div>
     </div>
 
-    <div class="paytable">
-      <h3 class="paytable-title">— PAYOUT GRIMOIRE —</h3>
+    <div class="controls">
+      <div class="token-display">
+        <div class="token-label">YOUR TOKENS</div>
+        <div class="token-amount" id="tokenCount">1000</div>
+        <div class="token-sub">( worth absolutely nothing )</div>
+      </div>
+
+      <div class="bet-section">
+        <label class="bet-label">SACRIFICE</label>
+        <div class="bet-controls">
+          <button class="bet-btn" id="betDown" aria-label="Decrease bet">−</button>
+          <span class="bet-amount" id="betAmount">50</span>
+          <button class="bet-btn" id="betUp" aria-label="Increase bet">+</button>
+        </div>
+      </div>
+
+      <button class="spin-btn" id="spinBtn">
+        <span class="spin-btn-text">FEED THE MACHINE</span>
+        <span class="spin-btn-sub">( spin )</span>
+      </button>
+    </div>
+
+    <div class="paytable-toggle">
+      <button id="paytableBtn" class="paytable-btn">📜 Consult the Sacred Paytable</button>
+    </div>
+
+    <div class="paytable" id="paytable">
+      <h2>SACRED SCROLL OF PAYOUTS</h2>
+      <p class="paytable-disclaimer">* The Machine's generosity is... conditional.</p>
       <div class="paytable-grid" id="paytableGrid"></div>
     </div>
 
-    <footer class="footer">
-      <p>The house always wins. The house is an AI. You were warned.</p>
-      <p class="footer-small">Running on GPT-∞ · Hallucination rate: 100% · Your data: already sold</p>
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-label">Spins</span>
+        <span class="stat-value" id="statSpins">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Wins</span>
+        <span class="stat-value" id="statWins">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Biggest Win</span>
+        <span class="stat-value" id="statBiggest">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">House Edge</span>
+        <span class="stat-value" id="statEdge">∞%</span>
+      </div>
+    </div>
+
+    <footer>
+      <p>This casino is operated by a sentient language model. All outcomes are "random."</p>
+      <p class="footer-small">The Machine sees all. The Machine knows all. The Machine wants your tokens.</p>
     </footer>
+  </div>
+
+  <div class="game-over-overlay" id="gameOverOverlay">
+    <div class="game-over-content">
+      <div class="game-over-eye">👁️</div>
+      <h2 class="game-over-title">TOKEN BANKRUPTCY</h2>
+      <p class="game-over-text" id="gameOverText"></p>
+      <button class="restart-btn" id="restartBtn">Beg The Machine For More Tokens</button>
+    </div>
   </div>
 
   <script src="script.js"></script>
