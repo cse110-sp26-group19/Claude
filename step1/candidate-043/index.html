@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI TOKEN SLOTS — Play at Your Own Risk</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="flash-overlay" class="flash-overlay"></div>
+
+  <header>
+    <h1>🤖 AI TOKEN SLOTS 🪙</h1>
+    <p class="tagline">spend tokens · lose tokens · repeat until agi</p>
+  </header>
+
+  <main class="machine" role="main" aria-label="Slot machine">
+
+    <!-- Token display -->
+    <div class="token-bar" aria-live="polite">
+      <div class="token-block">
+        <span class="label">Your Tokens</span>
+        <span class="value" id="token-count">100</span>
+      </div>
+      <div class="token-block">
+        <span class="label">Bet</span>
+        <span class="value" id="bet-display">2</span>
+      </div>
+      <div class="token-block">
+        <span class="label">Last Win</span>
+        <span class="value" id="win-display">0</span>
+      </div>
+    </div>
+
+    <!-- Reels -->
+    <div class="reels-window" aria-label="Slot reels">
+      <div class="reels-track">
+        <div class="reel-wrap"><div class="reel" id="reel-0"></div></div>
+        <div class="reel-wrap"><div class="reel" id="reel-1"></div></div>
+        <div class="reel-wrap"><div class="reel" id="reel-2"></div></div>
+      </div>
+    </div>
+
+    <!-- Message -->
+    <div class="message-area" aria-live="polite" aria-atomic="true">
+      <p class="message info" id="message">Loading model weights...</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="bet-row">
+        <span class="bet-label">BET:</span>
+        <button class="btn btn-bet btn-sm" id="bet-down" aria-label="Decrease bet">−</button>
+        <button class="btn btn-bet btn-sm" id="bet-up"   aria-label="Increase bet">+</button>
+        <button class="btn btn-bet btn-sm" id="bet-max"  aria-label="Max bet">MAX</button>
+      </div>
+
+      <button class="btn btn-spin" id="spin-btn" aria-label="Spin the reels">
+        ⚡ SPIN
+      </button>
+
+      <button class="btn btn-reset" id="reset-btn" aria-label="Reset game">
+        WIPE MEMORY &amp; RESTART
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Pay table -->
+  <section class="history-section" aria-label="Paytable and spin history">
+    <h2>📊 PAYTABLE (3-OF-A-KIND MULTIPLIER × BET)</h2>
+    <div id="history-log" aria-label="Spin history"></div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
