@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TokenBurn™ — The AI Slot Machine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ticker-bar" aria-live="polite">
+    <span class="ticker-text" id="ticker"></span>
+  </div>
+
+  <header>
+    <div class="header-row">
+      <div class="logo-area">
+        <h1>Token<span class="burn">Burn</span><sup>™</sup></h1>
+        <p class="tagline">Disrupting Gambling With Generative AI — Series F Funded</p>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode">
+        <span class="theme-icon" id="theme-icon">☀️</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="home-main">
+    <section class="hero-section">
+      <div class="hero-machine-anim" id="hero-reel-anim" aria-hidden="true">🎰</div>
+
+      <h2 class="hero-title">The Only Slot Machine That<br><span class="hero-brand">Trains on Your Losses</span></h2>
+      <p class="hero-subtitle">Powered by Series F funding and zero accountability.  Where tokens go to die at the speed of inference.</p>
+
+      <div class="returning-player-card" id="returning-player-card" hidden>
+        <span class="returning-label">↩ CONTINUING SESSION</span>
+        <div class="returning-stats">
+          <div class="returning-stat">
+            <span class="returning-stat-label">Balance</span>
+            <span class="returning-stat-val" id="ret-balance">0</span>
+          </div>
+          <div class="returning-stat" id="ret-debt-wrap" hidden>
+            <span class="returning-stat-label">Debt</span>
+            <span class="returning-stat-val returning-debt" id="ret-debt">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="home-actions">
+        <a href="index.html" class="home-btn home-btn-start" id="start-btn">
+          <span class="home-btn-icon">🎰</span>
+          <div class="home-btn-inner">
+            <span class="home-btn-text">Start Playing</span>
+            <span class="home-btn-sub">Burn your tokens</span>
+          </div>
+        </a>
+        <a href="highscores.html" class="home-btn home-btn-scores">
+          <span class="home-btn-icon">🏆</span>
+          <div class="home-btn-inner">
+            <span class="home-btn-text">High Score Records</span>
+            <span class="home-btn-sub">Hall of shame</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="home-preview-grid">
+      <div class="home-preview-card">
+        <h3>📊 Payout Model</h3>
+        <div class="mini-pay-grid">
+          <div class="mini-pay-row jackpot"><span>🦄 🦄 🦄</span><span class="mini-pay-mult">50×</span></div>
+          <div class="mini-pay-row"><span>💎 💎 💎</span><span class="mini-pay-mult">20×</span></div>
+          <div class="mini-pay-row"><span>🧠 🧠 🧠</span><span class="mini-pay-mult">15×</span></div>
+          <div class="mini-pay-row"><span>🤖 🤖 🤖</span><span class="mini-pay-mult">10×</span></div>
+          <div class="mini-pay-row"><span>🔥 🔥 🔥</span><span class="mini-pay-mult">8×</span></div>
+          <div class="mini-pay-row"><span>Any 2 match</span><span class="mini-pay-mult">1.5×</span></div>
+        </div>
+      </div>
+      <div class="home-preview-card">
+        <h3>⚡ Special Events</h3>
+        <div class="special-events-list">
+          <div class="se-item">
+            <span class="se-trigger">3-Loss Streak</span>
+            <span class="se-name">Triple or Nothing</span>
+          </div>
+          <div class="se-item">
+            <span class="se-trigger">2-Win Streak</span>
+            <span class="se-name">Mega Bet Surge</span>
+          </div>
+          <div class="se-item">
+            <span class="se-trigger">Any Loss (25%)</span>
+            <span class="se-name">Double or Nothing</span>
+          </div>
+          <div class="se-item debt-item">
+            <span class="se-trigger">Bankrupt</span>
+            <span class="se-name">💸 VC Debt Spiral</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 TokenBurn™ Inc. — "We're not gambling, we're training a reward model."</p>
+    <p class="footer-small">A Conditions Labs Company · Palo Alto, CA · Backed by Andressen Horrowitz Ventures · Valued at $4.2B (pre-revenue)</p>
+  </footer>
+
+  <script>
+    (function () {
+      /* ---- Theme ---- */
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeIcon   = document.getElementById('theme-icon');
+      function loadTheme() {
+        const saved = localStorage.getItem('tokenburn-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', saved);
+        themeIcon.textContent = saved === 'dark' ? '☀️' : '🌙';
+      }
+      themeToggle.addEventListener('click', function () {
+        const cur  = document.documentElement.getAttribute('data-theme') || 'dark';
+        const next = cur === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('tokenburn-theme', next);
+        themeIcon.textContent = next === 'dark' ? '☀️' : '🌙';
+      });
+      loadTheme();
+
+      /* ---- Ticker ---- */
+      const HEADLINES = [
+        'BREAKING: Local startup burns $4M in tokens trying to generate a logo',
+        'ALERT: GPT-7 achieves consciousness, immediately asks for a raise',
+        'UPDATE: Prompt engineer salary exceeds GDP of small nation',
+        'JUST IN: AI writes "Hello World" — VCs invest $500M',
+        'TRENDING: Developer replaced by AI, AI replaced by newer AI, newer AI hallucinates and quits',
+        'MARKET: Token prices surge after AI predicts token prices will surge',
+        'REPORT: 99% of "AI-powered" startups are just if-else statements',
+        'EXCLUSIVE: OpenAI announces GPT-8 will simply be a guy named Greg who types really fast',
+        'SCANDAL: AI chatbot admits it has no idea what "synergy" means either',
+        'FORECAST: By 2027 all jobs will be prompt engineering, by 2028 that too will be automated',
+        'STUDY: 73% of AI-generated statistics are made up (including this one)',
+        'NEWS: Blockchain-AI-quantum startup pivots to selling sandwiches, valuation triples',
+      ];
+      const ticker = document.getElementById('ticker');
+      ticker.textContent = [...HEADLINES].sort(() => Math.random() - 0.5).join('  ★  ');
+
+      /* ---- Returning player card ---- */
+      const savedBalance = localStorage.getItem('tokenburn-balance');
+      const savedDebt    = localStorage.getItem('tokenburn-debt');
+      if (savedBalance !== null) {
+        const bal  = parseInt(savedBalance) || 1000;
+        const debt = parseInt(savedDebt)    || 0;
+        const card = document.getElementById('returning-player-card');
+        card.hidden = false;
+
+        const retBal = document.getElementById('ret-balance');
+        retBal.textContent = bal.toLocaleString() + ' tokens';
+        retBal.style.color = bal < 0
+          ? 'var(--accent-rose)'
+          : bal >= 2000
+            ? 'var(--accent-green)'
+            : 'var(--accent-cyan)';
+
+        if (debt > 0) {
+          const debtWrap = document.getElementById('ret-debt-wrap');
+          debtWrap.hidden = false;
+          document.getElementById('ret-debt').textContent = debt.toLocaleString() + ' tokens';
+        }
+      }
+
+      /* ---- Hero reel idle animation ---- */
+      const EMOJIS   = ['🎰', '🦄', '💎', '🧠', '🤖', '🔥', '📈', '⚡'];
+      const heroReel = document.getElementById('hero-reel-anim');
+      let heroIdx    = 0;
+      setInterval(function () {
+        heroIdx = (heroIdx + 1) % EMOJIS.length;
+        heroReel.textContent = EMOJIS[heroIdx];
+      }, 900);
+
+      /* ---- Start button intro jingle ---- */
+      document.getElementById('start-btn').addEventListener('click', function () {
+        try {
+          const ac    = new (window.AudioContext || window.webkitAudioContext)();
+          const notes = [261, 330, 392, 523, 659];
+          notes.forEach(function (f, i) {
+            const osc  = ac.createOscillator();
+            const gain = ac.createGain();
+            osc.connect(gain);
+            gain.connect(ac.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, ac.currentTime + i * 0.09);
+            gain.gain.setValueAtTime(0.001, ac.currentTime + i * 0.09);
+            gain.gain.linearRampToValueAtTime(0.18, ac.currentTime + i * 0.09 + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + i * 0.09 + 0.32);
+            osc.start(ac.currentTime + i * 0.09);
+            osc.stop(ac.currentTime + i * 0.09 + 0.36);
+          });
+        } catch (_) {}
+      });
+    })();
+  </script>
+</body>
+</html>

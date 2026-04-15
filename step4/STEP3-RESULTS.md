@@ -1,0 +1,3 @@
+5: Chosen for the colorful night and day backgrounds, making it unique and immersive, with a pretty organized despite hard to read tracker. To point, the styling of this is more unique than the other 2.
+
+18: As not only is the ui in darkmode much more pleasant than 41, the statistics are also clear to see and much more understandable, Not to mention, the wins and losses remarks are much more enjoyable than 41. 

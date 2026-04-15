@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TokenBurn™ — High Score Records</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ticker-bar" aria-live="polite">
+    <span class="ticker-text" id="ticker"></span>
+  </div>
+
+  <header>
+    <div class="header-row">
+      <div class="logo-area">
+        <h1>Token<span class="burn">Burn</span><sup>™</sup></h1>
+        <p class="tagline">Hall of Shame — Disrupting Gambling With Generative AI</p>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode">
+        <span class="theme-icon" id="theme-icon">☀️</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="scores-main">
+    <div class="scores-nav">
+      <a href="home.html" class="nav-back-btn">← Back to Home</a>
+      <a href="index.html" class="nav-play-btn">🎰 Play Now</a>
+    </div>
+
+    <section class="scores-header-section">
+      <h2 class="scores-title">🏆 High Score Records</h2>
+      <p class="scores-subtitle">
+        Every token burned is a lesson in humility.<br>
+        <span class="fine-print">(Scores are stored locally and may vanish like your hopes.)</span>
+      </p>
+    </section>
+
+    <!-- Lifetime bests (global stats) -->
+    <section class="lifetime-stats-section" id="lifetime-section" hidden>
+      <h3>📈 All-Time Personal Bests</h3>
+      <div class="lifetime-grid">
+        <div class="lifetime-card">
+          <span class="lifetime-icon">💰</span>
+          <span class="lifetime-label">Peak Balance</span>
+          <span class="lifetime-val" id="lt-peak">—</span>
+        </div>
+        <div class="lifetime-card">
+          <span class="lifetime-icon">🎯</span>
+          <span class="lifetime-label">Biggest Single Win</span>
+          <span class="lifetime-val" id="lt-bigwin">—</span>
+        </div>
+        <div class="lifetime-card">
+          <span class="lifetime-icon">🔢</span>
+          <span class="lifetime-label">Total Spins</span>
+          <span class="lifetime-val" id="lt-spins">—</span>
+        </div>
+        <div class="lifetime-card">
+          <span class="lifetime-icon">🏅</span>
+          <span class="lifetime-label">Best Win Rate</span>
+          <span class="lifetime-val" id="lt-winrate">—</span>
+        </div>
+        <div class="lifetime-card">
+          <span class="lifetime-icon">⚡</span>
+          <span class="lifetime-label">Special Events</span>
+          <span class="lifetime-val" id="lt-special">—</span>
+        </div>
+        <div class="lifetime-card">
+          <span class="lifetime-icon">💸</span>
+          <span class="lifetime-label">Most Debt</span>
+          <span class="lifetime-val debt-val" id="lt-debt">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Session scores table -->
+    <section class="session-scores-section">
+      <h3>📋 Session History <span class="fine-print">(top 10 sessions)</span></h3>
+      <div id="scores-table-wrap">
+        <p class="no-scores-msg" id="no-scores-msg">No sessions recorded yet. Go burn some tokens first.</p>
+        <table class="scores-table" id="scores-table" hidden>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Date</th>
+              <th>Final Balance</th>
+              <th>Best Win</th>
+              <th>Spins</th>
+              <th>Win Rate</th>
+              <th>Net P/L</th>
+              <th>Special Events</th>
+            </tr>
+          </thead>
+          <tbody id="scores-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="scores-actions">
+      <button class="clear-scores-btn" id="clear-scores-btn">🗑️ Clear All Records</button>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 TokenBurn™ Inc. — "We're not gambling, we're training a reward model."</p>
+    <p class="footer-small">A Conditions Labs Company · Palo Alto, CA · Backed by Andressen Horrowitz Ventures · Valued at $4.2B (pre-revenue)</p>
+  </footer>
+
+  <script>
+    (function () {
+      /* ---- Theme ---- */
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeIcon   = document.getElementById('theme-icon');
+      function loadTheme() {
+        const saved = localStorage.getItem('tokenburn-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', saved);
+        themeIcon.textContent = saved === 'dark' ? '☀️' : '🌙';
+      }
+      themeToggle.addEventListener('click', function () {
+        const cur  = document.documentElement.getAttribute('data-theme') || 'dark';
+        const next = cur === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('tokenburn-theme', next);
+        themeIcon.textContent = next === 'dark' ? '☀️' : '🌙';
+      });
+      loadTheme();
+
+      /* ---- Ticker ---- */
+      const HEADLINES = [
+        'BREAKING: Player burned 4,200 tokens and has nothing to show for it',
+        'REPORT: High score table mostly consists of "0 tokens remaining"',
+        'ALERT: GPT-7 analyzed these scores and recommends therapy',
+        'UPDATE: Hall of Fame renamed Hall of Shame after community feedback',
+        'STUDY: 100% of players who checked their high scores felt some regret',
+      ];
+      const ticker = document.getElementById('ticker');
+      ticker.textContent = [...HEADLINES].sort(() => Math.random() - 0.5).join('  ★  ');
+
+      /* ---- Load & Render Scores ---- */
+      function formatDate(iso) {
+        try {
+          const d = new Date(iso);
+          return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        } catch (_) { return '—'; }
+      }
+
+      function renderScores() {
+        const raw    = localStorage.getItem('tokenburn-highscores');
+        const scores = raw ? JSON.parse(raw) : [];
+
+        if (scores.length === 0) {
+          document.getElementById('no-scores-msg').hidden = false;
+          document.getElementById('scores-table').hidden  = true;
+          return;
+        }
+
+        document.getElementById('no-scores-msg').hidden = true;
+        const table = document.getElementById('scores-table');
+        table.hidden = false;
+
+        const tbody = document.getElementById('scores-tbody');
+        tbody.innerHTML = '';
+
+        scores.forEach(function (s, i) {
+          const wins   = s.wins   || 0;
+          const losses = s.losses || 0;
+          const total  = wins + losses;
+          const wr     = total > 0 ? ((wins / total) * 100).toFixed(1) + '%' : '—';
+          const netPL  = (s.netProfit || 0);
+          const netStr = (netPL >= 0 ? '+' : '') + netPL.toLocaleString();
+          const specials = s.specialEvents || 0;
+          const debt   = s.maxDebt || 0;
+
+          const medals = ['🥇', '🥈', '🥉'];
+          const rank   = medals[i] || (i + 1);
+
+          const tr = document.createElement('tr');
+          if (i < 3) tr.classList.add('top-' + (i + 1));
+          if ((s.finalBalance || 0) < 0) tr.classList.add('row-debt');
+
+          tr.innerHTML = [
+            '<td class="rank-cell">' + rank + '</td>',
+            '<td class="date-cell">' + formatDate(s.date) + '</td>',
+            '<td class="balance-cell" style="color:' + ((s.finalBalance || 0) < 0 ? 'var(--accent-rose)' : ((s.finalBalance || 0) > 1000 ? 'var(--accent-green)' : 'var(--text-primary)')) + '">' + (s.finalBalance || 0).toLocaleString() + '</td>',
+            '<td class="bigwin-cell">' + (s.biggestWin || 0).toLocaleString() + '</td>',
+            '<td>' + (s.totalSpins || 0) + '</td>',
+            '<td>' + wr + '</td>',
+            '<td style="color:' + (netPL >= 0 ? 'var(--accent-green)' : 'var(--accent-rose)') + '">' + netStr + '</td>',
+            '<td class="specials-cell">' + (specials > 0 ? '⚡ ' + specials : '—') + '</td>',
+          ].join('');
+
+          if (debt > 0) {
+            tr.title = 'Peak debt: ' + debt.toLocaleString() + ' tokens';
+          }
+
+          tbody.appendChild(tr);
+        });
+
+        /* ---- Lifetime bests ---- */
+        const peakBal  = Math.max(...scores.map(function (s) { return s.finalBalance || 0; }));
+        const bigWin   = Math.max(...scores.map(function (s) { return s.biggestWin   || 0; }));
+        const totSpins = scores.reduce(function (a, s) { return a + (s.totalSpins || 0); }, 0);
+        const bestWR   = Math.max(...scores.map(function (s) {
+          const t = (s.wins || 0) + (s.losses || 0);
+          return t > 0 ? (s.wins || 0) / t * 100 : 0;
+        }));
+        const totSpecial = scores.reduce(function (a, s) { return a + (s.specialEvents || 0); }, 0);
+        const maxDebt    = Math.max(...scores.map(function (s) { return s.maxDebt || 0; }));
+
+        const ltSection = document.getElementById('lifetime-section');
+        ltSection.hidden = false;
+        document.getElementById('lt-peak').textContent    = peakBal.toLocaleString()   + ' tokens';
+        document.getElementById('lt-bigwin').textContent  = bigWin.toLocaleString()    + ' tokens';
+        document.getElementById('lt-spins').textContent   = totSpins.toLocaleString();
+        document.getElementById('lt-winrate').textContent = bestWR.toFixed(1)          + '%';
+        document.getElementById('lt-special').textContent = totSpecial.toLocaleString();
+
+        const debtEl = document.getElementById('lt-debt');
+        if (maxDebt > 0) {
+          debtEl.textContent   = maxDebt.toLocaleString() + ' tokens';
+          debtEl.style.color   = 'var(--accent-rose)';
+        } else {
+          debtEl.textContent   = 'Debt-free! 🎉';
+          debtEl.style.color   = 'var(--accent-green)';
+        }
+      }
+
+      renderScores();
+
+      /* ---- Clear scores ---- */
+      document.getElementById('clear-scores-btn').addEventListener('click', function () {
+        if (confirm('Clear all high score records? This cannot be undone.')) {
+          localStorage.removeItem('tokenburn-highscores');
+          renderScores();
+        }
+      });
+
+      /* ---- Intro jingle on page load ---- */
+      document.addEventListener('click', function playOnce() {
+        try {
+          const ac    = new (window.AudioContext || window.webkitAudioContext)();
+          const notes = [523, 392, 330, 261];
+          notes.forEach(function (f, i) {
+            const osc  = ac.createOscillator();
+            const gain = ac.createGain();
+            osc.connect(gain); gain.connect(ac.destination);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, ac.currentTime + i * 0.07);
+            gain.gain.setValueAtTime(0.001, ac.currentTime + i * 0.07);
+            gain.gain.linearRampToValueAtTime(0.1, ac.currentTime + i * 0.07 + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + i * 0.07 + 0.25);
+            osc.start(ac.currentTime + i * 0.07);
+            osc.stop(ac.currentTime + i * 0.07 + 0.28);
+          });
+        } catch (_) {}
+        document.removeEventListener('click', playOnce);
+      }, { once: true });
+    })();
+  </script>
+</body>
+</html>
