@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TokenSlot™ — The AI Token Casino</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="screen-flash" id="screenFlash"></div>
+
+  <div class="container">
+    <header class="header">
+      <div class="header-top-row">
+        <div class="header-badge">⚠️ DEFINITELY SENTIENT</div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode">
+          <span class="theme-icon" id="themeIcon">☀️</span>
+        </button>
+      </div>
+      <h1 class="title">TOKEN<span class="title-slot">SLOT</span>™</h1>
+      <p class="subtitle">The World's First AI-Powered Token Redistribution Engine</p>
+      <p class="disclaimer">*Tokens are not real. Neither is the AI consciousness. Probably.</p>
+    </header>
+
+    <div class="machine" id="machine">
+      <div class="machine-top">
+        <div class="model-label">MODEL: GPT-∞ <span class="blink">●</span></div>
+        <div class="context-bar-wrap">
+          <div class="context-label">CONTEXT WINDOW</div>
+          <div class="context-bar"><div class="context-fill" id="contextFill"></div></div>
+        </div>
+      </div>
+
+      <div class="reels-frame" id="reelsFrame">
+        <div class="reel-window">
+          <div class="reel" id="reel1">
+            <div class="reel-strip" id="strip1"></div>
+          </div>
+          <div class="reel" id="reel2">
+            <div class="reel-strip" id="strip2"></div>
+          </div>
+          <div class="reel" id="reel3">
+            <div class="reel-strip" id="strip3"></div>
+          </div>
+          <div class="payline"></div>
+        </div>
+      </div>
+
+      <div class="result-display" id="resultDisplay" aria-live="polite" aria-atomic="true">
+        <span class="result-text" id="resultText">Insert tokens to hallucinate wealth</span>
+      </div>
+
+      <div class="controls">
+        <div class="bet-control">
+          <button class="bet-btn" id="betDown">−</button>
+          <div class="bet-display">
+            <div class="bet-label">BET / SPIN</div>
+            <div class="bet-value" id="betValue">10</div>
+            <div class="bet-unit">tokens</div>
+          </div>
+          <button class="bet-btn" id="betUp">+</button>
+        </div>
+
+        <button class="spin-btn" id="spinBtn">
+          <span class="spin-icon">⚡</span>
+          <span class="spin-label">SPIN</span>
+          <span class="spin-sub">INFER NOW</span>
+        </button>
+
+        <div class="autoplay-wrap">
+          <button class="auto-btn" id="autoBtn">AUTO-TRAIN</button>
+          <div class="auto-count" id="autoCount"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-panel">
+      <div class="stat-card wallet">
+        <div class="stat-icon">🪙</div>
+        <div class="stat-info">
+          <div class="stat-label">TOKEN WALLET</div>
+          <div class="stat-value" id="tokenCount">1000</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-info">
+          <div class="stat-label">SPINS USED</div>
+          <div class="stat-value" id="spinsCount">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-info">
+          <div class="stat-label">BIGGEST WIN</div>
+          <div class="stat-value" id="biggestWin">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <div class="stat-label">WIN STREAK</div>
+          <div class="stat-value" id="winStreak">0</div>
+        </div>
+      </div>
+      <div class="stat-card streak-loss">
+        <div class="stat-icon">💀</div>
+        <div class="stat-info">
+          <div class="stat-label">LOSS STREAK</div>
+          <div class="stat-value" id="lossStreak">0</div>
+        </div>
+      </div>
+      <div class="stat-card stat-winrate">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-info">
+          <div class="stat-label">WIN RATE</div>
+          <div class="stat-value" id="winRate">0%</div>
+        </div>
+      </div>
+      <div class="stat-card stat-won">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+          <div class="stat-label">TOTAL WON</div>
+          <div class="stat-value" id="totalWon">0</div>
+        </div>
+      </div>
+      <div class="stat-card stat-lost">
+        <div class="stat-icon">🕳️</div>
+        <div class="stat-info">
+          <div class="stat-label">TOTAL LOST</div>
+          <div class="stat-value" id="totalLost">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="metrics-panel">
+      <h2 class="metrics-title">📊 PERFORMANCE ANALYTICS</h2>
+
+      <div class="metrics-row">
+        <div class="metric-block">
+          <div class="metric-header">
+            <span class="metric-label">NET PROFIT / LOSS</span>
+            <span class="metric-val" id="netProfitVal">0</span>
+          </div>
+          <div class="net-bar-wrap">
+            <div class="net-bar-neg" id="netBarNeg"></div>
+            <div class="net-bar-center"></div>
+            <div class="net-bar-pos" id="netBarPos"></div>
+          </div>
+        </div>
+        <div class="metric-block">
+          <div class="metric-header">
+            <span class="metric-label">ROI</span>
+            <span class="metric-val" id="roiVal">0%</span>
+          </div>
+          <div class="roi-bar-wrap">
+            <div class="roi-bar-fill" id="roiBar"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric-block wide">
+          <div class="metric-header">
+            <span class="metric-label">WIN / LOSS DISTRIBUTION</span>
+            <span class="metric-val" id="wlDistVal">0W — 0L</span>
+          </div>
+          <div class="wl-bar-wrap">
+            <div class="wl-bar-win" id="wlBarWin"></div>
+            <div class="wl-bar-loss" id="wlBarLoss"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric-block wide">
+          <div class="metric-header">
+            <span class="metric-label">SPIN HISTORY</span>
+            <span class="metric-val" id="historyLabel">last 50 spins</span>
+          </div>
+          <div class="history-dots" id="historyDots"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="paytable">
+      <h2 class="paytable-title">📋 PAYTABLE / TOKENOMICS</h2>
+      <div class="paytable-grid" id="paytableGrid"></div>
+    </div>
+
+    <div class="log-panel">
+      <div class="log-title">📟 INFERENCE LOG</div>
+      <div class="log-entries" id="logEntries"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-icon" id="modalIcon"></div>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-body" id="modalBody"></div>
+      <button class="modal-btn" id="modalBtn">ACKNOWLEDGE & CONTINUE</button>
+    </div>
+  </div>
+
+  <div class="floating-text-layer" id="floatingTextLayer"></div>
+  <div class="particle-layer" id="particleLayer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
