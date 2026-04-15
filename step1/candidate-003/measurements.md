@@ -1,7 +1,7 @@
 | Field | Notes |
 | :---: | :---: |
 | Timestamp | 04:23:51 |
-| Runtime | 10:28 |
+| Runtime | 3:28 |
 | Model + version string | Claude Sonnet 4.6 via Cursor IDE | 
 | Input tokens | N/A |
 | Output tokens| N/A |
