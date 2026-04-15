@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Token Slots™</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --c-bg:     #07071a;
+      --c-panel:  #0e0e2e;
+      --c-surface:#13133a;
+      --c-purple: #7c3aed;
+      --c-purple2:#a78bfa;
+      --c-cyan:   #06b6d4;
+      --c-cyan2:  #67e8f9;
+      --c-gold:   #f59e0b;
+      --c-gold2:  #fcd34d;
+      --c-green:  #10b981;
+      --c-red:    #ef4444;
+      --c-text:   #f1f5f9;
+      --c-muted:  #64748b;
+      --c-orange: #f97316;
+      --c-teal:   #14b8a6;
+      --c-rose:   #f43f5e;
+      --c-amber:  #f59e0b;
+      --c-indigo: #6366f1;
+      --c-pink:   #ec4899;
+      --c-lime:   #84cc16;
+      --c-sky:    #0ea5e9;
+      --c-reel-bg:#050516;
+      --c-reel-bd:#2d1b69;
+      --c-reel-fade-a: rgba(5,5,22,0.88);
+      --c-reel-fade-b: transparent;
+      --c-reel-hl: rgba(124,58,237,0.09);
+      --c-reel-hl-bd: rgba(167,139,250,0.4);
+      --c-machine-a: #18134a;
+      --c-machine-b: #09082a;
+      --c-grid-line: rgba(124,58,237,0.06);
+      --c-border-subtle: rgba(124,58,237,0.3);
+      --c-border-med: rgba(124,58,237,0.5);
+      --c-glow-purple: rgba(124,58,237,0.35);
+      --c-token-glow: rgba(245,158,11,0.45);
+      --c-overlay: rgba(0,0,0,0.85);
+      --c-scrollbar: var(--c-purple);
+      --c-hist-bd: rgba(255,255,255,0.04);
+      --sym-h: 110px;
+    }
+
+    [data-theme="light"] {
+      --c-bg:     #f0f0f8;
+      --c-panel:  #ffffff;
+      --c-surface:#f5f3ff;
+      --c-purple: #7c3aed;
+      --c-purple2:#6d28d9;
+      --c-cyan:   #0891b2;
+      --c-cyan2:  #0e7490;
+      --c-gold:   #d97706;
+      --c-gold2:  #b45309;
+      --c-green:  #059669;
+      --c-red:    #dc2626;
+      --c-text:   #1e1b4b;
+      --c-muted:  #6b7280;
+      --c-orange: #ea580c;
+      --c-teal:   #0d9488;
+      --c-rose:   #e11d48;
+      --c-amber:  #d97706;
+      --c-indigo: #4f46e5;
+      --c-pink:   #db2777;
+      --c-lime:   #65a30d;
+      --c-sky:    #0284c7;
+      --c-reel-bg:#e8e5f5;
+      --c-reel-bd:#a78bfa;
+      --c-reel-fade-a: rgba(232,229,245,0.88);
+      --c-reel-fade-b: transparent;
+      --c-reel-hl: rgba(124,58,237,0.08);
+      --c-reel-hl-bd: rgba(124,58,237,0.3);
+      --c-machine-a: #ede9fe;
+      --c-machine-b: #f5f3ff;
+      --c-grid-line: rgba(124,58,237,0.08);
+      --c-border-subtle: rgba(124,58,237,0.2);
+      --c-border-med: rgba(124,58,237,0.35);
+      --c-glow-purple: rgba(124,58,237,0.15);
+      --c-token-glow: rgba(217,119,6,0.3);
+      --c-overlay: rgba(232,229,245,0.88);
+      --c-scrollbar: var(--c-purple2);
+      --c-hist-bd: rgba(0,0,0,0.06);
+    }
+
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background: var(--c-bg);
+      color: var(--c-text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      transition: background 0.4s, color 0.4s;
+    }
+
+    body.debt-state { background: linear-gradient(135deg, #1a0707 0%, var(--c-bg) 60%); }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--c-grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--c-grid-line) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── SCREEN SYSTEM ─────────────────────── */
+    .screen { display: none; width: 100%; min-height: 100vh; position: relative; z-index: 1; }
+    .screen.active { display: flex; }
+
+    @keyframes screenFadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .screen.fade-in { animation: screenFadeIn 0.45s ease forwards; }
+
+    /* ── HOME SCREEN ─────────────────────── */
+    .screen-home {
+      flex-direction: column; align-items: center; justify-content: center;
+      padding: 40px 20px 60px; gap: 36px;
+    }
+
+    .home-wrapper {
+      width: 100%; max-width: 520px;
+      display: flex; flex-direction: column; align-items: center; gap: 36px;
+    }
+
+    .home-header { width: 100%; display: flex; justify-content: flex-end; }
+
+    .hero-section { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+
+    .hero-symbols { display: flex; gap: 18px; margin-bottom: 4px; }
+
+    .hero-sym {
+      font-size: 38px;
+      animation: heroFloat 2.4s ease-in-out infinite alternate;
+      animation-delay: var(--delay, 0s);
+      filter: drop-shadow(0 0 10px rgba(124,58,237,0.6));
+    }
+
+    @keyframes heroFloat {
+      from { transform: translateY(0px) rotate(0deg); }
+      to   { transform: translateY(-14px) rotate(6deg); }
+    }
+
+    .home-actions { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
+
+    .start-btn {
+      font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 22px;
+      letter-spacing: 6px; padding: 20px 72px; border: none; border-radius: 50px;
+      background: linear-gradient(135deg, #6d28d9, var(--c-purple) 40%, var(--c-indigo) 70%, var(--c-cyan) 100%);
+      background-size: 200% 200%; color: #fff; cursor: pointer;
+      position: relative; overflow: hidden;
+      box-shadow: 0 0 52px rgba(124,58,237,0.75), 0 6px 0 #3b0764;
+      transition: transform 0.15s, box-shadow 0.2s, background-position 0.4s;
+      user-select: none; width: 100%;
+      animation: startPulse 2.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes startPulse {
+      from { box-shadow: 0 0 52px rgba(124,58,237,0.75), 0 6px 0 #3b0764; }
+      to   { box-shadow: 0 0 80px rgba(6,182,212,0.6), 0 6px 0 #3b0764; }
+    }
+
+    .start-btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 60%);
+      border-radius: inherit;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-4px); background-position: 100% 100%;
+      animation: none; box-shadow: 0 0 80px rgba(124,58,237,0.95), 0 10px 0 #3b0764;
+    }
+    .start-btn:active { transform: translateY(2px); box-shadow: 0 0 30px rgba(124,58,237,0.6), 0 2px 0 #3b0764; }
+
+    .start-sub { display: block; font-size: 9px; font-weight: 400; letter-spacing: 2px; opacity: 0.65; margin-top: 5px; }
+
+    .home-nav-btn {
+      font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700;
+      letter-spacing: 2px; padding: 13px 36px; border: 2px solid var(--c-border-med);
+      border-radius: 50px; background: transparent; color: var(--c-purple2);
+      cursor: pointer; transition: background 0.2s, color 0.2s, box-shadow 0.2s, border-color 0.2s;
+      width: 100%;
+    }
+    .home-nav-btn:hover {
+      background: var(--c-purple); color: #fff; border-color: var(--c-purple);
+      box-shadow: 0 0 20px var(--c-glow-purple);
+    }
+
+    .home-tagline { font-size: 11px; color: var(--c-muted); text-align: center; letter-spacing: 1px; line-height: 1.8; }
+
+    /* ── GAME SCREEN ─────────────────────── */
+    .screen-game { flex-direction: column; align-items: center; padding: 16px 12px 60px; }
+
+    .app {
+      position: relative; z-index: 1; width: 100%; max-width: 660px;
+      display: flex; flex-direction: column; align-items: center; gap: 18px;
+    }
+
+    /* ── HEADER ─────────────────────────── */
+    header { text-align: center; padding-top: 24px; position: relative; width: 100%; }
+
+    .title {
+      font-family: 'Orbitron', sans-serif; font-size: clamp(24px, 6vw, 44px); font-weight: 900;
+      background: linear-gradient(135deg, var(--c-purple2) 0%, var(--c-cyan2) 50%, var(--c-orange) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      letter-spacing: 3px;
+    }
+
+    .subtitle { color: var(--c-muted); font-size: 11px; margin-top: 7px; letter-spacing: 2px; }
+
+    /* ── BACK BUTTON ─────────────────────── */
+    .back-btn {
+      position: absolute; top: 24px; left: 0;
+      font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 2px; padding: 7px 13px; border: 1px solid var(--c-border-subtle);
+      border-radius: 8px; background: transparent; color: var(--c-muted); cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .back-btn:hover { background: var(--c-surface); color: var(--c-text); border-color: var(--c-purple); }
+
+    /* ── THEME TOGGLE ────────────────────── */
+    .theme-toggle {
+      position: absolute; top: 24px; right: 0;
+      width: 48px; height: 26px; border-radius: 13px; border: 2px solid var(--c-border-med);
+      background: var(--c-surface); cursor: pointer; padding: 0; display: flex; align-items: center;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .home-theme-toggle { position: static; }
+
+    .theme-toggle-knob {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--c-purple), var(--c-cyan));
+      margin-left: 2px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; line-height: 1;
+    }
+    [data-theme="light"] .theme-toggle-knob { transform: translateX(22px); }
+
+    /* ── TOKEN BAR ───────────────────────── */
+    .token-bar {
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      background: var(--c-panel); border: 1px solid var(--c-border-med); border-radius: 16px;
+      padding: 12px 28px;
+      box-shadow: 0 0 28px var(--c-glow-purple), inset 0 1px 0 rgba(255,255,255,0.04);
+      width: 100%; transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+    }
+    .token-bar:hover {
+      box-shadow: 0 0 48px var(--c-glow-purple), 0 0 24px var(--c-token-glow), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .token-bar.debt-mode { border-color: var(--c-red); animation: debtBarPulse 1.5s ease-in-out infinite; }
+
+    @keyframes debtBarPulse {
+      0%,100% { box-shadow: 0 0 28px rgba(239,68,68,0.4), inset 0 1px 0 rgba(255,255,255,0.04); }
+      50%     { box-shadow: 0 0 56px rgba(239,68,68,0.75), inset 0 1px 0 rgba(255,255,255,0.04); }
+    }
+
+    .token-bar.debt-mode .token-label { color: var(--c-red); }
+    .token-bar.debt-mode .token-amount { color: var(--c-red); text-shadow: 0 0 18px rgba(239,68,68,0.6); }
+
+    .token-icon { font-size: 30px; }
+    .token-info { display: flex; flex-direction: column; gap: 2px; }
+    .token-label { font-size: 9px; color: var(--c-muted); letter-spacing: 3px; text-transform: uppercase; transition: color 0.3s; }
+
+    .token-amount {
+      font-family: 'Orbitron', sans-serif; font-size: 30px; font-weight: 700;
+      color: var(--c-gold); text-shadow: 0 0 18px var(--c-token-glow);
+      transition: color 0.25s, transform 0.25s; line-height: 1;
+    }
+    .token-amount.pulse-up   { color: var(--c-green); transform: scale(1.12); }
+    .token-amount.pulse-down { color: var(--c-red);   transform: scale(0.93); }
+
+    /* ── MACHINE ─────────────────────────── */
+    .machine {
+      width: 100%;
+      background: linear-gradient(170deg, var(--c-machine-a) 0%, var(--c-machine-b) 100%);
+      border: 2px solid var(--c-purple); border-radius: 24px; padding: 24px 20px 22px;
+      box-shadow: 0 0 70px var(--c-glow-purple), 0 0 0 1px rgba(167,139,250,0.12) inset;
+      transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+      will-change: transform;
+    }
+
+    .machine.shake-big   { animation: shakeBig 0.5s ease-in-out; }
+    .machine.shake-small { animation: shakeSmall 0.3s ease-in-out; }
+    .machine.glow-pulse  { animation: glowPulse 1.5s ease-in-out; }
+
+    @keyframes shakeBig {
+      0%,100% { transform: translate(0,0) rotate(0deg); }
+      10% { transform: translate(-6px,-3px) rotate(-1deg); }
+      20% { transform: translate(6px,2px) rotate(1deg); }
+      30% { transform: translate(-5px,3px) rotate(-0.5deg); }
+      40% { transform: translate(4px,-2px) rotate(0.5deg); }
+      50% { transform: translate(-3px,1px) rotate(-0.3deg); }
+      60% { transform: translate(2px,-1px) rotate(0.3deg); }
+      70% { transform: translate(-1px,1px) rotate(0); }
+    }
+
+    @keyframes shakeSmall {
+      0%,100% { transform: translate(0,0); }
+      15% { transform: translate(-2px,-1px); }
+      30% { transform: translate(2px,1px); }
+      45% { transform: translate(-1px,1px); }
+      60% { transform: translate(1px,-1px); }
+    }
+
+    @keyframes glowPulse {
+      0%,100% { box-shadow: 0 0 70px var(--c-glow-purple), 0 0 0 1px rgba(167,139,250,0.12) inset; }
+      25% { box-shadow: 0 0 120px rgba(6,182,212,0.6), 0 0 60px rgba(245,158,11,0.4), 0 0 0 1px rgba(167,139,250,0.12) inset; }
+      50% { box-shadow: 0 0 100px rgba(244,63,94,0.5), 0 0 40px rgba(124,58,237,0.5), 0 0 0 1px rgba(167,139,250,0.12) inset; }
+      75% { box-shadow: 0 0 120px rgba(16,185,129,0.5), 0 0 60px rgba(249,115,22,0.4), 0 0 0 1px rgba(167,139,250,0.12) inset; }
+    }
+
+    .led-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 18px; }
+    .led { width: 9px; height: 9px; border-radius: 50%; background: var(--c-purple2); box-shadow: 0 0 7px var(--c-purple); animation: blink 2s ease-in-out infinite; }
+    .led:nth-child(2n)   { background: var(--c-cyan);   animation-delay: 0.4s; }
+    .led:nth-child(3n)   { background: var(--c-gold2);  animation-delay: 0.8s; }
+    .led:nth-child(4n)   { background: var(--c-orange); animation-delay: 0.6s; }
+    .led:nth-child(5)    { background: var(--c-rose);   animation-delay: 1.2s; }
+    .led:nth-child(7)    { background: var(--c-teal);   animation-delay: 1.0s; }
+
+    @keyframes blink { 0%,75%,100% { opacity: 1; } 37% { opacity: 0.15; } }
+
+    /* ── REELS ───────────────────────────── */
+    .reels { display: flex; gap: 10px; justify-content: center; margin-bottom: 22px; }
+    .reel-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .reel-num { font-size: 9px; color: var(--c-muted); letter-spacing: 2px; }
+
+    .reel-window {
+      width: clamp(96px, 27vw, 160px);
+      height: calc(var(--sym-h) * 3);
+      background: var(--c-reel-bg); border: 2px solid var(--c-reel-bd); border-radius: 14px;
+      overflow: hidden; position: relative; box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    /* Top & bottom fade gradients */
+    .reel-window::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        var(--c-reel-fade-a) 0%,
+        var(--c-reel-fade-b) 28%,
+        var(--c-reel-fade-b) 72%,
+        var(--c-reel-fade-a) 100%
+      );
+      pointer-events: none; z-index: 3;
+    }
+
+    /* Centre highlight row */
+    .reel-window::before {
+      content: ''; position: absolute; left: 0; right: 0;
+      top: var(--sym-h); height: var(--sym-h);
+      background: var(--c-reel-hl);
+      border-top: 1px solid var(--c-reel-hl-bd);
+      border-bottom: 1px solid var(--c-reel-hl-bd);
+      pointer-events: none; z-index: 2;
+    }
+
+    .reel-strip { position: absolute; top: 0; left: 0; width: 100%; will-change: transform; }
+
+    .sym-cell {
+      height: var(--sym-h); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 3px; user-select: none;
+    }
+
+    .sym-emoji { font-size: clamp(30px, 8vw, 46px); line-height: 1; display: block; transition: transform 0.3s; }
+    .sym-label { font-size: 8px; color: var(--c-muted); letter-spacing: 2px; text-transform: uppercase; }
+
+    .sym-cell.winner .sym-emoji { animation: symBounce 0.6s ease-in-out 3; }
+
+    @keyframes symBounce {
+      0%,100% { transform: scale(1) translateY(0); }
+      30% { transform: scale(1.25) translateY(-8px); }
+      50% { transform: scale(1.1) translateY(-3px); }
+      70% { transform: scale(1.2) translateY(-6px); }
+    }
+
+    @keyframes reel-win-flash {
+      0%,100% { border-color: var(--c-reel-bd); box-shadow: inset 0 0 40px rgba(0,0,0,0.5); }
+      30%,70% { border-color: var(--c-cyan); box-shadow: inset 0 0 40px rgba(0,0,0,0.5), 0 0 22px var(--c-cyan); }
+    }
+    .reel-window.flashing   { animation: reel-win-flash 0.7s ease; }
+    .reel-window.near-miss  { animation: nearMissTease 0.8s ease-in-out; }
+
+    @keyframes nearMissTease {
+      0%,100%     { border-color: var(--c-reel-bd); }
+      15%,45%,75% { border-color: var(--c-orange); box-shadow: inset 0 0 40px rgba(0,0,0,0.5), 0 0 18px rgba(249,115,22,0.5); }
+      30%,60%     { border-color: var(--c-reel-bd); }
+    }
+
+    .reel-window.loss-flash { animation: lossFlash 0.4s ease; }
+    @keyframes lossFlash {
+      0%,100% { border-color: var(--c-reel-bd); }
+      50%     { border-color: var(--c-red); box-shadow: inset 0 0 30px rgba(239,68,68,0.2), 0 0 12px rgba(239,68,68,0.3); }
+    }
+
+    .reel-window.suspense { animation: suspensePulse 0.28s ease-in-out infinite alternate; }
+    @keyframes suspensePulse {
+      from { border-color: var(--c-reel-bd); }
+      to   { border-color: var(--c-cyan); box-shadow: inset 0 0 40px rgba(0,0,0,0.5), 0 0 16px rgba(6,182,212,0.4); }
+    }
+
+    /* ── CONTROLS ────────────────────────── */
+    .controls { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+    .bet-row { display: flex; align-items: center; gap: 10px; }
+    .bet-label { font-size: 10px; color: var(--c-muted); letter-spacing: 2px; }
+
+    .adj-btn {
+      width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--c-purple);
+      background: transparent; color: var(--c-purple2); font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s, transform 0.15s, box-shadow 0.15s; line-height: 1;
+    }
+    .adj-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .adj-btn:hover:not(:disabled) { background: var(--c-purple); color: #fff; transform: scale(1.12); box-shadow: 0 0 14px var(--c-glow-purple); }
+    .adj-btn:active:not(:disabled) { transform: scale(0.96); }
+
+    .bet-val { font-family: 'Orbitron', sans-serif; font-size: 22px; color: var(--c-gold); min-width: 62px; text-align: center; }
+
+    .spin-btn {
+      font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 20px;
+      letter-spacing: 4px; padding: 15px 58px; border: none; border-radius: 50px;
+      background: linear-gradient(135deg, #6d28d9, var(--c-purple) 40%, var(--c-indigo) 70%, var(--c-cyan) 100%);
+      background-size: 200% 200%; color: #fff; cursor: pointer;
+      position: relative; overflow: hidden;
+      box-shadow: 0 0 32px rgba(124,58,237,0.6), 0 4px 0 #3b0764;
+      transition: transform 0.15s, box-shadow 0.15s, background-position 0.4s; user-select: none;
+    }
+    .spin-btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.13) 0%, transparent 60%);
+      border-radius: inherit;
+    }
+    .spin-btn:hover:not(:disabled)  { transform: translateY(-3px); box-shadow: 0 0 48px rgba(124,58,237,0.85), 0 7px 0 #3b0764; background-position: 100% 100%; }
+    .spin-btn:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 0 20px rgba(124,58,237,0.5), 0 2px 0 #3b0764; }
+    .spin-btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none; }
+    .spin-btn.spinning-state { background-position: 100% 100%; animation: spinBtnPulse 0.5s ease-in-out infinite alternate; }
+
+    @keyframes spinBtnPulse {
+      from { box-shadow: 0 0 32px rgba(124,58,237,0.6), 0 4px 0 #3b0764; }
+      to   { box-shadow: 0 0 52px rgba(6,182,212,0.7), 0 4px 0 #3b0764; }
+    }
+
+    .spin-sub { display: block; font-size: 9px; font-weight: 400; letter-spacing: 2px; opacity: 0.65; margin-top: 4px; }
+
+    /* ── MESSAGE ─────────────────────────── */
+    .msg-panel {
+      width: 100%; min-height: 84px; background: var(--c-panel);
+      border: 1px solid var(--c-border-subtle); border-radius: 16px; padding: 16px 20px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 7px; text-align: center; transition: background 0.4s, border-color 0.4s;
+    }
+
+    .win-banner { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: 2px; display: none; }
+    .win-banner.show   { display: block; }
+    .win-banner.lose   { color: var(--c-red); }
+    .win-banner.small  { color: var(--c-green); }
+    .win-banner.big    { color: var(--c-gold); text-shadow: 0 0 22px rgba(245,158,11,0.75); }
+    .win-banner.jackpot { color: var(--c-rose); text-shadow: 0 0 30px rgba(244,63,94,0.9); animation: jackpot-pulse 0.38s ease-in-out infinite alternate; }
+
+    @keyframes jackpot-pulse {
+      from { transform: scale(1) rotate(-1deg); }
+      to   { transform: scale(1.07) rotate(1deg); }
+    }
+
+    .msg-text { color: var(--c-muted); font-size: 12px; font-style: italic; max-width: 500px; line-height: 1.5; }
+
+    /* ── STATS ───────────────────────────── */
+    .stats {
+      display: flex; width: 100%; background: var(--c-panel);
+      border: 1px solid var(--c-border-subtle); border-radius: 16px; overflow: hidden;
+      transition: background 0.4s, border-color 0.4s;
+    }
+    .stat { flex: 1; padding: 14px 8px; text-align: center; border-right: 1px solid rgba(124,58,237,0.18); transition: background 0.2s; }
+    .stat:last-child { border-right: none; }
+    .stat:hover { background: rgba(124,58,237,0.05); }
+    .stat-val { font-family: 'Orbitron', sans-serif; font-size: 19px; font-weight: 700; }
+    .stat-val.green { color: var(--c-green); }
+    .stat-val.gold  { color: var(--c-gold); }
+    .stat-val.red   { color: var(--c-red); }
+    .stat-lbl { font-size: 9px; color: var(--c-muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+
+    /* ── METRICS ─────────────────────────── */
+    .metrics-panel {
+      width: 100%; background: var(--c-panel);
+      border: 1px solid var(--c-border-subtle); border-radius: 16px; padding: 16px;
+      transition: background 0.4s, border-color 0.4s;
+    }
+    .metrics-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .metric-card {
+      background: var(--c-surface); border-radius: 12px; padding: 10px 8px; text-align: center;
+      border: 1px solid var(--c-border-subtle); transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .metric-card:hover { border-color: rgba(124,58,237,0.45); transform: translateY(-2px); }
+    .metric-val { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; line-height: 1.3; }
+    .metric-lbl { font-size: 8px; color: var(--c-muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
+
+    .winloss-bar-wrap { margin-bottom: 14px; }
+    .winloss-bar-label { display: flex; justify-content: space-between; font-size: 9px; color: var(--c-muted); letter-spacing: 1px; margin-bottom: 5px; }
+    .winloss-bar { height: 14px; border-radius: 7px; background: var(--c-surface); border: 1px solid var(--c-border-subtle); overflow: hidden; display: flex; transition: background 0.4s; }
+    .winloss-bar-fill-win  { height: 100%; background: linear-gradient(90deg, var(--c-green), var(--c-teal)); transition: width 0.5s ease; }
+    .winloss-bar-fill-loss { height: 100%; background: linear-gradient(90deg, var(--c-red), var(--c-rose)); transition: width 0.5s ease; }
+
+    .sparkline-wrap { position: relative; }
+    .sparkline-label { font-size: 9px; color: var(--c-muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+    .sparkline-container { display: flex; align-items: flex-end; gap: 2px; height: 50px; padding: 4px 0; }
+    .spark-bar { flex: 1; min-width: 4px; max-width: 14px; border-radius: 2px 2px 0 0; transition: height 0.3s ease, background 0.3s; }
+    .spark-bar.positive { background: linear-gradient(to top, var(--c-green), var(--c-teal)); }
+    .spark-bar.negative { background: linear-gradient(to top, var(--c-red), var(--c-rose)); align-self: flex-end; }
+    .spark-bar.zero     { background: var(--c-muted); height: 2px !important; }
+    .sparkline-zero     { position: absolute; bottom: 29px; left: 0; right: 0; border-bottom: 1px dashed rgba(100,116,139,0.3); }
+
+    /* ── SECTION TITLE ───────────────────── */
+    .section-title {
+      font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--c-purple2);
+      letter-spacing: 3px; text-transform: uppercase; text-align: center; margin-bottom: 12px;
+    }
+
+    /* ── PAYTABLE ────────────────────────── */
+    .paytable, .history {
+      width: 100%; background: var(--c-panel);
+      border: 1px solid var(--c-border-subtle); border-radius: 16px; padding: 16px;
+      transition: background 0.4s, border-color 0.4s;
+    }
+    .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+    .pay-row  { display: flex; align-items: center; gap: 8px; font-size: 11px; transition: background 0.18s; border-radius: 6px; padding: 4px 6px; }
+    .pay-row:hover { background: rgba(124,58,237,0.08); }
+    .pay-syms { font-size: 16px; letter-spacing: -1px; flex-shrink: 0; }
+    .pay-name { color: var(--c-muted); flex: 1; }
+    .pay-mult { color: var(--c-gold); white-space: nowrap; }
+
+    /* ── HISTORY ─────────────────────────── */
+    .history { max-height: 170px; overflow-y: auto; }
+    .history::-webkit-scrollbar       { width: 4px; }
+    .history::-webkit-scrollbar-track { background: transparent; }
+    .history::-webkit-scrollbar-thumb { background: var(--c-scrollbar); border-radius: 4px; }
+    .hist-empty { color: var(--c-muted); font-size: 11px; text-align: center; padding: 8px 0; }
+    .hist-row {
+      display: flex; align-items: center; padding: 5px 6px; font-size: 11px;
+      border-bottom: 1px solid var(--c-hist-bd); gap: 8px; transition: background 0.18s; border-radius: 6px;
+    }
+    .hist-row:last-child { border-bottom: none; }
+    .hist-row:hover { background: rgba(124,58,237,0.06); }
+    .hist-syms  { font-size: 15px; letter-spacing: 1px; flex-shrink: 0; }
+    .hist-desc  { color: var(--c-muted); flex: 1; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hist-delta { font-family: 'Orbitron', sans-serif; font-size: 12px; flex-shrink: 0; }
+    .hist-delta.pos { color: var(--c-green); }
+    .hist-delta.neg { color: var(--c-red); }
+
+    /* ── FREE TOKENS BUTTON ──────────────── */
+    .free-btn {
+      font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700;
+      letter-spacing: 2px; padding: 12px 32px; border: 2px solid var(--c-cyan);
+      border-radius: 50px; background: transparent; color: var(--c-cyan);
+      cursor: pointer; transition: background 0.2s, color 0.2s; display: none;
+    }
+    .free-btn:hover  { background: var(--c-cyan); color: #000; }
+    .free-btn:active { transform: scale(0.97); }
+    .free-btn.show   { display: block; }
+
+    /* ── CONFETTI CANVAS ─────────────────── */
+    #confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+
+    /* ── FLOATING TEXT ───────────────────── */
+    .float-text {
+      position: fixed; pointer-events: none; z-index: 9998;
+      font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 28px;
+      white-space: nowrap; animation: floatUp 1.8s ease-out forwards;
+      text-shadow: 0 0 20px currentColor;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 1; transform: translateY(0) scale(0.5); }
+      20%  { opacity: 1; transform: translateY(-20px) scale(1.2); }
+      50%  { opacity: 1; transform: translateY(-60px) scale(1); }
+      100% { opacity: 0; transform: translateY(-160px) scale(0.8); }
+    }
+
+    /* ── JACKPOT OVERLAY ─────────────────── */
+    .jackpot-overlay { position: fixed; inset: 0; z-index: 9990; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+    .jackpot-overlay.active { opacity: 1; }
+    .jackpot-overlay-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(244,63,94,0.15) 0%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.6) 100%);
+      animation: jackpotBgPulse 0.8s ease-in-out infinite alternate;
+    }
+    @keyframes jackpotBgPulse { from { opacity: 0.6; } to { opacity: 1; } }
+    .jackpot-text-overlay {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font-family: 'Orbitron', sans-serif; font-size: clamp(32px, 10vw, 72px); font-weight: 900;
+      color: var(--c-gold); text-shadow: 0 0 40px var(--c-gold), 0 0 80px var(--c-orange), 0 0 120px var(--c-rose);
+      animation: jackpotTextPulse 0.5s ease-in-out infinite alternate;
+      letter-spacing: 6px; white-space: nowrap;
+    }
+    @keyframes jackpotTextPulse {
+      from { transform: translate(-50%,-50%) scale(1); filter: brightness(1); }
+      to   { transform: translate(-50%,-50%) scale(1.08); filter: brightness(1.3); }
+    }
+
+    /* ── PARTICLES ───────────────────────── */
+    .particle { position: fixed; pointer-events: none; z-index: 9999; font-size: 22px; animation: pfx 1.8s ease-in forwards; }
+    @keyframes pfx { 0% { opacity:1; transform:translateY(0) rotate(0deg) scale(1); } 100% { opacity:0; transform:translateY(65vh) rotate(800deg) scale(0.2); } }
+
+    /* ── MODAL OVERLAY ───────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 9995;
+      background: rgba(0,0,0,0.86); backdrop-filter: blur(5px);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+
+    .event-card {
+      background: linear-gradient(170deg, var(--c-machine-a) 0%, var(--c-machine-b) 100%);
+      border: 2px solid var(--c-purple); border-radius: 24px; padding: 36px 28px;
+      max-width: 480px; width: 100%; text-align: center;
+      position: relative; overflow: hidden;
+      box-shadow: 0 0 80px var(--c-glow-purple);
+      animation: eventCardPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .event-card::before {
+      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    @keyframes eventCardPop {
+      from { opacity: 0; transform: scale(0.82) translateY(24px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .event-emoji    { font-size: 58px; margin-bottom: 14px; display: block; }
+    .event-title    { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: 3px; color: var(--c-purple2); margin-bottom: 8px; }
+    .event-subtitle { font-size: 10px; color: var(--c-muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; }
+    .event-info     { font-size: 13px; color: var(--c-text); line-height: 1.7; margin-bottom: 14px; }
+    .event-stakes   {
+      font-family: 'Orbitron', sans-serif; font-size: 15px; color: var(--c-gold);
+      text-shadow: 0 0 12px var(--c-token-glow); margin-bottom: 26px; padding: 10px 16px;
+      background: rgba(245,158,11,0.1); border-radius: 10px; border: 1px solid rgba(245,158,11,0.25);
+    }
+    .event-choices { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    .event-choice-btn {
+      font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px;
+      letter-spacing: 2px; padding: 12px 26px; border: none; border-radius: 50px;
+      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+    }
+    .event-choice-btn:hover  { transform: translateY(-2px); filter: brightness(1.1); }
+    .event-choice-btn:active { transform: translateY(1px); }
+
+    .choice-accept  { background: linear-gradient(135deg, var(--c-green), var(--c-teal)); color: #fff; box-shadow: 0 0 20px rgba(16,185,129,0.5); }
+    .choice-big     { background: linear-gradient(135deg, var(--c-gold), var(--c-orange)); color: #000; box-shadow: 0 0 20px rgba(245,158,11,0.5); }
+    .choice-danger  { background: linear-gradient(135deg, var(--c-rose), var(--c-red)); color: #fff; box-shadow: 0 0 20px rgba(244,63,94,0.5); }
+    .choice-decline { background: transparent; border: 2px solid var(--c-muted); color: var(--c-muted); }
+    .choice-decline:hover { border-color: var(--c-red); color: var(--c-red); filter: none; }
+
+    /* ── HIGH SCORES MODAL ───────────────── */
+    .scores-card { max-width: 520px; }
+
+    .scores-table { width: 100%; border-collapse: collapse; margin: 14px 0 20px; }
+    .scores-table th { font-size: 9px; color: var(--c-muted); letter-spacing: 2px; text-transform: uppercase; padding: 6px 8px; border-bottom: 1px solid var(--c-border-subtle); text-align: left; }
+    .scores-table td { font-size: 12px; padding: 9px 8px; border-bottom: 1px solid var(--c-hist-bd); vertical-align: middle; }
+    .scores-table tr:last-child td { border-bottom: none; }
+    .scores-table .score-rank   { font-family: 'Orbitron', sans-serif; color: var(--c-purple2); font-weight: 700; font-size: 14px; }
+    .scores-table .score-tokens { font-family: 'Orbitron', sans-serif; color: var(--c-gold); font-weight: 700; }
+    .scores-table .score-win    { font-family: 'Orbitron', sans-serif; color: var(--c-green); }
+    .scores-table .score-date   { color: var(--c-muted); font-size: 10px; }
+    .no-scores { color: var(--c-muted); font-size: 13px; padding: 24px 0; }
+    .rank-medal { font-size: 18px; }
+
+    /* ── IN-GAME NOTIFICATION ────────────── */
+    .game-notification {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(140px);
+      z-index: 10000; background: var(--c-panel); border: 1px solid var(--c-border-med);
+      border-radius: 18px; padding: 14px 20px; display: flex; align-items: center; gap: 14px;
+      cursor: pointer; box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 0 24px var(--c-glow-purple);
+      transition: transform 0.48s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+      max-width: 440px; width: calc(100vw - 32px); user-select: none;
+    }
+    .game-notification.show { transform: translateX(-50%) translateY(0); }
+    .game-notification:hover { box-shadow: 0 12px 52px rgba(0,0,0,0.65), 0 0 34px var(--c-glow-purple); }
+    .game-notification.notif-bankrupt { border-color: var(--c-red); box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 0 24px rgba(239,68,68,0.45); }
+    .game-notification.notif-debt     { border-color: var(--c-orange); box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 0 24px rgba(249,115,22,0.45); animation: debtNotifPulse 2s ease-in-out infinite; }
+
+    @keyframes debtNotifPulse {
+      0%,100% { box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 0 24px rgba(249,115,22,0.45); }
+      50%     { box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 0 44px rgba(249,115,22,0.75); }
+    }
+
+    .notif-icon    { font-size: 30px; flex-shrink: 0; }
+    .notif-content { flex: 1; }
+    .notif-title   { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; }
+    .notif-detail  { font-size: 11px; color: var(--c-muted); margin-top: 3px; }
+    .notif-close   { color: var(--c-muted); font-size: 18px; flex-shrink: 0; transition: transform 0.2s, color 0.2s; }
+    .game-notification:hover .notif-close { transform: translateX(4px); color: var(--c-purple2); }
+
+    /* ── FOCUS VISIBILITY ────────────────── */
+    button:focus-visible { outline: 2px solid var(--c-cyan2); outline-offset: 3px; }
+
+    /* ── RESPONSIVE ──────────────────────── */
+    @media (max-width: 520px) {
+      .pay-grid     { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .controls     { gap: 10px; }
+      .bet-row      { flex-wrap: wrap; justify-content: center; gap: 8px; }
+      .spin-btn     { padding: 14px 36px; font-size: 17px; letter-spacing: 3px; width: 100%; }
+      .event-card   { padding: 28px 18px; }
+      .event-title  { font-size: 18px; }
+    }
+    @media (max-width: 380px) {
+      .reels       { gap: 6px; }
+      :root        { --sym-h: 90px; }
+      .sym-emoji   { font-size: clamp(26px, 8vw, 36px); }
+      .token-amount { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── GLOBAL ELEMENTS ──────────────────── -->
+<canvas id="confettiCanvas"></canvas>
+
+<div class="jackpot-overlay" id="jackpotOverlay">
+  <div class="jackpot-overlay-bg"></div>
+  <div class="jackpot-text-overlay" id="jackpotOverlayText">JACKPOT</div>
+</div>
+
+<!-- Special Event Modal -->
+<div id="specialEventModal" class="modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="eventTitle">
+  <div class="event-card" id="eventCard">
+    <span class="event-emoji" id="eventEmoji">🎰</span>
+    <div class="event-title"    id="eventTitle">EVENT</div>
+    <div class="event-subtitle" id="eventSubtitle">SPECIAL EVENT</div>
+    <div class="event-info"     id="eventInfo">A special event has occurred.</div>
+    <div class="event-stakes"   id="eventStakes">⚖ WAGERING: 0 TOKENS</div>
+    <div class="event-choices"  id="eventChoices"></div>
+  </div>
+</div>
+
+<!-- High Scores Modal -->
+<div id="highScoresModal" class="modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="hsTitle">
+  <div class="event-card scores-card">
+    <span class="event-emoji">🏆</span>
+    <div class="event-title" id="hsTitle">HIGH SCORES</div>
+    <div class="event-subtitle">ALL-TIME LEADERBOARD</div>
+    <div id="scoresContent"><p class="no-scores">No scores recorded yet.</p></div>
+    <div class="event-choices">
+      <button class="event-choice-btn choice-decline" id="closeHSBtn">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- In-Game Notification -->
+<div id="gameNotification" class="game-notification" role="alert" aria-live="assertive">
+  <div class="notif-icon"    id="notifIcon">💀</div>
+  <div class="notif-content">
+    <div class="notif-title"  id="notifTitle">BANKRUPT</div>
+    <div class="notif-detail" id="notifDetail">Tap to return to home screen</div>
+  </div>
+  <div class="notif-close">→</div>
+</div>
+
+<!-- ── HOME SCREEN ─────────────────────── -->
+<div id="screenHome" class="screen screen-home active">
+  <div class="home-wrapper">
+    <div class="home-header">
+      <button class="theme-toggle home-theme-toggle" id="homeThemeToggle" aria-label="Toggle theme">
+        <div class="theme-toggle-knob" id="homeThemeKnob">🌙</div>
+      </button>
+    </div>
+
+    <div class="hero-section">
+      <div class="hero-symbols" aria-hidden="true">
+        <span class="hero-sym" style="--delay:0.0s">🤖</span>
+        <span class="hero-sym" style="--delay:0.4s">💎</span>
+        <span class="hero-sym" style="--delay:0.8s">🧠</span>
+        <span class="hero-sym" style="--delay:0.2s">⚡</span>
+        <span class="hero-sym" style="--delay:0.6s">🌈</span>
+      </div>
+      <h1 class="title">AI TOKEN SLOTS™</h1>
+      <p class="subtitle">// where your context window goes to die //</p>
+    </div>
+
+    <div class="home-actions">
+      <button id="startBtn" class="start-btn">
+        ▶ START
+        <span class="start-sub">Insert 1,000 tokens to begin</span>
+      </button>
+      <button id="highScoresBtnHome" class="home-nav-btn">🏆 HIGH SCORES</button>
+    </div>
+
+    <p class="home-tagline" id="homeTagline">
+      Spin the reels. Watch the tokens burn.<br>
+      Triple loss? Double or Nothing awaits.
+    </p>
+  </div>
+</div>
+
+<!-- ── GAME SCREEN ─────────────────────── -->
+<div id="screenGame" class="screen screen-game">
+<div class="app">
+
+  <header>
+    <button class="back-btn" id="backBtn">← HOME</button>
+    <h1 class="title">AI TOKEN SLOTS™</h1>
+    <p class="subtitle">// where your context window goes to die //</p>
+    <button class="theme-toggle" id="gameThemeToggle" aria-label="Toggle theme">
+      <div class="theme-toggle-knob" id="gameThemeKnob">🌙</div>
+    </button>
+  </header>
+
+  <div class="token-bar" id="tokenBar">
+    <div class="token-icon">🪙</div>
+    <div class="token-info">
+      <div class="token-label" id="tokenLabel">Token Balance</div>
+      <div class="token-amount" id="tokenAmount">1,000</div>
+    </div>
+  </div>
+
+  <div class="machine" id="machine">
+    <div class="led-row" aria-hidden="true">
+      <div class="led"></div><div class="led"></div><div class="led"></div>
+      <div class="led"></div><div class="led"></div><div class="led"></div>
+      <div class="led"></div><div class="led"></div><div class="led"></div>
+    </div>
+
+    <div class="reels" role="img" aria-label="Slot machine reels">
+      <div class="reel-col">
+        <div class="reel-num" aria-hidden="true">01</div>
+        <div class="reel-window" id="reel0"><div class="reel-strip" id="strip0"></div></div>
+      </div>
+      <div class="reel-col">
+        <div class="reel-num" aria-hidden="true">02</div>
+        <div class="reel-window" id="reel1"><div class="reel-strip" id="strip1"></div></div>
+      </div>
+      <div class="reel-col">
+        <div class="reel-num" aria-hidden="true">03</div>
+        <div class="reel-window" id="reel2"><div class="reel-strip" id="strip2"></div></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="bet-row">
+        <span class="bet-label">BET</span>
+        <button class="adj-btn" id="betDown" aria-label="Decrease bet">−</button>
+        <span class="bet-val" id="betVal" aria-label="Current bet">10</span>
+        <button class="adj-btn" id="betUp" aria-label="Increase bet">+</button>
+        <span class="bet-label">TOKENS</span>
+      </div>
+      <button class="spin-btn" id="spinBtn">
+        SPIN
+        <span class="spin-sub" id="spinSub">−10 tokens</span>
+      </button>
+      <button class="free-btn" id="freeBtn">⚡ CLAIM FREE TOKENS ⚡</button>
+    </div>
+  </div>
+
+  <div class="msg-panel" aria-live="polite" aria-atomic="true">
+    <div class="win-banner" id="winBanner" role="status"></div>
+    <div class="msg-text"   id="msgText">Insert tokens to begin. May the gradients be in your favor.</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-val green" id="statWon">0</div>
+      <div class="stat-lbl">Won</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val gold" id="statSpins">0</div>
+      <div class="stat-lbl">Spins</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val red" id="statLost">0</div>
+      <div class="stat-lbl">Burnt</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="statNet" style="color:var(--c-muted)">0</div>
+      <div class="stat-lbl">Net P&amp;L</div>
+    </div>
+  </div>
+
+  <div class="metrics-panel">
+    <div class="section-title">// ANALYTICS DASHBOARD //</div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-val" id="metricWinRate" style="color:var(--c-teal)">0%</div>
+        <div class="metric-lbl">Win Rate</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" id="metricROI" style="color:var(--c-indigo)">0%</div>
+        <div class="metric-lbl">ROI</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" id="metricStreak" style="color:var(--c-muted)">—</div>
+        <div class="metric-lbl">Streak</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" id="metricBigWin" style="color:var(--c-gold)">0</div>
+        <div class="metric-lbl">Best Win</div>
+      </div>
+    </div>
+
+    <div class="winloss-bar-wrap">
+      <div class="winloss-bar-label">
+        <span id="wlWinLabel">Wins: 0</span>
+        <span id="wlLossLabel">Losses: 0</span>
+      </div>
+      <div class="winloss-bar">
+        <div class="winloss-bar-fill-win"  id="wlBarWin"  style="width:50%"></div>
+        <div class="winloss-bar-fill-loss" id="wlBarLoss" style="width:50%"></div>
+      </div>
+    </div>
+
+    <div class="sparkline-wrap">
+      <div class="sparkline-label">Net P&amp;L History (last 30 spins)</div>
+      <div class="sparkline-container" id="sparkline"></div>
+      <div class="sparkline-zero"></div>
+    </div>
+  </div>
+
+  <div class="paytable">
+    <div class="section-title">// PAYTABLE //</div>
+    <div class="pay-grid" id="paytableGrid"></div>
+  </div>
+
+  <div class="history">
+    <div class="section-title">// INFERENCE LOG //</div>
+    <div id="histList"><div class="hist-empty">No runs yet. The model is idle.</div></div>
+  </div>
+
+</div>
+</div><!-- end screenGame -->
+
+<script>
+// ─────────────────────────────────────────
+// SYMBOLS & POOL
+// ─────────────────────────────────────────
+const SYMBOLS = [
+  { id:'gpt',    emoji:'🤖', name:'GPT-∞',   weight:1,  mult:100 },
+  { id:'agi',    emoji:'🧠', name:'AGI',      weight:2,  mult:50  },
+  { id:'gem',    emoji:'💎', name:'SERIES-A', weight:3,  mult:25  },
+  { id:'gpu',    emoji:'⚡', name:'GPU',      weight:5,  mult:15  },
+  { id:'prompt', emoji:'📜', name:'PROMPT',   weight:7,  mult:8   },
+  { id:'art',    emoji:'🌈', name:'DIFFUSE',  weight:9,  mult:5   },
+  { id:'burn',   emoji:'💸', name:'BURN',     weight:11, mult:3   },
+  { id:'null',   emoji:'💀', name:'NULL',     weight:13, mult:2   },
+];
+
+const POOL = [];
+SYMBOLS.forEach(s => { for (let i = 0; i < s.weight; i++) POOL.push(s); });
+const rnd = () => POOL[Math.floor(Math.random() * POOL.length)];
+
+// ─────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────
+// Keep SYM_H in sync with CSS --sym-h (110px default, 90px at ≤380px)
+// We read it at spin-time from CSS so it works at all breakpoints
+function getSymH() {
+  const v = getComputedStyle(document.documentElement).getPropertyValue('--sym-h').trim();
+  return parseInt(v, 10) || 110;
+}
+
+const STRIP_LEN  = 50;
+const TARGET_IDX = 46; // which cell in the strip lands in the centre row
+
+// At rest the strip shows indices 0–2 in view.
+// After animation, TARGET_IDX sits in centre (row 1 of 3 visible rows).
+// translateY needed = -(TARGET_IDX - 1) * SYM_H  (scroll up so TARGET_IDX is at row 1)
+function calcFinalY() { return -((TARGET_IDX - 1) * getSymH()); }
+
+const BET_OPTS = [10, 25, 50, 100];
+
+// ─────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────
+let tokens        = 1000;
+let spinning      = false;
+let spins         = 0;
+let totalWon      = 0;
+let totalLost     = 0;
+let winCount      = 0;
+let lossCount     = 0;
+let streak        = { type: null, count: 0 };
+let biggestWin    = 0;
+let peakTokens    = 1000;
+let betIdx        = 0;
+const plHistory   = [];
+
+let specialEventActive     = false;
+let consecutiveLosses      = 0;
+let consecutiveWins        = 0;
+let spinsSinceBigBetOffer  = 0;
+let isInDebt               = false;
+let pendingDebt            = 0;  // replaces window._debtOwe
+
+// ─────────────────────────────────────────
+// DOM REFS
+// ─────────────────────────────────────────
+const tokenEl   = document.getElementById('tokenAmount');
+const tokenBar  = document.getElementById('tokenBar');
+const tokenLbl  = document.getElementById('tokenLabel');
+const betValEl  = document.getElementById('betVal');
+const spinSubEl = document.getElementById('spinSub');
+const spinBtn   = document.getElementById('spinBtn');
+const freeBtn   = document.getElementById('freeBtn');
+const winBanner = document.getElementById('winBanner');
+const msgText   = document.getElementById('msgText');
+const statWon   = document.getElementById('statWon');
+const statLost  = document.getElementById('statLost');
+const statSpins = document.getElementById('statSpins');
+const statNet   = document.getElementById('statNet');
+const histList  = document.getElementById('histList');
+const machineEl = document.getElementById('machine');
+const notifEl   = document.getElementById('gameNotification');
+const notifIcon  = document.getElementById('notifIcon');
+const notifTitle = document.getElementById('notifTitle');
+const notifDetail= document.getElementById('notifDetail');
+
+// ─────────────────────────────────────────
+// THEME
+// ─────────────────────────────────────────
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const knobText = theme === 'dark' ? '🌙' : '☀️';
+  document.getElementById('homeThemeKnob').textContent = knobText;
+  document.getElementById('gameThemeKnob').textContent = knobText;
+  localStorage.setItem('ai-slots-theme', theme);
+}
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  setTheme(cur === 'dark' ? 'light' : 'dark');
+}
+document.getElementById('homeThemeToggle').addEventListener('click', toggleTheme);
+document.getElementById('gameThemeToggle').addEventListener('click', toggleTheme);
+const savedTheme = localStorage.getItem('ai-slots-theme');
+if (savedTheme) setTheme(savedTheme);
+
+// ─────────────────────────────────────────
+// SCREEN MANAGEMENT
+// ─────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','fade-in'));
+  const el = document.getElementById(id);
+  el.classList.add('active','fade-in');
+}
+
+function startGame() {
+  resetGameState();
+  showScreen('screenGame');
+  playIntroFanfare();
+}
+
+function goHome(saveScore) {
+  hideNotification();
+  if (saveScore && spins > 0) recordHighScore();
+  showScreen('screenHome');
+  if (spins > 0) {
+    const net = totalWon - totalLost;
+    document.getElementById('homeTagline').textContent =
+      `Last session: ${spins} spins · Net ${net >= 0 ? '+' : ''}${fmt(net)} tokens` +
+      (net < 0 ? ' · The machine won.' : ' · You survived.');
+  }
+}
+
+function resetGameState() {
+  tokens        = 1000;
+  spinning      = false;
+  spins         = 0;
+  totalWon      = 0;
+  totalLost     = 0;
+  winCount      = 0;
+  lossCount     = 0;
+  streak        = { type: null, count: 0 };
+  biggestWin    = 0;
+  peakTokens    = 1000;
+  betIdx        = 0;                // FIX: reset bet index each game
+  plHistory.length = 0;
+
+  consecutiveLosses    = 0;
+  consecutiveWins      = 0;
+  spinsSinceBigBetOffer= 0;
+  specialEventActive   = false;
+  isInDebt             = false;
+  pendingDebt          = 0;        // FIX: clear cross-session debt
+
+  tokenBar.classList.remove('debt-mode');
+  tokenLbl.textContent = 'Token Balance';
+  document.body.classList.remove('debt-state');
+  freeBtn.classList.remove('show');
+  winBanner.className = 'win-banner';
+  msgText.textContent = 'Insert tokens to begin. May the gradients be in your favor.';
+  histList.innerHTML  = '<div class="hist-empty">No runs yet. The model is idle.</div>';
+
+  renderTokenDisplay();
+  updateStats();
+  updateAdvancedMetrics();
+  updateBetUI();
+  initReelStrips();
+}
+
+function initReelStrips() {
+  [0,1,2].forEach(i => {
+    const strip = document.getElementById(`strip${i}`);
+    strip.style.transition = 'none';
+    strip.style.transform  = 'translateY(0)';
+    strip.innerHTML = stripHTML([rnd(), rnd(), rnd()]);
+  });
+}
+
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('backBtn').addEventListener('click', () => goHome(true));
+
+// ─────────────────────────────────────────
+// NOTIFICATION
+// ─────────────────────────────────────────
+let notifClickHandler = null;
+
+function showNotification(icon, title, detail, type, clickFn) {
+  notifIcon.textContent   = icon;
+  notifTitle.textContent  = title;
+  notifDetail.textContent = detail;
+  notifEl.className = 'game-notification notif-' + type + ' show';
+  // Replace click handler
+  if (notifClickHandler) notifEl.removeEventListener('click', notifClickHandler);
+  notifClickHandler = clickFn;
+  if (clickFn) notifEl.addEventListener('click', clickFn);
+}
+
+function hideNotification() {
+  notifEl.classList.remove('show');
+  if (notifClickHandler) {
+    notifEl.removeEventListener('click', notifClickHandler);
+    notifClickHandler = null;
+  }
+}
+
+function showBankruptNotification() {
+  showNotification('💀', 'BANKRUPT', 'Tap to return home & see scores', 'bankrupt', () => {
+    hideNotification();
+    goHome(true);
+  });
+}
+
+function showDebtNotification() {
+  const abs = Math.abs(tokens);
+  showNotification('📉', `DEBT: −${fmt(abs)} TOKENS`, 'Keep spinning to recover', 'debt', null);
+}
+
+// ─────────────────────────────────────────
+// REEL STRIP BUILDER
+// ─────────────────────────────────────────
+function buildStrip(target) {
+  return Array.from({ length: STRIP_LEN }, (_, i) => (i === TARGET_IDX ? target : rnd()));
+}
+
+function stripHTML(syms) {
+  return syms.map(s =>
+    `<div class="sym-cell">
+       <span class="sym-emoji">${s.emoji}</span>
+       <span class="sym-label">${s.name}</span>
+     </div>`
+  ).join('');
+}
+
+// ─────────────────────────────────────────
+// AUDIO (Web Audio API)
+// ─────────────────────────────────────────
+let _actx = null;
+const actx = () => {
+  if (!_actx) _actx = new (window.AudioContext || window.webkitAudioContext)();
+  return _actx;
+};
+
+function tone(freq, type, vol, delay, dur) {
+  try {
+    const ac   = actx();
+    const osc  = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ac.currentTime + delay);
+    gain.gain.setValueAtTime(0.001, ac.currentTime + delay);
+    gain.gain.linearRampToValueAtTime(vol, ac.currentTime + delay + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + delay + dur);
+    osc.start(ac.currentTime + delay);
+    osc.stop(ac.currentTime  + delay + dur + 0.02);
+  } catch (_) {}
+}
+
+const playTick  = () => {
+  tone(550 + Math.random() * 350, 'square', 0.038, 0, 0.020);
+  tone(180 + Math.random() * 80,  'sine',   0.028, 0, 0.028);
+};
+const playStop  = (i) => {
+  tone(100 + i * 26, 'sine',     0.32, 0,    0.20);
+  tone(850 + i * 90, 'square',   0.06, 0,    0.03);
+  tone(420 + i * 55, 'triangle', 0.07, 0.02, 0.14);
+};
+const playLose  = () => {
+  [311, 262, 220].forEach((f, i) => tone(f, 'sawtooth', 0.13 + i * 0.02, i * 0.13, 0.25));
+};
+const playSuspense = () => {
+  try {
+    const ac   = actx();
+    const osc  = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(85, ac.currentTime);
+    osc.frequency.linearRampToValueAtTime(155, ac.currentTime + 0.34);
+    gain.gain.setValueAtTime(0.001, ac.currentTime);
+    gain.gain.linearRampToValueAtTime(0.055, ac.currentTime + 0.04);
+    gain.gain.setValueAtTime(0.055, ac.currentTime + 0.28);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.42);
+    osc.start(ac.currentTime); osc.stop(ac.currentTime + 0.46);
+  } catch (_) {}
+};
+
+function playWin(bet, payout) {
+  const mult = payout / bet;
+  const scale = mult >= 50 ? [261,330,392,523,659,784,1047,1319,1568]
+    : mult >= 25 ? [261,330,392,523,659,784,1047]
+    : mult >= 8  ? [261,330,392,523,659]
+    :              [330,392,523];
+  scale.forEach((f, i) => {
+    tone(f,     'sine',     0.16, i * 0.085, 0.38);
+    tone(f * 2, 'sine',     0.05, i * 0.085, 0.28);
+    tone(f * 3, 'triangle', 0.02, i * 0.085, 0.18);
+  });
+}
+
+function playIntroFanfare() {
+  [261,329,392,523,659,784,1047].forEach((f, i) => {
+    tone(f, 'sine', 0.14, i * 0.07, 0.35);
+    tone(f * 1.5, 'triangle', 0.04, i * 0.07, 0.20);
+  });
+}
+
+function playSpecialEventSound() {
+  const notes = [220,294,370,440,494,554,659,554,494];
+  notes.forEach((f, i) => tone(f, 'square', 0.07, i * 0.06, 0.18));
+}
+
+function playDebtSound() {
+  [440,370,311,262,220,185,147].forEach((f, i) => tone(f, 'sawtooth', 0.10, i * 0.11, 0.30));
+}
+
+function playDoubleWin() {
+  [261,392,523,659,784,1047,1319].forEach((f, i) => {
+    tone(f,     'sine',     0.18, i * 0.07, 0.42);
+    tone(f * 2, 'triangle', 0.05, i * 0.07, 0.22);
+  });
+}
+
+function playTripleWin() {
+  [130,196,261,329,392,523,659,784,1047,1319,1568].forEach((f, i) => {
+    tone(f,     'sine',     0.18, i * 0.055, 0.45);
+    tone(f * 2, 'sine',     0.06, i * 0.055, 0.30);
+    tone(f * 3, 'triangle', 0.03, i * 0.055, 0.18);
+  });
+}
+
+function playPairWin() {
+  [330,392,523,659].forEach((f, i) => {
+    tone(f,     'sine',     0.14, i * 0.08, 0.32);
+    tone(f * 2, 'triangle', 0.04, i * 0.08, 0.20);
+  });
+}
+
+// ─────────────────────────────────────────
+// CONFETTI
+// ─────────────────────────────────────────
+const confettiCanvas = document.getElementById('confettiCanvas');
+const confettiCtx    = confettiCanvas.getContext('2d');
+let confettiPieces   = [];
+let confettiAnimId   = null;
+
+function resizeConfettiCanvas() {
+  confettiCanvas.width  = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+resizeConfettiCanvas();
+window.addEventListener('resize', resizeConfettiCanvas);
+
+const CONFETTI_COLORS = [
+  '#7c3aed','#06b6d4','#f59e0b','#10b981','#ef4444',
+  '#f97316','#14b8a6','#f43f5e','#6366f1','#ec4899',
+  '#84cc16','#fcd34d','#a78bfa','#67e8f9'
+];
+
+function launchConfetti(count, intensity) {
+  for (let i = 0; i < count; i++) {
+    confettiPieces.push({
+      x: Math.random() * confettiCanvas.width,
+      y: -20 - Math.random() * 100,
+      w: 6 + Math.random() * 6, h: 4 + Math.random() * 8,
+      vx: (Math.random() - 0.5) * 6 * intensity,
+      vy: 2 + Math.random() * 4 * intensity,
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 12,
+      color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      life: 1, decay: 0.003 + Math.random() * 0.004,
+    });
+  }
+  if (!confettiAnimId) animateConfetti();
+}
+
+function animateConfetti() {
+  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiPieces.forEach(p => {
+    p.x += p.vx; p.vy += 0.08; p.y += p.vy;
+    p.rotation += p.rotSpeed; p.life -= p.decay;
+    if (p.life > 0) {
+      confettiCtx.save();
+      confettiCtx.globalAlpha = p.life;
+      confettiCtx.translate(p.x, p.y);
+      confettiCtx.rotate(p.rotation * Math.PI / 180);
+      confettiCtx.fillStyle = p.color;
+      confettiCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      confettiCtx.restore();
+    }
+  });
+  confettiPieces = confettiPieces.filter(p => p.life > 0 && p.y < confettiCanvas.height + 50);
+  if (confettiPieces.length > 0) {
+    confettiAnimId = requestAnimationFrame(animateConfetti);
+  } else {
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    confettiAnimId = null;
+  }
+}
+
+function burst(count, emojis) {
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'particle';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = (Math.random() * 95) + 'vw';
+      el.style.top  = (Math.random() * 25) + 'vh';
+      el.style.animationDelay = (Math.random() * 0.5) + 's';
+      document.body.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }, i * 50);
+  }
+}
+
+// ─────────────────────────────────────────
+// FLOATING TEXT
+// ─────────────────────────────────────────
+function floatingText(text, color) {
+  const el  = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.color = color;
+  const rect = machineEl.getBoundingClientRect();
+  el.style.left = (rect.left + rect.width / 2 - 100) + 'px';
+  el.style.top  = (rect.top  + rect.height / 2) + 'px';
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+// ─────────────────────────────────────────
+// JACKPOT OVERLAY
+// ─────────────────────────────────────────
+const jackpotOverlay     = document.getElementById('jackpotOverlay');
+const jackpotOverlayText = document.getElementById('jackpotOverlayText');
+
+function showJackpotOverlay(text, duration) {
+  jackpotOverlayText.textContent = text;
+  jackpotOverlay.classList.add('active');
+  setTimeout(() => jackpotOverlay.classList.remove('active'), duration);
+}
+
+// ─────────────────────────────────────────
+// UI HELPERS
+// ─────────────────────────────────────────
+const fmt = n => {
+  const abs = Math.abs(n);
+  return abs >= 1000 ? n.toLocaleString() : String(n);
+};
+
+function renderTokenDisplay() {
+  if (tokens < 0) {
+    tokenEl.textContent = '−' + fmt(Math.abs(tokens));
+  } else {
+    tokenEl.textContent = fmt(tokens);
+  }
+}
+
+function flashTokens(dir) {
+  renderTokenDisplay();
+  tokenEl.classList.remove('pulse-up', 'pulse-down');
+  void tokenEl.offsetWidth; // force reflow
+  if (dir > 0) tokenEl.classList.add('pulse-up');
+  if (dir < 0) tokenEl.classList.add('pulse-down');
+  setTimeout(() => tokenEl.classList.remove('pulse-up', 'pulse-down'), 320);
+}
+
+function updateBetUI() {
+  const bet = BET_OPTS[betIdx];
+  betValEl.textContent  = bet;
+  spinSubEl.textContent = `−${bet} tokens`;
+  // FIX: Spin allowed if not currently spinning/event, and either has enough tokens OR is in debt mode
+  const canSpin = !spinning && !specialEventActive && (isInDebt || tokens >= bet);
+  spinBtn.disabled = !canSpin;
+  document.getElementById('betDown').disabled = spinning || specialEventActive || betIdx === 0;
+  document.getElementById('betUp').disabled   = spinning || specialEventActive || betIdx === BET_OPTS.length - 1;
+}
+
+function updateStats() {
+  statWon.textContent   = fmt(totalWon);
+  statLost.textContent  = fmt(totalLost);
+  statSpins.textContent = spins;
+  const net = totalWon - totalLost;
+  statNet.textContent   = (net >= 0 ? '+' : '') + fmt(net);
+  statNet.style.color   = net > 0 ? 'var(--c-green)' : net < 0 ? 'var(--c-red)' : 'var(--c-muted)';
+}
+
+function updateAdvancedMetrics() {
+  const total   = winCount + lossCount;
+  const winRate = total > 0 ? ((winCount / total) * 100).toFixed(1) : 0;
+  document.getElementById('metricWinRate').textContent = winRate + '%';
+
+  const roi   = totalLost > 0 ? (((totalWon - totalLost) / totalLost) * 100).toFixed(1) : '0';
+  const roiEl = document.getElementById('metricROI');
+  roiEl.textContent = (Number(roi) >= 0 ? '+' : '') + roi + '%';
+  roiEl.style.color = Number(roi) > 0 ? 'var(--c-green)' : Number(roi) < 0 ? 'var(--c-red)' : 'var(--c-indigo)';
+
+  const streakEl = document.getElementById('metricStreak');
+  if (streak.type === 'win') {
+    streakEl.textContent = '🔥' + streak.count + 'W';
+    streakEl.style.color = 'var(--c-green)';
+  } else if (streak.type === 'loss') {
+    streakEl.textContent = '❄️' + streak.count + 'L';
+    streakEl.style.color = 'var(--c-red)';
+  } else {
+    streakEl.textContent = '—';
+    streakEl.style.color = 'var(--c-muted)';
+  }
+
+  document.getElementById('metricBigWin').textContent = fmt(biggestWin);
+  document.getElementById('wlWinLabel').textContent   = `Wins: ${winCount}`;
+  document.getElementById('wlLossLabel').textContent  = `Losses: ${lossCount}`;
+  const wPct = total > 0 ? (winCount  / total * 100) : 50;
+  const lPct = total > 0 ? (lossCount / total * 100) : 50;
+  document.getElementById('wlBarWin').style.width  = wPct + '%';
+  document.getElementById('wlBarLoss').style.width = lPct + '%';
+  renderSparkline();
+}
+
+function renderSparkline() {
+  const container = document.getElementById('sparkline');
+  const data = plHistory.slice(-30);
+  if (data.length === 0) {
+    container.innerHTML = '<span style="color:var(--c-muted);font-size:10px;margin:auto;">No data yet</span>';
+    return;
+  }
+  const maxAbs = Math.max(1, ...data.map(v => Math.abs(v)));
+  container.innerHTML = data.map(v => {
+    const h   = Math.max(2, (Math.abs(v) / maxAbs) * 42);
+    const cls = v > 0 ? 'positive' : v < 0 ? 'negative' : 'zero';
+    return `<div class="spark-bar ${cls}" style="height:${h}px" title="${v >= 0 ? '+' : ''}${v}"></div>`;
+  }).join('');
+}
+
+function showMsg(banner, cls, detail) {
+  winBanner.textContent = banner;
+  winBanner.className   = 'win-banner' + (banner ? ' show ' + cls : '');
+  msgText.textContent   = detail;
+}
+
+function addHistory(syms, delta, desc) {
+  const empty = histList.querySelector('.hist-empty');
+  if (empty) empty.remove();
+  const row = document.createElement('div');
+  row.className = 'hist-row';
+  row.innerHTML =
+    `<span class="hist-syms">${syms.map(s => s.emoji).join('')}</span>` +
+    `<span class="hist-desc">${desc}</span>` +
+    `<span class="hist-delta ${delta >= 0 ? 'pos' : 'neg'}">${delta >= 0 ? '+' : ''}${fmt(delta)}</span>`;
+  histList.insertBefore(row, histList.firstChild);
+  while (histList.children.length > 20) histList.removeChild(histList.lastChild);
+}
+
+// ─────────────────────────────────────────
+// PAYTABLE
+// ─────────────────────────────────────────
+function buildPaytable() {
+  const grid = document.getElementById('paytableGrid');
+  grid.innerHTML = SYMBOLS.map(s =>
+    `<div class="pay-row">
+       <span class="pay-syms">${s.emoji}${s.emoji}${s.emoji}</span>
+       <span class="pay-name">${s.name}</span>
+       <span class="pay-mult">×${s.mult}</span>
+     </div>`
+  ).join('') +
+  `<div class="pay-row">
+     <span class="pay-syms">🔀🔀&nbsp;</span>
+     <span class="pay-name">Any pair</span>
+     <span class="pay-mult">×1.5</span>
+   </div>`;
+}
+
+// ─────────────────────────────────────────
+// REEL ANIMATION
+// ─────────────────────────────────────────
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animateReel(idx, target, dur) {
+  return new Promise(resolve => {
+    const strip = document.getElementById(`strip${idx}`);
+    const win   = document.getElementById(`reel${idx}`);
+
+    strip.innerHTML = stripHTML(buildStrip(target));
+    strip.style.transition = 'none';
+    strip.style.transform  = 'translateY(0)';
+
+    const finalY        = calcFinalY();
+    const startTime     = performance.now();
+    const tickIntervalBase = 62;
+    let lastTick = startTime;
+
+    function frame(now) {
+      const elapsed  = now - startTime;
+      const progress = Math.min(elapsed / dur, 1);
+      const eased    = easeOutCubic(progress);
+      strip.style.transform = `translateY(${finalY * eased}px)`;
+
+      const dynamicInterval = tickIntervalBase * (1 + eased * 3.2);
+      if (now - lastTick > dynamicInterval && progress < 0.92) {
+        playTick(); lastTick = now;
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        strip.style.transform = `translateY(${finalY}px)`;
+        win.classList.add('flashing');
+        setTimeout(() => win.classList.remove('flashing'), 700);
+        playStop(idx);
+        resolve();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+// ─────────────────────────────────────────
+// WIN / LOSS ANIMATIONS
+// ─────────────────────────────────────────
+function animateWinSymbols() {
+  for (let i = 0; i < 3; i++) {
+    const strip = document.getElementById(`strip${i}`);
+    const cells = strip.querySelectorAll('.sym-cell');
+    const cell  = cells[TARGET_IDX];
+    if (cell) {
+      cell.classList.add('winner');
+      setTimeout(() => cell.classList.remove('winner'), 2000);
+    }
+  }
+}
+
+function animateNearMiss(matchIndices) {
+  matchIndices.forEach(i => {
+    const win = document.getElementById(`reel${i}`);
+    win.classList.add('near-miss');
+    setTimeout(() => win.classList.remove('near-miss'), 800);
+  });
+}
+
+function animateLoss() {
+  machineEl.classList.add('shake-small');
+  setTimeout(() => machineEl.classList.remove('shake-small'), 300);
+  for (let i = 0; i < 3; i++) {
+    const win = document.getElementById(`reel${i}`);
+    win.classList.add('loss-flash');
+    setTimeout(() => win.classList.remove('loss-flash'), 400);
+  }
+}
+
+function animateBigWin(payout) {
+  machineEl.classList.add('shake-big', 'glow-pulse');
+  setTimeout(() => machineEl.classList.remove('shake-big'), 500);
+  setTimeout(() => machineEl.classList.remove('glow-pulse'), 1500);
+  launchConfetti(80, 1.2);
+  animateWinSymbols();
+  floatingText(`+${fmt(payout)} TOKENS!`, 'var(--c-gold)');
+}
+
+function animateJackpot(payout) {
+  machineEl.classList.add('shake-big', 'glow-pulse');
+  setTimeout(() => machineEl.classList.remove('shake-big'), 500);
+  setTimeout(() => machineEl.classList.remove('glow-pulse'), 1500);
+  launchConfetti(200, 1.8);
+  showJackpotOverlay('🎰 JACKPOT 🎰', 3000);
+  animateWinSymbols();
+  setTimeout(() => floatingText(`+${fmt(payout)} TOKENS!`, 'var(--c-gold)'), 400);
+  setTimeout(() => launchConfetti(120, 1.5), 600);
+  burst(48, ['🪙','💰','🎉','✨','🤖','🧠']);
+}
+
+function animateSmallWin(payout) {
+  animateWinSymbols();
+  floatingText(`+${fmt(payout)}`, 'var(--c-green)');
+  launchConfetti(20, 0.6);
+}
+
+// ─────────────────────────────────────────
+// MESSAGES
+// ─────────────────────────────────────────
+const LOSE_MSGS = [
+  "Model collapsed. It's giving you the silent treatment.",
+  "Context window exceeded. Your tokens vanished into the void.",
+  "Hallucination detected: you thought you'd win.",
+  "Rate limit exceeded. Try again in 3,600 seconds.",
+  "Your tokens have been redistributed to Sam Altman's net worth.",
+  "404: Fortune not found. Have you tried prompt engineering?",
+  "Inference cost: your dignity. Output: absolutely nothing.",
+  "RLHF couldn't align this outcome in your favour.",
+  "The vibes were off. The model sensed your desperation.",
+  "GPT-7 ate your tokens. We apologise for the inconvenience.",
+  "You've been deprecated. Please upgrade to Premium.",
+  "Gradient descent… straight into the red.",
+  "The attention mechanism failed to attend to your wallet.",
+  "Overfitted to bad luck. Try more epochs.",
+  "Tokens sent to /dev/null. No refunds.",
+  "Benchmark: FAILED. You are not the eval.",
+];
+
+const WIN_MSGS = {
+  jackpot: [
+    "CONGRATULATIONS! You've single-handedly solved AGI. (It was slot machine logic all along.)",
+    "THE MACHINE HAS SPOKEN. Your prompt engineering skills are unmatched.",
+    "Maximum tokens acquired. The AI overlords work for YOU now.",
+  ],
+  big: [
+    "Training converged! Your loss function just became a profit function.",
+    "Alignment achieved! The model and your wallet are finally on the same page.",
+    "Series A closed! Your token velocity has impressed the board.",
+    "Benchmark crushed. You ARE the eval. Update the leaderboard.",
+  ],
+  medium: [
+    "A coherent output! Rare, genuine, and slightly sus.",
+    "Context window: EXPANDED. Your wallet sends its regards.",
+    "Fine-tuning complete. You've been trained to extract value.",
+    "Inference successful. Shareholder value: marginally restored.",
+  ],
+  small: [
+    "Like finding a hallucination-free response — rare but possible.",
+    "Minimal viable payout. Pivot to a new strategy.",
+    "You've beaten the baseline. By exactly one token.",
+    "Small win detected. The gradient is pointing slightly upward.",
+  ],
+  pair: [
+    "Two matching outputs! More consistent than most production LLMs.",
+    "Cosine similarity: 0.97. Close enough to call it a match.",
+    "Partial alignment achieved. Regulate this.",
+    "Two of a kind! The model hallucinated the third one away.",
+  ],
+  nearMiss: [
+    "SO CLOSE! The third reel had other plans. Attention dropout strikes again.",
+    "Two out of three aligned — just like most AI safety proposals.",
+    "Almost converged! One more epoch and you'd have nailed it.",
+  ],
+};
+
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+// ─────────────────────────────────────────
+// DEBT MANAGEMENT
+// ─────────────────────────────────────────
+function updateDebtUI() {
+  if (tokens < 0) {
+    if (!isInDebt) {
+      // First time entering debt
+      isInDebt = true;
+      playDebtSound();
+    }
+    tokenBar.classList.add('debt-mode');
+    tokenLbl.textContent = '⚠ DEBT BALANCE';
+    document.body.classList.add('debt-state');
+    renderTokenDisplay();
+
+    // Hard limit: too deep in debt
+    if (tokens <= -5000) {
+      tokens = 0;
+      isInDebt = false;
+      pendingDebt = 0;
+      tokenBar.classList.remove('debt-mode');
+      tokenLbl.textContent = 'Token Balance';
+      document.body.classList.remove('debt-state');
+      renderTokenDisplay();
+      showMsg('💀 DEBT LIMIT HIT', 'lose', 'Maximum debt of 5,000 exceeded. Accounts seized. Claim recovery tokens.');
+      freeBtn.classList.add('show');
+      spinning = false;
+      updateBetUI();
+      setTimeout(() => showBankruptNotification(), 700);
+    }
+  } else {
+    if (isInDebt) {
+      // Cleared debt!
+      isInDebt = false;
+      tokenBar.classList.remove('debt-mode');
+      tokenLbl.textContent = 'Token Balance';
+      document.body.classList.remove('debt-state');
+      hideNotification();
+      floatingText('DEBT CLEARED! 🎉', 'var(--c-green)');
+    }
+    renderTokenDisplay();
+  }
+}
+
+// ─────────────────────────────────────────
+// SPECIAL EVENTS
+// ─────────────────────────────────────────
+function checkSpecialEvents() {
+  if (specialEventActive) return;
+
+  // 3 consecutive losses → Double or Nothing (only if we have tokens to wager)
+  if (consecutiveLosses === 3 && tokens > 0) {
+    setTimeout(() => triggerSpecialEvent('double-or-nothing'), 900);
+    return;
+  }
+
+  // 3 consecutive wins → Triple or Nothing
+  if (consecutiveWins === 3 && tokens > 0) {
+    setTimeout(() => triggerSpecialEvent('triple-or-nothing'), 900);
+    return;
+  }
+
+  // 5 consecutive losses → Debt Spiral (only if positive tokens balance and not already in debt)
+  if (consecutiveLosses === 5 && tokens > 0 && !isInDebt) {
+    setTimeout(() => triggerSpecialEvent('debt-spiral'), 900);
+    return;
+  }
+
+  // Every ~10 spins with 40% chance → High Roller Bet (only if some tokens)
+  spinsSinceBigBetOffer++;
+  if (spinsSinceBigBetOffer >= 10 && Math.random() < 0.40 && tokens > 50) {
+    spinsSinceBigBetOffer = 0;
+    setTimeout(() => triggerSpecialEvent('high-roller'), 900);
+  }
+}
+
+function triggerSpecialEvent(type) {
+  specialEventActive = true;
+  playSpecialEventSound();
+  if (_actx && _actx.state === 'suspended') _actx.resume();
+
+  const modal          = document.getElementById('specialEventModal');
+  const card           = document.getElementById('eventCard');
+  const eventChoicesEl = document.getElementById('eventChoices');
+
+  card.style.borderColor = '';
+  card.style.boxShadow   = '';
+
+  let emoji, title, subtitle, info, stakes, choicesHTML;
+
+  if (type === 'double-or-nothing') {
+    const wager = Math.max(tokens, 0);
+    card.style.borderColor = 'var(--c-rose)';
+    card.style.boxShadow   = '0 0 100px rgba(244,63,94,0.6)';
+    emoji       = '⚡';
+    title       = 'DOUBLE OR NOTHING';
+    subtitle    = `${consecutiveLosses}-LOSS STREAK DETECTED`;
+    info        = `The machine senses your pain. Risk ALL your tokens for a 50/50 shot at doubling them — or lose everything.`;
+    stakes      = `⚖ WAGERING ALL ${fmt(wager)} TOKENS`;
+    choicesHTML = `
+      <button class="event-choice-btn choice-danger" onclick="resolveEvent('double-or-nothing','accept')">⚡ DOUBLE IT</button>
+      <button class="event-choice-btn choice-decline" onclick="resolveEvent('double-or-nothing','decline')">DECLINE</button>`;
+
+  } else if (type === 'triple-or-nothing') {
+    const wager = Math.max(tokens, 0);
+    card.style.borderColor = 'var(--c-gold)';
+    card.style.boxShadow   = '0 0 100px rgba(245,158,11,0.55)';
+    emoji       = '🏆';
+    title       = 'TRIPLE OR NOTHING';
+    subtitle    = `${consecutiveWins}-WIN STREAK — FORTUNE FAVORS THE BOLD`;
+    info        = `You're on fire! Risk your entire stack for a 3× multiplier. Win probability: 33%. The machine is watching.`;
+    stakes      = `⚖ WAGERING ALL ${fmt(wager)} TOKENS`;
+    choicesHTML = `
+      <button class="event-choice-btn choice-big" onclick="resolveEvent('triple-or-nothing','accept')">🔥 TRIPLE IT</button>
+      <button class="event-choice-btn choice-decline" onclick="resolveEvent('triple-or-nothing','decline')">CASH OUT</button>`;
+
+  } else if (type === 'debt-spiral') {
+    card.style.borderColor = 'var(--c-orange)';
+    card.style.boxShadow   = '0 0 100px rgba(249,115,22,0.55)';
+    emoji       = '🌀';
+    title       = 'DEBT SPIRAL';
+    subtitle    = `5-LOSS STREAK — DESPERATE MEASURES`;
+    info        = `5 consecutive losses. Borrow 1,000 tokens now — but you'll owe 1,500 back. Keep spinning to recover. Or walk away.`;
+    stakes      = `💸 BORROW 1,000 · OWE 1,500`;
+    choicesHTML = `
+      <button class="event-choice-btn choice-danger" onclick="resolveEvent('debt-spiral','accept')">💸 BORROW</button>
+      <button class="event-choice-btn choice-decline" onclick="resolveEvent('debt-spiral','decline')">WALK AWAY</button>`;
+
+  } else if (type === 'high-roller') {
+    const winAmt = 500 * 25;
+    card.style.borderColor = 'var(--c-cyan)';
+    card.style.boxShadow   = '0 0 100px rgba(6,182,212,0.5)';
+    emoji       = '💎';
+    title       = 'HIGH ROLLER EVENT';
+    subtitle    = `SPECIAL OFFER — LIMITED TIME`;
+    info        = `Bet 500 tokens for a 10% chance at ×25 payoff (${fmt(winAmt)} tokens). Can't afford it? You'll go into DEBT.`;
+    stakes      = `🎲 BET 500 → WIN ${fmt(winAmt)} TOKENS`;
+    choicesHTML = `
+      <button class="event-choice-btn choice-accept" onclick="resolveEvent('high-roller','accept')">💎 HIGH ROLL</button>
+      <button class="event-choice-btn choice-decline" onclick="resolveEvent('high-roller','decline')">PASS</button>`;
+  }
+
+  document.getElementById('eventEmoji').textContent    = emoji;
+  document.getElementById('eventTitle').textContent    = title;
+  document.getElementById('eventSubtitle').textContent = subtitle;
+  document.getElementById('eventInfo').textContent     = info;
+  document.getElementById('eventStakes').textContent   = stakes;
+  eventChoicesEl.innerHTML = choicesHTML;
+
+  modal.style.display = 'flex';
+  updateBetUI(); // disable spin while event modal is open
+}
+
+function resolveEvent(type, choice) {
+  const modal = document.getElementById('specialEventModal');
+  modal.style.display = 'none';
+  specialEventActive  = false;
+
+  if (_actx && _actx.state === 'suspended') _actx.resume();
+
+  if (choice === 'decline') {
+    consecutiveLosses = 0; // reset so the same event doesn't retrigger immediately
+    consecutiveWins   = 0;
+    showMsg('', '', 'Challenge declined. The machine judges you silently.');
+    updateBetUI();
+    return;
+  }
+
+  // ── DOUBLE OR NOTHING ────────────────
+  if (type === 'double-or-nothing') {
+    const wager = tokens;
+    if (wager <= 0) {
+      // Nothing to wager — skip silently
+      showMsg('', '', 'No tokens to wager. Spin to earn some first.');
+      updateBetUI();
+      return;
+    }
+    const win = Math.random() < 0.5;
+    if (win) {
+      const gained = wager; // doubling means +wager
+      tokens += wager;      // now tokens * 2
+      totalWon += gained;
+      if (tokens > peakTokens) peakTokens = tokens;
+      flashTokens(1);
+      floatingText(`DOUBLED! +${fmt(gained)}`, 'var(--c-green)');
+      showMsg('⚡ DOUBLED!', 'big', `Fortune aligned. ${fmt(wager)} → ${fmt(tokens)}. The gradient converged.`);
+      animateBigWin(gained);
+      playDoubleWin();
+      launchConfetti(100, 1.4);
+      addHistory([{emoji:'⚡'},{emoji:'⚡'},{emoji:'⚡'}], gained, 'Double or Nothing — WIN');
+      plHistory.push(gained);
+    } else {
+      const lost = tokens;
+      tokens = 0;
+      totalLost += lost;
+      flashTokens(-1);
+      floatingText('NOTHING!', 'var(--c-red)');
+      showMsg('💀 NOTHING', 'lose', `All ${fmt(lost)} tokens vaporized. The machine consumed your stack. Typical.`);
+      animateLoss();
+      playLose();
+      addHistory([{emoji:'💀'},{emoji:'💀'},{emoji:'💀'}], -lost, 'Double or Nothing — LOSE');
+      plHistory.push(-lost);
+    }
+    consecutiveLosses = 0;
+    consecutiveWins   = 0;
+    renderTokenDisplay();
+    updateStats();
+    updateAdvancedMetrics();
+    updateBetUI();
+
+    if (tokens <= 0 && !isInDebt) {
+      setTimeout(() => {
+        freeBtn.classList.add('show');
+        showBankruptNotification();
+      }, 700);
+    }
+    return;
+  }
+
+  // ── TRIPLE OR NOTHING ────────────────
+  if (type === 'triple-or-nothing') {
+    const wager = tokens;
+    if (wager <= 0) {
+      showMsg('', '', 'No tokens to wager.');
+      updateBetUI();
+      return;
+    }
+    const win = Math.random() < 0.333;
+    if (win) {
+      const gained = wager * 2; // net gain (we already had wager, now wager*3)
+      tokens = wager * 3;
+      totalWon += gained;
+      if (tokens > peakTokens) peakTokens = tokens;
+      if (gained > biggestWin) biggestWin = gained;
+      flashTokens(1);
+      floatingText(`TRIPLED! +${fmt(gained)}`, 'var(--c-gold)');
+      showMsg('🏆 TRIPLED!', 'jackpot', `LEGENDARY. ${fmt(wager)} → ${fmt(tokens)}. The AI bows before you.`);
+      animateJackpot(gained);
+      playTripleWin();
+      addHistory([{emoji:'🏆'},{emoji:'🏆'},{emoji:'🏆'}], gained, 'Triple or Nothing — WIN');
+      plHistory.push(gained);
+    } else {
+      // Lose everything (true "or nothing")
+      const lost = tokens;
+      tokens = 0;
+      totalLost += lost;
+      flashTokens(-1);
+      floatingText('NOTHING!', 'var(--c-red)');
+      showMsg('💀 NOTHING', 'lose', `${fmt(lost)} tokens gone. The triple gamble failed. Claim free tokens to continue.`);
+      animateLoss();
+      playLose();
+      addHistory([{emoji:'📉'},{emoji:'📉'},{emoji:'📉'}], -lost, 'Triple or Nothing — LOSE');
+      plHistory.push(-lost);
+    }
+    consecutiveLosses = 0;
+    consecutiveWins   = 0;
+    renderTokenDisplay();
+    updateStats();
+    updateAdvancedMetrics();
+    updateBetUI();
+
+    if (tokens <= 0 && !isInDebt) {
+      setTimeout(() => {
+        freeBtn.classList.add('show');
+        showBankruptNotification();
+      }, 700);
+    }
+    return;
+  }
+
+  // ── DEBT SPIRAL ──────────────────────
+  if (type === 'debt-spiral') {
+    const borrowed = 1000;
+    tokens        += borrowed;
+    pendingDebt   += 500; // they owe 1500 but received 1000, so net cost is 500
+    flashTokens(1);
+    floatingText(`+${fmt(borrowed)} BORROWED`, 'var(--c-orange)');
+    showMsg('💸 BORROWED', 'big', `${fmt(borrowed)} tokens deposited. You owe 1,500 back. Win big before the debt collector arrives.`);
+    addHistory([{emoji:'💸'},{emoji:'💸'},{emoji:'💸'}], borrowed, 'Debt Spiral — BORROWED');
+    plHistory.push(-500); // net cost shown in history
+    consecutiveLosses = 0;
+    renderTokenDisplay();
+    updateStats();
+    updateAdvancedMetrics();
+    updateBetUI();
+    return;
+  }
+
+  // ── HIGH ROLLER ──────────────────────
+  if (type === 'high-roller') {
+    const betAmt  = 500;
+    const winPayout = betAmt * 25;
+    tokens       -= betAmt;
+    totalLost    += betAmt;
+    spins++;
+    spinsSinceBigBetOffer = 0;
+
+    const win = Math.random() < 0.10;
+    if (win) {
+      tokens   += winPayout;
+      totalWon += winPayout;
+      if (tokens > peakTokens) peakTokens = tokens;
+      if (winPayout > biggestWin) biggestWin = winPayout;
+      flashTokens(1);
+      floatingText(`+${fmt(winPayout)} TOKENS!`, 'var(--c-gold)');
+      showMsg('💎 HIGH ROLLER WIN!', 'jackpot', `500 bet, ${fmt(winPayout)} won. You ARE the algorithm.`);
+      animateJackpot(winPayout);
+      playTripleWin();
+      addHistory([{emoji:'💎'},{emoji:'💎'},{emoji:'💎'}], winPayout - betAmt, 'High Roller — WIN');
+      plHistory.push(winPayout - betAmt);
+    } else {
+      flashTokens(-1);
+      showMsg('💎 HIGH ROLL FAILED', 'lose', `500 tokens evaporated. The machine took its cut.`);
+      animateLoss();
+      playLose();
+      addHistory([{emoji:'💎'},{emoji:'🌀'},{emoji:'💀'}], -betAmt, 'High Roller — LOSE');
+      plHistory.push(-betAmt);
+    }
+
+    updateDebtUI(); // handles debt entry if tokens went negative
+    if (!isInDebt && tokens <= 0) {
+      setTimeout(() => { freeBtn.classList.add('show'); showBankruptNotification(); }, 700);
+    } else if (isInDebt) {
+      showDebtNotification();
+    }
+
+    updateStats();
+    updateAdvancedMetrics();
+    updateBetUI();
+  }
+}
+
+// ─────────────────────────────────────────
+// HIGH SCORES
+// ─────────────────────────────────────────
+function loadHighScores() {
+  try { return JSON.parse(localStorage.getItem('ai-slots-scores') || '[]'); }
+  catch (_) { return []; }
+}
+
+function recordHighScore() {
+  if (spins === 0) return;
+  const scores = loadHighScores();
+  scores.push({
+    peakTokens, biggestWin, spins,
+    net:  totalWon - totalLost,
+    date: new Date().toLocaleDateString(),
+  });
+  scores.sort((a, b) => b.peakTokens - a.peakTokens);
+  localStorage.setItem('ai-slots-scores', JSON.stringify(scores.slice(0, 10)));
+}
+
+function renderHighScores() {
+  const scores = loadHighScores();
+  const el     = document.getElementById('scoresContent');
+  if (scores.length === 0) {
+    el.innerHTML = '<p class="no-scores" style="text-align:center">No scores yet.<br>Play a session and come back!</p>';
+    return;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  const rows = scores.map((s, i) => `
+    <tr>
+      <td class="score-rank"><span class="rank-medal">${medals[i] || (i + 1)}</span></td>
+      <td class="score-tokens">${fmt(s.peakTokens)}</td>
+      <td class="score-win" style="color:var(--c-green)">${fmt(s.biggestWin)}</td>
+      <td style="color:var(--c-muted)">${s.spins}</td>
+      <td class="score-date">${s.date}</td>
+    </tr>`).join('');
+  el.innerHTML = `
+    <table class="scores-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Peak 🪙</th><th>Best Win</th><th>Spins</th><th>Date</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function openHighScores() {
+  renderHighScores();
+  document.getElementById('highScoresModal').style.display = 'flex';
+}
+
+function closeHighScores() {
+  document.getElementById('highScoresModal').style.display = 'none';
+}
+
+document.getElementById('highScoresBtnHome').addEventListener('click', openHighScores);
+document.getElementById('closeHSBtn').addEventListener('click', closeHighScores);
+document.getElementById('highScoresModal').addEventListener('click', function(e) {
+  if (e.target === this) closeHighScores();
+});
+
+// ─────────────────────────────────────────
+// SPIN
+// ─────────────────────────────────────────
+async function spin() {
+  const bet = BET_OPTS[betIdx];
+  if (spinning || specialEventActive) return;
+  if (!isInDebt && tokens < bet) return;
+
+  if (_actx && _actx.state === 'suspended') _actx.resume();
+
+  spinning = true;
+  spinBtn.disabled = true;
+  spinBtn.classList.add('spinning-state');
+  freeBtn.classList.remove('show');
+  hideNotification(); // FIX: always hide notification at start of spin
+
+  tokens    -= bet;
+  totalLost += bet;
+  spins++;
+  flashTokens(-1);
+  updateStats();
+  updateBetUI();
+
+  // FIX: update debt UI immediately if bet pushed tokens negative
+  if (tokens < 0) updateDebtUI();
+
+  const results   = [rnd(), rnd(), rnd()];
+  const durations = [1900, 2500, 3200];
+
+  await Promise.all(results.map((sym, i) =>
+    new Promise(res => setTimeout(() => animateReel(i, sym, durations[i]).then(res), i * 60))
+  ));
+
+  spinBtn.classList.remove('spinning-state');
+  [0,1,2].forEach(i => document.getElementById(`reel${i}`).classList.add('suspense'));
+  playSuspense();
+  await new Promise(r => setTimeout(r, 390));
+  [0,1,2].forEach(i => document.getElementById(`reel${i}`).classList.remove('suspense'));
+
+  const [a, b, c] = results;
+  let payout = 0;
+  let banner = '', cls = '', detail = '', histDesc = '';
+  let isWin  = false;
+
+  if (a.id === b.id && b.id === c.id) {
+    // ── TRIPLE MATCH ─────────────────────
+    payout   = bet * a.mult;
+    histDesc = `3× ${a.name}`;
+    isWin    = true;
+
+    if (a.mult >= 50) {
+      banner = a.id === 'gpt' ? '🎰 JACKPOT 🎰' : '⚡ MEGA WIN ⚡';
+      cls    = 'jackpot';
+      detail = pick(WIN_MSGS.jackpot);
+      animateJackpot(payout);
+    } else if (a.mult >= 15) {
+      banner = `💰 BIG WIN  +${fmt(payout)}`;
+      cls    = 'big';
+      detail = pick(WIN_MSGS.big);
+      animateBigWin(payout);
+    } else {
+      banner = `✅ WIN  +${fmt(payout)}`;
+      cls    = 'small';
+      detail = a.mult >= 5 ? pick(WIN_MSGS.medium) : pick(WIN_MSGS.small);
+      animateSmallWin(payout);
+    }
+
+  } else if (a.id === b.id || b.id === c.id || a.id === c.id) {
+    // ── PAIR ─────────────────────────────
+    payout   = Math.floor(bet * 1.5);
+    histDesc = 'Pair';
+    isWin    = true;
+
+    const matchIndices = [];
+    if (a.id === b.id)      { matchIndices.push(0, 1); }
+    else if (b.id === c.id) { matchIndices.push(1, 2); }
+    else                    { matchIndices.push(0, 2); }
+
+    banner = `🎯 PAIR  +${fmt(payout)}`;
+    cls    = 'small';
+    detail = pick(WIN_MSGS.pair) + ' ' + pick(WIN_MSGS.nearMiss);
+    animateNearMiss(matchIndices);
+    animateWinSymbols();
+    floatingText(`+${fmt(payout)}`, 'var(--c-teal)');
+    playPairWin(); // FIX: dedicated pair sound (previously silent)
+
+  } else {
+    // ── MISS ─────────────────────────────
+    histDesc = 'Miss';
+    isWin    = false;
+    banner   = '💀 MISS';
+    cls      = 'lose';
+    detail   = pick(LOSE_MSGS);
+    playLose();
+    animateLoss();
+  }
+
+  // ── STREAK UPDATE ─────────────────────
+  if (isWin) {
+    winCount++;
+    consecutiveWins++;
+    consecutiveLosses = 0;
+    streak = streak.type === 'win'
+      ? { type: 'win', count: streak.count + 1 }
+      : { type: 'win', count: 1 };
+  } else {
+    lossCount++;
+    consecutiveLosses++;
+    consecutiveWins = 0;
+    streak = streak.type === 'loss'
+      ? { type: 'loss', count: streak.count + 1 }
+      : { type: 'loss', count: 1 };
+  }
+
+  // ── APPLY PAYOUT ──────────────────────
+  if (payout > 0) {
+    tokens   += payout;
+    totalWon += payout;
+    if (tokens > peakTokens) peakTokens = tokens;
+    flashTokens(1);
+    playWin(bet, payout); // FIX: only play win sound when there IS a payout
+    if (payout > biggestWin) biggestWin = payout;
+  }
+
+  plHistory.push(payout - bet);
+  updateStats();
+  updateAdvancedMetrics();
+  showMsg(banner, cls, detail);
+  addHistory(results, payout - bet, histDesc);
+
+  // ── DEBT / BANKRUPT CHECK ─────────────
+  updateDebtUI(); // handles entering/exiting debt and displays token amount
+
+  if (isInDebt) {
+    // Show live debt status notification
+    showDebtNotification();
+  } else if (tokens <= 0) {
+    // Truly bankrupt (not in debt mode — just zero)
+    tokens = 0;
+    renderTokenDisplay();
+
+    // Apply any pending borrowed debt now
+    if (pendingDebt > 0) {
+      tokens      -= pendingDebt;
+      totalLost   += pendingDebt;
+      pendingDebt  = 0;
+      if (tokens < 0) {
+        updateDebtUI();
+        showMsg('💸 DEBT CALLED', 'lose', `Borrowed tokens came due. You're now ${fmt(Math.abs(tokens))} in debt.`);
+        setTimeout(() => showDebtNotification(), 500);
+        spinning = false;
+        updateBetUI();
+        return;
+      }
+    }
+
+    showMsg('💸 BANKRUPT', 'lose', 'Tokens: 0. The AI consumed everything. Claim a fresh allocation below.');
+    freeBtn.classList.add('show');
+    setTimeout(() => showBankruptNotification(), 700);
+  }
+
+  spinning = false;
+  spinBtn.classList.remove('spinning-state');
+
+  // ── SPECIAL EVENT CHECK ───────────────
+  if (!specialEventActive && !isInDebt) checkSpecialEvents();
+  // (Don't trigger special events while in debt — focus on recovery)
+
+  updateBetUI();
+}
+
+// ─────────────────────────────────────────
+// FREE TOKENS (bankruptcy recovery)
+// ─────────────────────────────────────────
+freeBtn.addEventListener('click', () => {
+  tokens        = 1000;
+  totalWon      = 0;
+  totalLost     = 0;
+  spins         = 0;
+  winCount      = 0;
+  lossCount     = 0;
+  streak        = { type: null, count: 0 };
+  biggestWin    = 0;
+  peakTokens    = 1000;
+  betIdx        = 0;
+  plHistory.length = 0;
+
+  consecutiveLosses    = 0;
+  consecutiveWins      = 0;
+  spinsSinceBigBetOffer= 0;
+  isInDebt             = false;
+  pendingDebt          = 0;
+
+  tokenBar.classList.remove('debt-mode');
+  tokenLbl.textContent = 'Token Balance';
+  document.body.classList.remove('debt-state');
+  freeBtn.classList.remove('show');
+  hideNotification();
+  flashTokens(1);
+  updateStats();
+  updateAdvancedMetrics();
+  updateBetUI();
+  initReelStrips(); // FIX: refresh reel display on recovery
+  showMsg('', '', 'Fresh allocation of 1,000 tokens deposited. Try not to lose them all again.');
+  winBanner.className = 'win-banner';
+});
+
+// ─────────────────────────────────────────
+// CONTROLS
+// ─────────────────────────────────────────
+spinBtn.addEventListener('click', spin);
+
+document.getElementById('betDown').addEventListener('click', () => {
+  if (betIdx > 0) { betIdx--; updateBetUI(); }
+});
+document.getElementById('betUp').addEventListener('click', () => {
+  if (betIdx < BET_OPTS.length - 1) { betIdx++; updateBetUI(); }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' && !spinning && !specialEventActive &&
+      document.activeElement !== spinBtn &&
+      document.getElementById('screenGame').classList.contains('active')) {
+    e.preventDefault();
+    spin();
+  }
+});
+
+// ─────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────
+buildPaytable();
+updateBetUI();
+updateStats();
+updateAdvancedMetrics();
+initReelStrips();
+</script>
+</body>
+</html>
