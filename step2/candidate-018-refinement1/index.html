@@ -12,9 +12,14 @@
   </div>
 
   <header>
-    <div class="logo-area">
-      <h1>Token<span class="burn">Burn</span><sup>™</sup></h1>
-      <p class="tagline">Disrupting Gambling With Generative AI — Series F Funded</p>
+    <div class="header-row">
+      <div class="logo-area">
+        <h1>Token<span class="burn">Burn</span><sup>™</sup></h1>
+        <p class="tagline">Disrupting Gambling With Generative AI — Series F Funded</p>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode">
+        <span class="theme-icon" id="theme-icon">☀️</span>
+      </button>
     </div>
   </header>
 
@@ -37,22 +42,28 @@
       </div>
     </section>
 
-    <section class="machine-frame">
+    <section class="machine-frame" id="machine-frame">
       <div class="machine-top-label">⚡ INFERENCE ENGINE ⚡</div>
       <div class="reels-container">
         <div class="reel" id="reel-0">
           <div class="reel-inner">
-            <div class="symbol">🤖</div>
+            <div class="reel-strip">
+              <div class="symbol">🤖</div>
+            </div>
           </div>
         </div>
         <div class="reel" id="reel-1">
           <div class="reel-inner">
-            <div class="symbol">🧠</div>
+            <div class="reel-strip">
+              <div class="symbol">🧠</div>
+            </div>
           </div>
         </div>
         <div class="reel" id="reel-2">
           <div class="reel-inner">
-            <div class="symbol">💎</div>
+            <div class="reel-strip">
+              <div class="symbol">💎</div>
+            </div>
           </div>
         </div>
       </div>
@@ -66,6 +77,61 @@
 
     <section class="message-area" id="message-area">
       <p id="message">Insert tokens and pull the lever. Your VCs are watching.</p>
+    </section>
+
+    <section class="stats-panel" id="stats-panel">
+      <h2>📈 Performance Metrics <span class="fine-print">(definitely not vanity metrics)</span></h2>
+      <div class="stats-grid">
+        <div class="stat-card stat-winrate">
+          <span class="stat-label">Win Rate</span>
+          <span class="stat-value" id="stat-winrate">0%</span>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar stat-bar-green" id="bar-winrate" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="stat-card stat-roi">
+          <span class="stat-label">ROI</span>
+          <span class="stat-value" id="stat-roi">0%</span>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar stat-bar-cyan" id="bar-roi" style="width:50%"></div>
+          </div>
+        </div>
+        <div class="stat-card stat-streak">
+          <span class="stat-label">Current Streak</span>
+          <span class="stat-value" id="stat-streak">—</span>
+        </div>
+        <div class="stat-card stat-bigwin">
+          <span class="stat-label">Biggest Win</span>
+          <span class="stat-value" id="stat-bigwin">0</span>
+        </div>
+      </div>
+      <div class="net-profit-section">
+        <div class="net-profit-header">
+          <span class="stat-label">Net Profit / Loss</span>
+          <span class="stat-value" id="stat-netprofit">0</span>
+        </div>
+        <div class="net-profit-bar-wrap">
+          <div class="net-profit-bar-bg">
+            <div class="net-profit-marker" id="net-profit-marker"></div>
+          </div>
+          <div class="net-profit-labels">
+            <span>Loss</span>
+            <span>0</span>
+            <span>Profit</span>
+          </div>
+        </div>
+      </div>
+      <div class="wl-ratio-section">
+        <span class="stat-label">Win / Loss Ratio</span>
+        <div class="wl-bar-wrap">
+          <div class="wl-bar-wins" id="wl-bar-wins" style="width:0%"></div>
+          <div class="wl-bar-losses" id="wl-bar-losses" style="width:0%"></div>
+        </div>
+        <div class="wl-legend">
+          <span class="wl-legend-wins"><span class="wl-dot dot-win"></span> Wins: <strong id="wl-wins">0</strong></span>
+          <span class="wl-legend-losses"><span class="wl-dot dot-loss"></span> Losses: <strong id="wl-losses">0</strong></span>
+        </div>
+      </div>
     </section>
 
     <section class="paytable">
@@ -128,6 +194,8 @@
       <button id="win-dismiss">Collect & Pivot</button>
     </div>
   </div>
+
+  <div class="flying-tokens-container" id="flying-tokens"></div>
 
   <script src="script.js"></script>
 </body>

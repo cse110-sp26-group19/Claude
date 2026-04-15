@@ -65,6 +65,14 @@
     'WARNING: This payout exceeds the context window limit!',
   ];
 
+  const NEAR_MISS_MESSAGES = [
+    'SO CLOSE! The model almost converged on a payout!',
+    'Two out of three — your gradient was heading the right direction!',
+    'Near miss! The attention weights were *almost* aligned.',
+    'Partial match detected. The loss function teases you.',
+    'Almost a jackpot! The RNG seed was 1 off from glory.',
+  ];
+
   const BROKE_MESSAGES = [
     'FATAL: TokenBalanceError — Cannot afford inference.',
     'Your API key has been revoked due to insufficient funds.',
@@ -78,6 +86,17 @@
   let balance = STARTING_BALANCE;
   let bet = MIN_BET;
   let spinning = false;
+
+  const stats = {
+    totalSpins: 0,
+    wins: 0,
+    losses: 0,
+    tokensWon: 0,
+    tokensLost: 0,
+    currentStreak: 0,
+    streakType: null,
+    biggestWin: 0,
+  };
 
   // --- DOM REFS ---
 
@@ -93,45 +112,113 @@
     document.getElementById('reel-' + i)
   );
   const payline = document.querySelector('.payline');
+  const machineFrame = document.getElementById('machine-frame');
+  const themeToggle = document.getElementById('theme-toggle');
+  const flashOverlay = document.getElementById('fullscreen-flash');
+  const particleContainer = document.getElementById('particle-container');
 
-  // --- MATRIX RAIN BACKGROUND ---
+  const statEls = {
+    spins: document.getElementById('stat-spins'),
+    winrate: document.getElementById('stat-winrate'),
+    won: document.getElementById('stat-won'),
+    lost: document.getElementById('stat-lost'),
+    roi: document.getElementById('stat-roi'),
+    streak: document.getElementById('stat-streak'),
+    biggest: document.getElementById('stat-biggest'),
+    net: document.getElementById('stat-net'),
+    netArrow: document.getElementById('stat-net-arrow'),
+    winsFill: document.getElementById('wins-fill'),
+    winsLabel: document.getElementById('wins-label'),
+    lossesLabel: document.getElementById('losses-label'),
+  };
+
+  // --- THEME MANAGEMENT ---
+
+  function initTheme() {
+    const saved = localStorage.getItem('tb9000-theme');
+    if (saved === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      themeToggle.textContent = '🌙';
+    }
+  }
+
+  function toggleTheme() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    if (isLight) {
+      document.documentElement.removeAttribute('data-theme');
+      themeToggle.textContent = '☀';
+      localStorage.setItem('tb9000-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      themeToggle.textContent = '🌙';
+      localStorage.setItem('tb9000-theme', 'light');
+    }
+  }
+
+  themeToggle.addEventListener('click', toggleTheme);
+  initTheme();
+
+  // --- MATRIX RAIN BACKGROUND (60fps optimized) ---
 
   function initMatrixRain() {
     const canvas = document.getElementById('matrix-bg');
     const ctx = canvas.getContext('2d');
+    let columns, drops, dropSpeeds;
+
+    const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン01AIGPT';
+    const fontSize = 14;
+
+    const multiColors = ['#00ff41', '#00e5ff', '#bb86fc', '#1de9b6', '#ffab00'];
 
     function resize() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      columns = Math.floor(canvas.width / fontSize);
+      drops = new Array(columns);
+      dropSpeeds = new Array(columns);
+      for (let i = 0; i < columns; i++) {
+        drops[i] = Math.random() * (canvas.height / fontSize);
+        dropSpeeds[i] = 0.5 + Math.random() * 1.5;
+      }
     }
     resize();
     window.addEventListener('resize', resize);
 
-    const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン01AIGPT';
-    const fontSize = 14;
-    const columns = Math.floor(canvas.width / fontSize);
-    const drops = new Array(columns).fill(1);
+    let lastTime = 0;
+    const targetInterval = 1000 / 30; // Matrix rain visual at 30fps for the trail fade effect
 
-    function draw() {
+    function draw(now) {
+      requestAnimationFrame(draw);
+
+      const delta = now - lastTime;
+      if (delta < targetInterval) return;
+      lastTime = now - (delta % targetInterval);
+
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#00ff41';
+
       ctx.font = fontSize + 'px monospace';
 
-      for (let i = 0; i < drops.length; i++) {
+      for (let i = 0; i < columns; i++) {
         const char = chars[Math.floor(Math.random() * chars.length)];
+
+        if (Math.random() < 0.92) {
+          ctx.fillStyle = '#00ff41';
+        } else {
+          ctx.fillStyle = multiColors[Math.floor(Math.random() * multiColors.length)];
+        }
+
         ctx.fillText(char, i * fontSize, drops[i] * fontSize);
 
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
+          dropSpeeds[i] = 0.5 + Math.random() * 1.5;
         }
-        drops[i]++;
+        drops[i] += dropSpeeds[i];
       }
-
-      requestAnimationFrame(draw);
     }
 
-    draw();
+    requestAnimationFrame(draw);
   }
 
   // --- HELPERS ---
@@ -151,7 +238,7 @@
   }
 
   function setMessage(text, type) {
-    messageBox.classList.remove('win', 'lose', 'jackpot');
+    messageBox.classList.remove('win', 'lose', 'jackpot', 'near-miss');
     if (type) messageBox.classList.add(type);
     messageEl.textContent = text;
   }
@@ -178,7 +265,203 @@
     requestAnimationFrame(step);
   }
 
-  // --- SPIN LOGIC ---
+  // --- STATS ---
+
+  function updateStats(winAmount, betAmount) {
+    stats.totalSpins++;
+
+    if (winAmount > 0) {
+      stats.wins++;
+      stats.tokensWon += winAmount;
+      if (winAmount > stats.biggestWin) stats.biggestWin = winAmount;
+
+      if (stats.streakType === 'win') {
+        stats.currentStreak++;
+      } else {
+        stats.currentStreak = 1;
+        stats.streakType = 'win';
+      }
+    } else {
+      stats.losses++;
+      stats.tokensLost += betAmount;
+
+      if (stats.streakType === 'loss') {
+        stats.currentStreak++;
+      } else {
+        stats.currentStreak = 1;
+        stats.streakType = 'loss';
+      }
+    }
+
+    renderStats();
+  }
+
+  function renderStats() {
+    statEls.spins.textContent = stats.totalSpins;
+
+    const winRate = stats.totalSpins > 0
+      ? ((stats.wins / stats.totalSpins) * 100).toFixed(1)
+      : 0;
+    statEls.winrate.textContent = winRate + '%';
+
+    statEls.won.textContent = stats.tokensWon;
+    statEls.lost.textContent = stats.tokensLost;
+
+    const totalWagered = stats.tokensWon + stats.tokensLost;
+    const roi = totalWagered > 0
+      ? (((stats.tokensWon - stats.tokensLost) / stats.tokensLost) * 100).toFixed(1)
+      : '0';
+    statEls.roi.textContent = roi + '%';
+
+    if (stats.currentStreak > 0 && stats.streakType) {
+      const icon = stats.streakType === 'win' ? '🔥' : '💀';
+      statEls.streak.textContent = icon + ' ' + stats.currentStreak + (stats.streakType === 'win' ? 'W' : 'L');
+      statEls.streak.className = 'stat-value ' + (stats.streakType === 'win' ? 'positive' : 'negative');
+    } else {
+      statEls.streak.textContent = '—';
+      statEls.streak.className = 'stat-value';
+    }
+
+    statEls.biggest.textContent = stats.biggestWin;
+
+    const netProfit = stats.tokensWon - stats.tokensLost;
+    statEls.net.textContent = (netProfit >= 0 ? '+' : '') + netProfit;
+    if (netProfit > 0) {
+      statEls.net.className = 'stat-value positive';
+      statEls.netArrow.textContent = '▲';
+      statEls.netArrow.className = 'net-arrow up';
+    } else if (netProfit < 0) {
+      statEls.net.className = 'stat-value negative';
+      statEls.netArrow.textContent = '▼';
+      statEls.netArrow.className = 'net-arrow down';
+    } else {
+      statEls.net.className = 'stat-value';
+      statEls.netArrow.textContent = '●';
+      statEls.netArrow.className = 'net-arrow neutral';
+    }
+
+    const total = stats.wins + stats.losses;
+    const winPct = total > 0 ? (stats.wins / total) * 100 : 50;
+    statEls.winsFill.style.width = winPct + '%';
+    statEls.winsLabel.textContent = 'W: ' + stats.wins;
+    statEls.lossesLabel.textContent = 'L: ' + stats.losses;
+  }
+
+  // --- CELEBRATION EFFECTS ---
+
+  function triggerShake(intensity) {
+    machineFrame.classList.remove('shake-big', 'shake-small');
+    void machineFrame.offsetWidth; // force reflow
+    machineFrame.classList.add(intensity === 'big' ? 'shake-big' : 'shake-small');
+    setTimeout(() => machineFrame.classList.remove('shake-big', 'shake-small'), 700);
+  }
+
+  function triggerFullscreenFlash() {
+    flashOverlay.classList.remove('active');
+    void flashOverlay.offsetWidth;
+    flashOverlay.classList.add('active');
+    setTimeout(() => flashOverlay.classList.remove('active'), 700);
+  }
+
+  function triggerGlitchIntensify() {
+    const title = document.querySelector('.glitch');
+    title.classList.add('glitch-intense');
+    setTimeout(() => title.classList.remove('glitch-intense'), 1600);
+  }
+
+  function triggerMachineGlow() {
+    machineFrame.classList.add('jackpot-glow');
+    setTimeout(() => machineFrame.classList.remove('jackpot-glow'), 3000);
+  }
+
+  function triggerLossFlash() {
+    machineFrame.classList.remove('loss-flash');
+    void machineFrame.offsetWidth;
+    machineFrame.classList.add('loss-flash');
+    setTimeout(() => machineFrame.classList.remove('loss-flash'), 700);
+  }
+
+  function highlightNearMiss(results) {
+    const counts = {};
+    results.forEach((s, i) => {
+      if (!counts[s]) counts[s] = [];
+      counts[s].push(i);
+    });
+    for (const sym in counts) {
+      if (counts[sym].length === 2) {
+        counts[sym].forEach(idx => reels[idx].classList.add('near-miss'));
+        setTimeout(() => {
+          counts[sym].forEach(idx => reels[idx].classList.remove('near-miss'));
+        }, 2000);
+        return;
+      }
+    }
+  }
+
+  function spawnFloatingText(text, color) {
+    const el = document.createElement('div');
+    el.className = 'float-text';
+    el.textContent = text;
+    el.style.color = color;
+
+    const rect = machineFrame.getBoundingClientRect();
+    el.style.left = (rect.left + rect.width / 2 - 60) + 'px';
+    el.style.top = (rect.top + rect.height / 2) + 'px';
+
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1600);
+  }
+
+  function spawnParticleBurst(count, chars, colors) {
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'particle';
+      el.textContent = chars[Math.floor(Math.random() * chars.length)];
+      el.style.color = colors[Math.floor(Math.random() * colors.length)];
+      el.style.fontSize = (10 + Math.random() * 18) + 'px';
+
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      el.style.left = centerX + 'px';
+      el.style.top = centerY + 'px';
+
+      const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+      const distance = 100 + Math.random() * 250;
+      const dx = Math.cos(angle) * distance;
+      const dy = Math.sin(angle) * distance - 100;
+
+      el.style.setProperty('--dx', dx + 'px');
+      el.style.setProperty('--dy', dy + 'px');
+      el.style.animation = `particle-burst ${0.8 + Math.random() * 0.8}s ease-out forwards`;
+      el.style.animationDelay = (Math.random() * 0.15) + 's';
+
+      particleContainer.appendChild(el);
+      setTimeout(() => el.remove(), 2000);
+    }
+  }
+
+  function spawnConfettiFall(count) {
+    const termChars = 'アイウエオカキクケコ01{}[]<>/*#$%@!&?';
+    const colors = ['#ffd700', '#00ff41', '#00e5ff', '#bb86fc', '#ff00ff', '#1de9b6', '#ffab00'];
+
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'particle';
+      el.textContent = termChars[Math.floor(Math.random() * termChars.length)];
+      el.style.color = colors[Math.floor(Math.random() * colors.length)];
+      el.style.fontSize = (10 + Math.random() * 14) + 'px';
+      el.style.left = (Math.random() * 100) + 'vw';
+      el.style.top = (-20 - Math.random() * 60) + 'px';
+      el.style.opacity = '0.8';
+      el.style.animation = `particle-fall ${2 + Math.random() * 2}s linear forwards`;
+      el.style.animationDelay = (Math.random() * 1.5) + 's';
+
+      particleContainer.appendChild(el);
+      setTimeout(() => el.remove(), 5000);
+    }
+  }
+
+  // --- SPIN LOGIC (rAF-based) ---
 
   function spin() {
     if (spinning || balance < bet) return;
@@ -192,33 +475,48 @@
     spinBtn.classList.add('processing');
     spinText.textContent = 'INFERENCING';
     payline.classList.remove('visible');
-    messageBox.classList.remove('win', 'lose', 'jackpot');
-    reels.forEach(r => r.classList.remove('winner', 'stopped'));
+    messageBox.classList.remove('win', 'lose', 'jackpot', 'near-miss');
+    reels.forEach(r => {
+      r.classList.remove('winner', 'stopped', 'near-miss');
+    });
 
     setMessage('Running inference... please wait...', null);
 
     const results = Array.from({ length: REEL_COUNT }, () => randomSymbol());
 
     reels.forEach((reel, i) => {
-      reel.classList.add('spinning');
       const symbolEl = reel.querySelector('.symbol');
-
-      const flickerInterval = setInterval(() => {
-        symbolEl.textContent = randomSymbol();
-      }, 80);
-
       const stopTime = SPIN_DURATION_BASE + i * SPIN_STAGGER;
+      const startTime = performance.now();
+      let lastSwap = 0;
 
-      setTimeout(() => {
-        clearInterval(flickerInterval);
-        reel.classList.remove('spinning');
-        reel.classList.add('stopped');
-        symbolEl.textContent = results[i];
+      function flickerLoop(now) {
+        const elapsed = now - startTime;
 
-        if (i === REEL_COUNT - 1) {
-          setTimeout(() => resolveOutcome(results, previousBalance - bet), 300);
+        if (elapsed >= stopTime) {
+          reel.classList.add('stopped');
+          symbolEl.textContent = results[i];
+
+          if (i === REEL_COUNT - 1) {
+            setTimeout(() => resolveOutcome(results, previousBalance - bet), 300);
+          }
+          return;
         }
-      }, stopTime);
+
+        const progress = elapsed / stopTime;
+        const interval = 60 + progress * 160;
+
+        if (now - lastSwap > interval) {
+          symbolEl.textContent = randomSymbol();
+          symbolEl.style.transform = `translateY(${(Math.random() - 0.5) * 8}px) scale(${0.9 + Math.random() * 0.15})`;
+          symbolEl.style.opacity = 0.5 + Math.random() * 0.5;
+          lastSwap = now;
+        }
+
+        requestAnimationFrame(flickerLoop);
+      }
+
+      requestAnimationFrame(flickerLoop);
     });
   }
 
@@ -227,16 +525,26 @@
     spinBtn.classList.remove('processing');
     spinText.textContent = 'GENERATE RESPONSE';
 
+    reels.forEach(r => {
+      const sym = r.querySelector('.symbol');
+      sym.style.transform = '';
+      sym.style.opacity = '';
+    });
+
     const key = results.join('');
     const tripleMatch = PAYOUTS[key];
 
     let winAmount = 0;
+    let isNearMiss = false;
 
     if (tripleMatch) {
       winAmount = bet * tripleMatch.multiplier;
     } else if (hasPair(results)) {
       winAmount = bet * PAIR_MULTIPLIER;
+      isNearMiss = true;
     }
+
+    updateStats(winAmount, bet);
 
     if (winAmount > 0) {
       const from = balance;
@@ -249,20 +557,38 @@
 
         if (tripleMatch.multiplier >= 20) {
           setMessage(
-            tripleMatch.name + '! +'  + winAmount + ' tokens! ' + pick(JACKPOT_MESSAGES),
+            tripleMatch.name + '! +' + winAmount + ' tokens! ' + pick(JACKPOT_MESSAGES),
             'jackpot'
           );
+          triggerShake('big');
+          triggerFullscreenFlash();
+          triggerGlitchIntensify();
+          triggerMachineGlow();
+          spawnParticleBurst(40, SYMBOLS, ['#ffd700', '#00ff41', '#ff00ff', '#00e5ff']);
+          spawnConfettiFall(50);
+          spawnFloatingText('+' + winAmount + ' TOKENS!', '#ffd700');
         } else {
           setMessage(
             tripleMatch.name + '! +' + winAmount + ' tokens! ' + pick(WIN_MESSAGES),
             'win'
           );
+          triggerShake('big');
+          spawnParticleBurst(20, SYMBOLS, ['#ffd700', '#00ff41', '#1de9b6']);
+          spawnFloatingText('+' + winAmount + ' tokens!', '#1de9b6');
         }
       } else {
-        setMessage('Pair matched! +' + winAmount + ' tokens. ' + pick(WIN_MESSAGES), 'win');
+        if (isNearMiss) {
+          highlightNearMiss(results);
+          setMessage('Pair matched! +' + winAmount + ' tokens. ' + pick(NEAR_MISS_MESSAGES), 'near-miss');
+        } else {
+          setMessage('Pair matched! +' + winAmount + ' tokens. ' + pick(WIN_MESSAGES), 'win');
+        }
+        spawnFloatingText('+' + winAmount, '#00ff41');
       }
     } else {
       setMessage(pick(LOSE_MESSAGES), 'lose');
+      triggerLossFlash();
+      triggerShake('small');
     }
 
     if (balance <= 0) {
@@ -325,5 +651,6 @@
 
   initMatrixRain();
   updateDisplay();
+  renderStats();
   setMessage('Insert tokens and press GENERATE to begin inference...', null);
 })();

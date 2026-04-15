@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,6 +13,7 @@
     :root {
       --c-bg:     #07071a;
       --c-panel:  #0e0e2e;
+      --c-surface:#13133a;
       --c-purple: #7c3aed;
       --c-purple2:#a78bfa;
       --c-cyan:   #06b6d4;
@@ -23,7 +24,71 @@
       --c-red:    #ef4444;
       --c-text:   #f1f5f9;
       --c-muted:  #64748b;
+      --c-orange: #f97316;
+      --c-teal:   #14b8a6;
+      --c-rose:   #f43f5e;
+      --c-amber:  #f59e0b;
+      --c-indigo: #6366f1;
+      --c-pink:   #ec4899;
+      --c-lime:   #84cc16;
+      --c-sky:    #0ea5e9;
+      --c-reel-bg:#050516;
+      --c-reel-bd:#2d1b69;
+      --c-reel-fade-a: rgba(5,5,22,0.88);
+      --c-reel-fade-b: transparent;
+      --c-reel-hl: rgba(124,58,237,0.09);
+      --c-reel-hl-bd: rgba(167,139,250,0.4);
+      --c-machine-a: #18134a;
+      --c-machine-b: #09082a;
+      --c-grid-line: rgba(124,58,237,0.06);
+      --c-border-subtle: rgba(124,58,237,0.3);
+      --c-border-med: rgba(124,58,237,0.5);
+      --c-glow-purple: rgba(124,58,237,0.35);
+      --c-token-glow: rgba(245,158,11,0.45);
+      --c-overlay: rgba(0,0,0,0.85);
+      --c-scrollbar: var(--c-purple);
+      --c-hist-bd: rgba(255,255,255,0.04);
       --sym-h:    110px;
+    }
+
+    [data-theme="light"] {
+      --c-bg:     #f0f0f8;
+      --c-panel:  #ffffff;
+      --c-surface:#f5f3ff;
+      --c-purple: #7c3aed;
+      --c-purple2:#6d28d9;
+      --c-cyan:   #0891b2;
+      --c-cyan2:  #0e7490;
+      --c-gold:   #d97706;
+      --c-gold2:  #b45309;
+      --c-green:  #059669;
+      --c-red:    #dc2626;
+      --c-text:   #1e1b4b;
+      --c-muted:  #6b7280;
+      --c-orange: #ea580c;
+      --c-teal:   #0d9488;
+      --c-rose:   #e11d48;
+      --c-amber:  #d97706;
+      --c-indigo: #4f46e5;
+      --c-pink:   #db2777;
+      --c-lime:   #65a30d;
+      --c-sky:    #0284c7;
+      --c-reel-bg:#e8e5f5;
+      --c-reel-bd:#a78bfa;
+      --c-reel-fade-a: rgba(232,229,245,0.88);
+      --c-reel-fade-b: transparent;
+      --c-reel-hl: rgba(124,58,237,0.08);
+      --c-reel-hl-bd: rgba(124,58,237,0.3);
+      --c-machine-a: #ede9fe;
+      --c-machine-b: #f5f3ff;
+      --c-grid-line: rgba(124,58,237,0.08);
+      --c-border-subtle: rgba(124,58,237,0.2);
+      --c-border-med: rgba(124,58,237,0.35);
+      --c-glow-purple: rgba(124,58,237,0.15);
+      --c-token-glow: rgba(217,119,6,0.3);
+      --c-overlay: rgba(255,255,255,0.7);
+      --c-scrollbar: var(--c-purple2);
+      --c-hist-bd: rgba(0,0,0,0.06);
     }
 
     body {
@@ -37,6 +102,7 @@
       padding: 16px 12px 60px;
       overflow-x: hidden;
       position: relative;
+      transition: background 0.4s, color 0.4s;
     }
 
     body::before {
@@ -44,8 +110,8 @@
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(124,58,237,0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,58,237,0.06) 1px, transparent 1px);
+        linear-gradient(var(--c-grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--c-grid-line) 1px, transparent 1px);
       background-size: 44px 44px;
       pointer-events: none;
       z-index: 0;
@@ -63,13 +129,13 @@
     }
 
     /* ── HEADER ─────────────────────────────────────── */
-    header { text-align: center; padding-top: 24px; }
+    header { text-align: center; padding-top: 24px; position: relative; width: 100%; }
 
     .title {
       font-family: 'Orbitron', sans-serif;
       font-size: clamp(24px, 6vw, 44px);
       font-weight: 900;
-      background: linear-gradient(135deg, var(--c-purple2) 0%, var(--c-cyan2) 100%);
+      background: linear-gradient(135deg, var(--c-purple2) 0%, var(--c-cyan2) 50%, var(--c-orange) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -83,6 +149,41 @@
       letter-spacing: 2px;
     }
 
+    /* ── THEME TOGGLE ───────────────────────────────── */
+    .theme-toggle {
+      position: absolute;
+      top: 24px;
+      right: 0;
+      width: 48px;
+      height: 26px;
+      border-radius: 13px;
+      border: 2px solid var(--c-border-med);
+      background: var(--c-surface);
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .theme-toggle-knob {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--c-purple), var(--c-cyan));
+      margin-left: 2px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    [data-theme="light"] .theme-toggle-knob {
+      transform: translateX(22px);
+    }
+
     /* ── TOKEN BAR ───────────────────────────────────── */
     .token-bar {
       display: flex;
@@ -90,11 +191,12 @@
       justify-content: center;
       gap: 14px;
       background: var(--c-panel);
-      border: 1px solid rgba(124,58,237,0.5);
+      border: 1px solid var(--c-border-med);
       border-radius: 16px;
       padding: 12px 28px;
-      box-shadow: 0 0 28px rgba(124,58,237,0.2), inset 0 1px 0 rgba(255,255,255,0.04);
+      box-shadow: 0 0 28px var(--c-glow-purple), inset 0 1px 0 rgba(255,255,255,0.04);
       width: 100%;
+      transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
     }
 
     .token-icon { font-size: 30px; }
@@ -113,7 +215,7 @@
       font-size: 30px;
       font-weight: 700;
       color: var(--c-gold);
-      text-shadow: 0 0 18px rgba(245,158,11,0.45);
+      text-shadow: 0 0 18px var(--c-token-glow);
       transition: color 0.25s, transform 0.25s;
       line-height: 1;
     }
@@ -124,16 +226,53 @@
     /* ── MACHINE ─────────────────────────────────────── */
     .machine {
       width: 100%;
-      background: linear-gradient(170deg, #18134a 0%, #09082a 100%);
+      background: linear-gradient(170deg, var(--c-machine-a) 0%, var(--c-machine-b) 100%);
       border: 2px solid var(--c-purple);
       border-radius: 24px;
       padding: 24px 20px 22px;
       box-shadow:
-        0 0 70px rgba(124,58,237,0.35),
+        0 0 70px var(--c-glow-purple),
         0 0 0 1px rgba(167,139,250,0.12) inset;
+      transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+      will-change: transform;
     }
 
-    /* decorative LED row */
+    .machine.shake-big {
+      animation: shakeBig 0.5s ease-in-out;
+    }
+    .machine.shake-small {
+      animation: shakeSmall 0.3s ease-in-out;
+    }
+    .machine.glow-pulse {
+      animation: glowPulse 1.5s ease-in-out;
+    }
+
+    @keyframes shakeBig {
+      0%, 100% { transform: translate(0,0) rotate(0deg); }
+      10% { transform: translate(-6px, -3px) rotate(-1deg); }
+      20% { transform: translate(6px, 2px) rotate(1deg); }
+      30% { transform: translate(-5px, 3px) rotate(-0.5deg); }
+      40% { transform: translate(4px, -2px) rotate(0.5deg); }
+      50% { transform: translate(-3px, 1px) rotate(-0.3deg); }
+      60% { transform: translate(2px, -1px) rotate(0.3deg); }
+      70% { transform: translate(-1px, 1px) rotate(0); }
+    }
+
+    @keyframes shakeSmall {
+      0%, 100% { transform: translate(0,0); }
+      15% { transform: translate(-2px, -1px); }
+      30% { transform: translate(2px, 1px); }
+      45% { transform: translate(-1px, 1px); }
+      60% { transform: translate(1px, -1px); }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 70px var(--c-glow-purple), 0 0 0 1px rgba(167,139,250,0.12) inset; }
+      25% { box-shadow: 0 0 120px rgba(6,182,212,0.6), 0 0 60px rgba(245,158,11,0.4), 0 0 0 1px rgba(167,139,250,0.12) inset; }
+      50% { box-shadow: 0 0 100px rgba(244,63,94,0.5), 0 0 40px rgba(124,58,237,0.5), 0 0 0 1px rgba(167,139,250,0.12) inset; }
+      75% { box-shadow: 0 0 120px rgba(16,185,129,0.5), 0 0 60px rgba(249,115,22,0.4), 0 0 0 1px rgba(167,139,250,0.12) inset; }
+    }
+
     .led-row {
       display: flex;
       justify-content: center;
@@ -148,9 +287,11 @@
       box-shadow: 0 0 7px var(--c-purple);
       animation: blink 2s ease-in-out infinite;
     }
-    .led:nth-child(2n)   { background: var(--c-cyan);  animation-delay: 0.4s; }
-    .led:nth-child(3n)   { background: var(--c-gold2); animation-delay: 0.8s; }
-    .led:nth-child(5)    { animation-delay: 1.2s; }
+    .led:nth-child(2n)   { background: var(--c-cyan);   animation-delay: 0.4s; }
+    .led:nth-child(3n)   { background: var(--c-gold2);  animation-delay: 0.8s; }
+    .led:nth-child(4n)   { background: var(--c-orange);  animation-delay: 0.6s; }
+    .led:nth-child(5)    { background: var(--c-rose);   animation-delay: 1.2s; }
+    .led:nth-child(7)    { background: var(--c-teal);   animation-delay: 1.0s; }
 
     @keyframes blink {
       0%,75%,100% { opacity: 1; }
@@ -181,41 +322,39 @@
     .reel-window {
       width: clamp(96px, 27vw, 160px);
       height: calc(var(--sym-h) * 3);
-      background: #050516;
-      border: 2px solid #2d1b69;
+      background: var(--c-reel-bg);
+      border: 2px solid var(--c-reel-bd);
       border-radius: 14px;
       overflow: hidden;
       position: relative;
-      box-shadow: inset 0 0 40px rgba(0,0,0,0.85);
+      box-shadow: inset 0 0 40px var(--c-overlay);
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    /* top + bottom fade */
     .reel-window::after {
       content: '';
       position: absolute;
       inset: 0;
       background: linear-gradient(
         to bottom,
-        rgba(5,5,22,0.88) 0%,
-        transparent 28%,
-        transparent 72%,
-        rgba(5,5,22,0.88) 100%
+        var(--c-reel-fade-a) 0%,
+        var(--c-reel-fade-b) 28%,
+        var(--c-reel-fade-b) 72%,
+        var(--c-reel-fade-a) 100%
       );
       pointer-events: none;
       z-index: 3;
     }
 
-    /* centre-row highlight band */
     .reel-window::before {
       content: '';
       position: absolute;
       left: 0; right: 0;
       top: var(--sym-h);
       height: var(--sym-h);
-      background: rgba(124,58,237,0.09);
-      border-top: 1px solid rgba(167,139,250,0.4);
-      border-bottom: 1px solid rgba(167,139,250,0.4);
+      background: var(--c-reel-hl);
+      border-top: 1px solid var(--c-reel-hl-bd);
+      border-bottom: 1px solid var(--c-reel-hl-bd);
       pointer-events: none;
       z-index: 2;
     }
@@ -235,12 +374,14 @@
       justify-content: center;
       gap: 3px;
       user-select: none;
+      will-change: transform;
     }
 
     .sym-emoji {
       font-size: clamp(30px, 8vw, 46px);
       line-height: 1;
       display: block;
+      transition: transform 0.3s;
     }
 
     .sym-label {
@@ -250,14 +391,43 @@
       text-transform: uppercase;
     }
 
+    .sym-cell.winner .sym-emoji {
+      animation: symBounce 0.6s ease-in-out 3;
+    }
+
+    @keyframes symBounce {
+      0%, 100% { transform: scale(1) translateY(0); }
+      30% { transform: scale(1.25) translateY(-8px); }
+      50% { transform: scale(1.1) translateY(-3px); }
+      70% { transform: scale(1.2) translateY(-6px); }
+    }
+
     @keyframes reel-win-flash {
-      0%,100% { border-color: #2d1b69; box-shadow: inset 0 0 40px rgba(0,0,0,0.85); }
+      0%,100% { border-color: var(--c-reel-bd); box-shadow: inset 0 0 40px var(--c-overlay); }
       30%,70% {
         border-color: var(--c-cyan);
-        box-shadow: inset 0 0 40px rgba(0,0,0,0.85), 0 0 22px var(--c-cyan);
+        box-shadow: inset 0 0 40px var(--c-overlay), 0 0 22px var(--c-cyan);
       }
     }
     .reel-window.flashing { animation: reel-win-flash 0.7s ease; }
+
+    .reel-window.near-miss {
+      animation: nearMissTease 0.8s ease-in-out;
+    }
+
+    @keyframes nearMissTease {
+      0%, 100% { border-color: var(--c-reel-bd); }
+      15%, 45%, 75% { border-color: var(--c-orange); box-shadow: inset 0 0 40px var(--c-overlay), 0 0 18px rgba(249,115,22,0.5); }
+      30%, 60% { border-color: var(--c-reel-bd); }
+    }
+
+    .reel-window.loss-flash {
+      animation: lossFlash 0.4s ease;
+    }
+    @keyframes lossFlash {
+      0%, 100% { border-color: var(--c-reel-bd); }
+      50% { border-color: var(--c-red); box-shadow: inset 0 0 30px rgba(239,68,68,0.2), 0 0 12px rgba(239,68,68,0.3); }
+    }
 
     /* ── CONTROLS ────────────────────────────────────── */
     .controls {
@@ -312,13 +482,14 @@
       padding: 15px 58px;
       border: none;
       border-radius: 50px;
-      background: linear-gradient(135deg, #6d28d9, #7c3aed 55%, #5b21b6);
+      background: linear-gradient(135deg, #6d28d9, var(--c-purple) 40%, var(--c-indigo) 70%, var(--c-cyan) 100%);
+      background-size: 200% 200%;
       color: #fff;
       cursor: pointer;
       position: relative;
       overflow: hidden;
       box-shadow: 0 0 32px rgba(124,58,237,0.6), 0 4px 0 #3b0764;
-      transition: transform 0.15s, box-shadow 0.15s;
+      transition: transform 0.15s, box-shadow 0.15s, background-position 0.4s;
       user-select: none;
     }
     .spin-btn::after {
@@ -331,6 +502,7 @@
     .spin-btn:hover:not(:disabled) {
       transform: translateY(-3px);
       box-shadow: 0 0 48px rgba(124,58,237,0.85), 0 7px 0 #3b0764;
+      background-position: 100% 100%;
     }
     .spin-btn:active:not(:disabled) {
       transform: translateY(1px);
@@ -352,7 +524,7 @@
       width: 100%;
       min-height: 84px;
       background: var(--c-panel);
-      border: 1px solid rgba(124,58,237,0.3);
+      border: 1px solid var(--c-border-subtle);
       border-radius: 16px;
       padding: 16px 20px;
       display: flex;
@@ -361,6 +533,7 @@
       justify-content: center;
       gap: 7px;
       text-align: center;
+      transition: background 0.4s, border-color 0.4s;
     }
 
     .win-banner {
@@ -380,7 +553,7 @@
       to   { transform: scale(1.07) rotate(1deg); }
     }
     .win-banner.jackpot {
-      color: #f43f5e;
+      color: var(--c-rose);
       text-shadow: 0 0 30px rgba(244,63,94,0.9);
       animation: jackpot-pulse 0.38s ease-in-out infinite alternate;
     }
@@ -398,9 +571,10 @@
       display: flex;
       width: 100%;
       background: var(--c-panel);
-      border: 1px solid rgba(124,58,237,0.3);
+      border: 1px solid var(--c-border-subtle);
       border-radius: 16px;
       overflow: hidden;
+      transition: background 0.4s, border-color 0.4s;
     }
 
     .stat {
@@ -428,13 +602,139 @@
       margin-top: 4px;
     }
 
+    /* ── ADVANCED METRICS ────────────────────────────── */
+    .metrics-panel {
+      width: 100%;
+      background: var(--c-panel);
+      border: 1px solid var(--c-border-subtle);
+      border-radius: 16px;
+      padding: 16px;
+      transition: background 0.4s, border-color 0.4s;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .metric-card {
+      background: var(--c-surface);
+      border-radius: 12px;
+      padding: 10px 8px;
+      text-align: center;
+      border: 1px solid var(--c-border-subtle);
+      transition: background 0.4s, border-color 0.4s;
+    }
+
+    .metric-val {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .metric-lbl {
+      font-size: 8px;
+      color: var(--c-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .winloss-bar-wrap {
+      margin-bottom: 14px;
+    }
+
+    .winloss-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: var(--c-muted);
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .winloss-bar {
+      height: 14px;
+      border-radius: 7px;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border-subtle);
+      overflow: hidden;
+      display: flex;
+      transition: background 0.4s;
+    }
+
+    .winloss-bar-fill-win {
+      height: 100%;
+      background: linear-gradient(90deg, var(--c-green), var(--c-teal));
+      transition: width 0.5s ease;
+      min-width: 0;
+    }
+    .winloss-bar-fill-loss {
+      height: 100%;
+      background: linear-gradient(90deg, var(--c-red), var(--c-rose));
+      transition: width 0.5s ease;
+      min-width: 0;
+    }
+
+    .sparkline-wrap {
+      position: relative;
+    }
+
+    .sparkline-label {
+      font-size: 9px;
+      color: var(--c-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .sparkline-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 50px;
+      padding: 4px 0;
+    }
+
+    .spark-bar {
+      flex: 1;
+      min-width: 4px;
+      max-width: 14px;
+      border-radius: 2px 2px 0 0;
+      transition: height 0.3s ease, background 0.3s;
+    }
+
+    .spark-bar.positive {
+      background: linear-gradient(to top, var(--c-green), var(--c-teal));
+    }
+    .spark-bar.negative {
+      background: linear-gradient(to top, var(--c-red), var(--c-rose));
+      align-self: flex-end;
+    }
+    .spark-bar.zero {
+      background: var(--c-muted);
+      height: 2px !important;
+    }
+
+    .sparkline-zero {
+      position: absolute;
+      bottom: 29px;
+      left: 0;
+      right: 0;
+      border-bottom: 1px dashed rgba(100,116,139,0.3);
+    }
+
     /* ── PAYTABLE ────────────────────────────────────── */
     .paytable, .history {
       width: 100%;
       background: var(--c-panel);
-      border: 1px solid rgba(124,58,237,0.3);
+      border: 1px solid var(--c-border-subtle);
       border-radius: 16px;
       padding: 16px;
+      transition: background 0.4s, border-color 0.4s;
     }
 
     .section-title {
@@ -471,7 +771,7 @@
     }
     .history::-webkit-scrollbar { width: 4px; }
     .history::-webkit-scrollbar-track { background: transparent; }
-    .history::-webkit-scrollbar-thumb { background: var(--c-purple); border-radius: 4px; }
+    .history::-webkit-scrollbar-thumb { background: var(--c-scrollbar); border-radius: 4px; }
 
     .hist-empty {
       color: var(--c-muted);
@@ -485,7 +785,7 @@
       align-items: center;
       padding: 5px 0;
       font-size: 11px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--c-hist-bd);
       gap: 8px;
     }
     .hist-row:last-child { border-bottom: none; }
@@ -496,7 +796,83 @@
     .hist-delta.pos { color: var(--c-green); }
     .hist-delta.neg { color: var(--c-red); }
 
-    /* ── PARTICLES ───────────────────────────────────── */
+    /* ── CONFETTI CANVAS ─────────────────────────────── */
+    #confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── FLOATING TEXT ────────────────────────────────── */
+    .float-text {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: 28px;
+      white-space: nowrap;
+      animation: floatUp 1.8s ease-out forwards;
+      text-shadow: 0 0 20px currentColor;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(0.5); }
+      20% { opacity: 1; transform: translateY(-20px) scale(1.2); }
+      50% { opacity: 1; transform: translateY(-60px) scale(1); }
+      100% { opacity: 0; transform: translateY(-160px) scale(0.8); }
+    }
+
+    /* ── JACKPOT OVERLAY ─────────────────────────────── */
+    .jackpot-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9990;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .jackpot-overlay.active {
+      opacity: 1;
+    }
+
+    .jackpot-overlay-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(244,63,94,0.15) 0%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.6) 100%);
+      animation: jackpotBgPulse 0.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes jackpotBgPulse {
+      from { opacity: 0.6; }
+      to   { opacity: 1; }
+    }
+
+    .jackpot-text-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(32px, 10vw, 72px);
+      font-weight: 900;
+      color: var(--c-gold);
+      text-shadow: 0 0 40px var(--c-gold), 0 0 80px var(--c-orange), 0 0 120px var(--c-rose);
+      animation: jackpotTextPulse 0.5s ease-in-out infinite alternate;
+      letter-spacing: 6px;
+      white-space: nowrap;
+    }
+
+    @keyframes jackpotTextPulse {
+      from { transform: translate(-50%, -50%) scale(1); filter: brightness(1); }
+      to   { transform: translate(-50%, -50%) scale(1.08); filter: brightness(1.3); }
+    }
+
+    /* ── PARTICLES (legacy, kept for compatibility) ──── */
     .particle {
       position: fixed;
       pointer-events: none;
@@ -527,17 +903,27 @@
     .free-btn:hover { background: var(--c-cyan); color: #000; }
     .free-btn.show { display: block; }
 
-    @media (max-width: 480px) {
+    @media (max-width: 520px) {
       .pay-grid { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
 <body>
+<canvas id="confettiCanvas"></canvas>
+<div class="jackpot-overlay" id="jackpotOverlay">
+  <div class="jackpot-overlay-bg"></div>
+  <div class="jackpot-text-overlay" id="jackpotOverlayText">JACKPOT</div>
+</div>
+
 <div class="app">
 
   <header>
     <h1 class="title">AI TOKEN SLOTS™</h1>
     <p class="subtitle">// where your context window goes to die //</p>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <div class="theme-toggle-knob" id="themeKnob">🌙</div>
+    </button>
   </header>
 
   <div class="token-bar">
@@ -548,7 +934,7 @@
     </div>
   </div>
 
-  <div class="machine">
+  <div class="machine" id="machine">
     <div class="led-row">
       <div class="led"></div><div class="led"></div><div class="led"></div>
       <div class="led"></div><div class="led"></div><div class="led"></div>
@@ -610,6 +996,45 @@
     </div>
   </div>
 
+  <div class="metrics-panel">
+    <div class="section-title">// ANALYTICS DASHBOARD //</div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-val" id="metricWinRate" style="color:var(--c-teal)">0%</div>
+        <div class="metric-lbl">Win Rate</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" id="metricROI" style="color:var(--c-indigo)">0%</div>
+        <div class="metric-lbl">ROI</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" id="metricStreak" style="color:var(--c-muted)">—</div>
+        <div class="metric-lbl">Streak</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" id="metricBigWin" style="color:var(--c-gold)">0</div>
+        <div class="metric-lbl">Best Win</div>
+      </div>
+    </div>
+
+    <div class="winloss-bar-wrap">
+      <div class="winloss-bar-label">
+        <span id="wlWinLabel">Wins: 0</span>
+        <span id="wlLossLabel">Losses: 0</span>
+      </div>
+      <div class="winloss-bar">
+        <div class="winloss-bar-fill-win" id="wlBarWin" style="width:50%"></div>
+        <div class="winloss-bar-fill-loss" id="wlBarLoss" style="width:50%"></div>
+      </div>
+    </div>
+
+    <div class="sparkline-wrap">
+      <div class="sparkline-label">Net P&L History (last 30 spins)</div>
+      <div class="sparkline-container" id="sparkline"></div>
+      <div class="sparkline-zero"></div>
+    </div>
+  </div>
+
   <div class="paytable">
     <div class="section-title">// PAYTABLE //</div>
     <div class="pay-grid" id="paytableGrid"></div>
@@ -636,7 +1061,6 @@ const SYMBOLS = [
   { id:'null',   emoji:'💀', name:'NULL',   weight:13, mult:2   },
 ];
 
-// Weighted random pool
 const POOL = [];
 SYMBOLS.forEach(s => { for (let i = 0; i < s.weight; i++) POOL.push(s); });
 const rnd = () => POOL[Math.floor(Math.random() * POOL.length)];
@@ -651,6 +1075,12 @@ let totalWon = 0;
 let totalLost= 0;
 const BET_OPTS = [10, 25, 50, 100];
 let betIdx = 0;
+
+let winCount  = 0;
+let lossCount = 0;
+let streak    = { type: null, count: 0 };
+let biggestWin = 0;
+const plHistory = [];
 
 // ─────────────────────────────────────────────────────
 // DOM
@@ -667,18 +1097,35 @@ const statLost  = document.getElementById('statLost');
 const statSpins = document.getElementById('statSpins');
 const statNet   = document.getElementById('statNet');
 const histList  = document.getElementById('histList');
+const machineEl = document.getElementById('machine');
+
+// ─────────────────────────────────────────────────────
+// THEME TOGGLE
+// ─────────────────────────────────────────────────────
+const themeToggle = document.getElementById('themeToggle');
+const themeKnob   = document.getElementById('themeKnob');
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  themeKnob.textContent = theme === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem('ai-slots-theme', theme);
+}
+
+themeToggle.addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  setTheme(cur === 'dark' ? 'light' : 'dark');
+});
+
+const savedTheme = localStorage.getItem('ai-slots-theme');
+if (savedTheme) setTheme(savedTheme);
 
 // ─────────────────────────────────────────────────────
 // REEL CONSTANTS
-//   SYM_H = 110px (matches CSS --sym-h)
-//   Strip has 50 symbols; target sits at index 46
-//   translateY(0)         → symbols 0,1,2 visible; index 1 centred
-//   translateY(FINAL_Y)   → symbols 45,46,47 visible; index 46 centred
 // ─────────────────────────────────────────────────────
 const SYM_H      = 110;
 const STRIP_LEN  = 50;
 const TARGET_IDX = 46;
-const FINAL_Y    = (1 - TARGET_IDX) * SYM_H;   // −4950
+const FINAL_Y    = (1 - TARGET_IDX) * SYM_H;
 
 function buildStrip(target) {
   return Array.from({ length: STRIP_LEN }, (_, i) => i === TARGET_IDX ? target : rnd());
@@ -694,7 +1141,7 @@ function stripHTML(syms) {
 }
 
 // ─────────────────────────────────────────────────────
-// AUDIO  (Web Audio API — no external files needed)
+// AUDIO
 // ─────────────────────────────────────────────────────
 let _actx = null;
 const actx = () => {
@@ -715,7 +1162,7 @@ function tone(freq, type, vol, delay, dur) {
     gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + delay + dur);
     osc.start(ac.currentTime + delay);
     osc.stop(ac.currentTime  + delay + dur + 0.02);
-  } catch (_) { /* audio blocked */ }
+  } catch (_) {}
 }
 
 const playTick  = () => tone(380 + Math.random() * 620, 'square',   0.035, 0,    0.04);
@@ -733,7 +1180,77 @@ function playWin(bet, payout) {
 }
 
 // ─────────────────────────────────────────────────────
-// PARTICLES
+// CONFETTI (canvas-based for 60fps)
+// ─────────────────────────────────────────────────────
+const confettiCanvas = document.getElementById('confettiCanvas');
+const confettiCtx = confettiCanvas.getContext('2d');
+let confettiPieces = [];
+let confettiAnimId = null;
+
+function resizeConfettiCanvas() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+resizeConfettiCanvas();
+window.addEventListener('resize', resizeConfettiCanvas);
+
+const CONFETTI_COLORS = [
+  '#7c3aed','#06b6d4','#f59e0b','#10b981','#ef4444',
+  '#f97316','#14b8a6','#f43f5e','#6366f1','#ec4899',
+  '#84cc16','#fcd34d','#a78bfa','#67e8f9'
+];
+
+function launchConfetti(count, intensity) {
+  for (let i = 0; i < count; i++) {
+    confettiPieces.push({
+      x: Math.random() * confettiCanvas.width,
+      y: -20 - Math.random() * 100,
+      w: 6 + Math.random() * 6,
+      h: 4 + Math.random() * 8,
+      vx: (Math.random() - 0.5) * 6 * intensity,
+      vy: 2 + Math.random() * 4 * intensity,
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 12,
+      color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      life: 1,
+      decay: 0.003 + Math.random() * 0.004,
+    });
+  }
+  if (!confettiAnimId) animateConfetti();
+}
+
+function animateConfetti() {
+  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiPieces.forEach(p => {
+    p.x += p.vx;
+    p.vy += 0.08;
+    p.y += p.vy;
+    p.rotation += p.rotSpeed;
+    p.life -= p.decay;
+
+    if (p.life > 0) {
+      confettiCtx.save();
+      confettiCtx.globalAlpha = p.life;
+      confettiCtx.translate(p.x, p.y);
+      confettiCtx.rotate(p.rotation * Math.PI / 180);
+      confettiCtx.fillStyle = p.color;
+      confettiCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      confettiCtx.restore();
+    }
+  });
+
+  confettiPieces = confettiPieces.filter(p => p.life > 0 && p.y < confettiCanvas.height + 50);
+
+  if (confettiPieces.length > 0) {
+    confettiAnimId = requestAnimationFrame(animateConfetti);
+  } else {
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    confettiAnimId = null;
+  }
+}
+
+// ─────────────────────────────────────────────────────
+// EMOJI PARTICLES (legacy kept)
 // ─────────────────────────────────────────────────────
 function burst(count, emojis) {
   for (let i = 0; i < count; i++) {
@@ -748,6 +1265,33 @@ function burst(count, emojis) {
       el.addEventListener('animationend', () => el.remove());
     }, i * 50);
   }
+}
+
+// ─────────────────────────────────────────────────────
+// FLOATING TEXT ANIMATION
+// ─────────────────────────────────────────────────────
+function floatingText(text, color) {
+  const el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.color = color;
+  const rect = machineEl.getBoundingClientRect();
+  el.style.left = (rect.left + rect.width / 2 - 80) + 'px';
+  el.style.top = (rect.top + rect.height / 2) + 'px';
+  document.body.appendChild(el);
+  el.addEventListener('animationend', () => el.remove());
+}
+
+// ─────────────────────────────────────────────────────
+// JACKPOT OVERLAY
+// ─────────────────────────────────────────────────────
+const jackpotOverlay = document.getElementById('jackpotOverlay');
+const jackpotOverlayText = document.getElementById('jackpotOverlayText');
+
+function showJackpotOverlay(text, duration) {
+  jackpotOverlayText.textContent = text;
+  jackpotOverlay.classList.add('active');
+  setTimeout(() => jackpotOverlay.classList.remove('active'), duration);
 }
 
 // ─────────────────────────────────────────────────────
@@ -780,6 +1324,55 @@ function updateStats() {
   const net = totalWon - totalLost;
   statNet.textContent   = (net >= 0 ? '+' : '') + fmt(net);
   statNet.style.color   = net > 0 ? 'var(--c-green)' : net < 0 ? 'var(--c-red)' : 'var(--c-muted)';
+}
+
+function updateAdvancedMetrics() {
+  const total = winCount + lossCount;
+  const winRate = total > 0 ? ((winCount / total) * 100).toFixed(1) : 0;
+  document.getElementById('metricWinRate').textContent = winRate + '%';
+
+  const roi = totalLost > 0 ? (((totalWon - totalLost) / totalLost) * 100).toFixed(1) : '0';
+  const roiEl = document.getElementById('metricROI');
+  roiEl.textContent = (roi >= 0 ? '+' : '') + roi + '%';
+  roiEl.style.color = roi > 0 ? 'var(--c-green)' : roi < 0 ? 'var(--c-red)' : 'var(--c-indigo)';
+
+  const streakEl = document.getElementById('metricStreak');
+  if (streak.type === 'win') {
+    streakEl.textContent = '🔥' + streak.count + 'W';
+    streakEl.style.color = 'var(--c-green)';
+  } else if (streak.type === 'loss') {
+    streakEl.textContent = '❄️' + streak.count + 'L';
+    streakEl.style.color = 'var(--c-red)';
+  } else {
+    streakEl.textContent = '—';
+    streakEl.style.color = 'var(--c-muted)';
+  }
+
+  document.getElementById('metricBigWin').textContent = fmt(biggestWin);
+
+  document.getElementById('wlWinLabel').textContent = `Wins: ${winCount}`;
+  document.getElementById('wlLossLabel').textContent = `Losses: ${lossCount}`;
+  const wPct = total > 0 ? (winCount / total * 100) : 50;
+  const lPct = total > 0 ? (lossCount / total * 100) : 50;
+  document.getElementById('wlBarWin').style.width = wPct + '%';
+  document.getElementById('wlBarLoss').style.width = lPct + '%';
+
+  renderSparkline();
+}
+
+function renderSparkline() {
+  const container = document.getElementById('sparkline');
+  const data = plHistory.slice(-30);
+  if (data.length === 0) {
+    container.innerHTML = '<span style="color:var(--c-muted);font-size:10px;margin:auto;">No data yet</span>';
+    return;
+  }
+  const maxAbs = Math.max(1, ...data.map(v => Math.abs(v)));
+  container.innerHTML = data.map(v => {
+    const h = Math.max(2, (Math.abs(v) / maxAbs) * 42);
+    const cls = v > 0 ? 'positive' : v < 0 ? 'negative' : 'zero';
+    return `<div class="spark-bar ${cls}" style="height:${h}px" title="${v >= 0 ? '+' : ''}${v}"></div>`;
+  }).join('');
 }
 
 function showMsg(banner, cls, detail) {
@@ -821,36 +1414,114 @@ function buildPaytable() {
 }
 
 // ─────────────────────────────────────────────────────
-// REEL ANIMATION
+// REEL ANIMATION (requestAnimationFrame, 60fps)
 // ─────────────────────────────────────────────────────
+function easeOutCubic(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
 function animateReel(idx, target, dur) {
   return new Promise(resolve => {
     const strip = document.getElementById(`strip${idx}`);
     const win   = document.getElementById(`reel${idx}`);
 
-    // Rebuild strip with target at TARGET_IDX
     strip.innerHTML = stripHTML(buildStrip(target));
 
-    // Instant reset to top
     strip.style.transition = 'none';
     strip.style.transform  = 'translateY(0)';
-    void strip.getBoundingClientRect(); // force reflow
 
-    // Tick sounds during spin
-    const iv = setInterval(playTick, 68);
-    setTimeout(() => clearInterval(iv), dur - 100);
+    const startTime = performance.now();
+    const startY = 0;
+    const endY = FINAL_Y;
 
-    // Spin — ease-out: starts fast, dramatic deceleration to stop
-    strip.style.transition = `transform ${dur}ms cubic-bezier(0, 0, 0.18, 1)`;
-    strip.style.transform  = `translateY(${FINAL_Y}px)`;
+    const tickInterval = 68;
+    let lastTick = startTime;
 
-    setTimeout(() => {
-      win.classList.add('flashing');
-      setTimeout(() => win.classList.remove('flashing'), 700);
-      playStop(idx);
-      resolve();
-    }, dur);
+    function frame(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / dur, 1);
+      const eased = easeOutCubic(progress);
+      const currentY = startY + (endY - startY) * eased;
+
+      strip.style.transform = `translateY(${currentY}px)`;
+
+      if (now - lastTick > tickInterval && progress < 0.9) {
+        playTick();
+        lastTick = now;
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        strip.style.transform = `translateY(${endY}px)`;
+        win.classList.add('flashing');
+        setTimeout(() => win.classList.remove('flashing'), 700);
+        playStop(idx);
+        resolve();
+      }
+    }
+
+    requestAnimationFrame(frame);
   });
+}
+
+// ─────────────────────────────────────────────────────
+// POST-SPIN ANIMATIONS
+// ─────────────────────────────────────────────────────
+function animateWinSymbols() {
+  for (let i = 0; i < 3; i++) {
+    const strip = document.getElementById(`strip${i}`);
+    const cells = strip.querySelectorAll('.sym-cell');
+    if (cells[TARGET_IDX]) {
+      cells[TARGET_IDX].classList.add('winner');
+      setTimeout(() => cells[TARGET_IDX].classList.remove('winner'), 2000);
+    }
+  }
+}
+
+function animateNearMiss(matchIndices) {
+  matchIndices.forEach(i => {
+    const win = document.getElementById(`reel${i}`);
+    win.classList.add('near-miss');
+    setTimeout(() => win.classList.remove('near-miss'), 800);
+  });
+}
+
+function animateLoss() {
+  machineEl.classList.add('shake-small');
+  setTimeout(() => machineEl.classList.remove('shake-small'), 300);
+  for (let i = 0; i < 3; i++) {
+    const win = document.getElementById(`reel${i}`);
+    win.classList.add('loss-flash');
+    setTimeout(() => win.classList.remove('loss-flash'), 400);
+  }
+}
+
+function animateBigWin(payout) {
+  machineEl.classList.add('shake-big', 'glow-pulse');
+  setTimeout(() => machineEl.classList.remove('shake-big'), 500);
+  setTimeout(() => machineEl.classList.remove('glow-pulse'), 1500);
+  launchConfetti(80, 1.2);
+  animateWinSymbols();
+  floatingText(`+${fmt(payout)} TOKENS!`, 'var(--c-gold)');
+}
+
+function animateJackpot(payout) {
+  machineEl.classList.add('shake-big', 'glow-pulse');
+  setTimeout(() => machineEl.classList.remove('shake-big'), 500);
+  setTimeout(() => machineEl.classList.remove('glow-pulse'), 1500);
+  launchConfetti(200, 1.8);
+  showJackpotOverlay('🎰 JACKPOT 🎰', 3000);
+  animateWinSymbols();
+  setTimeout(() => floatingText(`+${fmt(payout)} TOKENS!`, 'var(--c-gold)'), 400);
+  setTimeout(() => launchConfetti(120, 1.5), 600);
+  burst(48, ['🪙','💰','🎉','✨','🤖','🧠']);
+}
+
+function animateSmallWin(payout) {
+  animateWinSymbols();
+  floatingText(`+${fmt(payout)}`, 'var(--c-green)');
+  launchConfetti(20, 0.6);
 }
 
 // ─────────────────────────────────────────────────────
@@ -906,6 +1577,12 @@ const WIN_MSGS = {
     "Partial alignment achieved. Regulate this.",
     "Two of a kind! The model hallucinated the third one away.",
   ],
+  nearMiss: [
+    "SO CLOSE! The third reel had other plans. Attention dropout strikes again.",
+    "Two out of three aligned — just like most AI safety proposals.",
+    "Almost converged! One more epoch and you'd have nailed it.",
+    "Near miss! The model was this close to a breakthrough.",
+  ],
 };
 
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -917,14 +1594,12 @@ async function spin() {
   const bet = BET_OPTS[betIdx];
   if (spinning || tokens < bet) return;
 
-  // Resume AudioContext on first user gesture
   if (_actx && _actx.state === 'suspended') _actx.resume();
 
   spinning = true;
   spinBtn.disabled = true;
   freeBtn.classList.remove('show');
 
-  // Deduct bet
   tokens    -= bet;
   totalLost += bet;
   spins++;
@@ -932,60 +1607,79 @@ async function spin() {
   updateStats();
   updateBet();
 
-  // Determine outcomes
   const results   = [rnd(), rnd(), rnd()];
-  const durations = [1900, 2500, 3200]; // staggered stops
+  const durations = [1900, 2500, 3200];
 
-  // Launch all reels with staggered starts
   await Promise.all(results.map((sym, i) =>
     new Promise(res => setTimeout(() => animateReel(i, sym, durations[i]).then(res), i * 60))
   ));
 
-  // Brief pause before resolving outcome
   await new Promise(r => setTimeout(r, 180));
 
   const [a, b, c] = results;
   let payout = 0;
   let banner = '', cls = '', detail = '', histDesc = '';
+  let isWin = false;
 
   if (a.id === b.id && b.id === c.id) {
-    // ── 3 of a kind
     payout = bet * a.mult;
     histDesc = `3× ${a.name}`;
+    isWin = true;
     if (a.mult >= 50) {
       banner = a.id === 'gpt' ? '🎰 JACKPOT 🎰' : '⚡ MEGA WIN ⚡';
       cls    = 'jackpot';
       detail = pick(WIN_MSGS.jackpot);
-      burst(48, ['🪙','💰','🎉','✨','🤖','🧠']);
+      animateJackpot(payout);
     } else if (a.mult >= 15) {
       banner = `💰 BIG WIN  +${fmt(payout)}`;
       cls    = 'big';
       detail = pick(WIN_MSGS.big);
-      burst(24, ['🪙','💰','✨']);
+      animateBigWin(payout);
     } else if (a.mult >= 5) {
       banner = `✅ WIN  +${fmt(payout)}`;
       cls    = 'small';
       detail = pick(WIN_MSGS.medium);
+      animateSmallWin(payout);
     } else {
       banner = `✅ WIN  +${fmt(payout)}`;
       cls    = 'small';
       detail = pick(WIN_MSGS.small);
+      animateSmallWin(payout);
     }
   } else if (a.id === b.id || b.id === c.id || a.id === c.id) {
-    // ── Pair
     payout = Math.floor(bet * 1.5);
     histDesc = 'Pair';
+    isWin = true;
+
+    const isNearMiss = true;
+    const matchIndices = [];
+    if (a.id === b.id) { matchIndices.push(0, 1); }
+    else if (b.id === c.id) { matchIndices.push(1, 2); }
+    else { matchIndices.push(0, 2); }
+
     banner = `🎯 PAIR  +${fmt(payout)}`;
     cls    = 'small';
-    detail = pick(WIN_MSGS.pair);
+    detail = pick(WIN_MSGS.pair) + ' ' + pick(WIN_MSGS.nearMiss);
+    animateNearMiss(matchIndices);
+    animateWinSymbols();
+    floatingText(`+${fmt(payout)}`, 'var(--c-teal)');
   } else {
-    // ── Miss
     payout  = 0;
     histDesc= 'Miss';
+    isWin = false;
     banner  = '💀 MISS';
     cls     = 'lose';
     detail  = pick(LOSE_MSGS);
     playLose();
+    animateLoss();
+  }
+
+  if (isWin) {
+    winCount++;
+    streak = streak.type === 'win' ? { type: 'win', count: streak.count + 1 } : { type: 'win', count: 1 };
+  } else {
+    lossCount++;
+    streak = streak.type === 'loss' ? { type: 'loss', count: streak.count + 1 } : { type: 'loss', count: 1 };
   }
 
   if (payout > 0) {
@@ -993,13 +1687,16 @@ async function spin() {
     totalWon  += payout;
     flashTokens(1);
     playWin(bet, payout);
+    if (payout > biggestWin) biggestWin = payout;
   }
 
+  plHistory.push(payout - bet);
+
   updateStats();
+  updateAdvancedMetrics();
   showMsg(banner, cls, detail);
   addHistory(results, payout - bet, histDesc);
 
-  // Bankruptcy
   if (tokens <= 0) {
     tokens = 0;
     flashTokens(0);
@@ -1022,9 +1719,15 @@ freeBtn.addEventListener('click', () => {
   totalWon  = 0;
   totalLost = 0;
   spins     = 0;
+  winCount  = 0;
+  lossCount = 0;
+  streak    = { type: null, count: 0 };
+  biggestWin = 0;
+  plHistory.length = 0;
   freeBtn.classList.remove('show');
   flashTokens(1);
   updateStats();
+  updateAdvancedMetrics();
   updateBet();
   showMsg('', '', 'Fresh allocation of 1,000 tokens deposited. Try not to lose them all again.');
   winBanner.classList.remove('show');
@@ -1042,7 +1745,6 @@ document.getElementById('betUp').addEventListener('click', () => {
   if (betIdx < BET_OPTS.length - 1) { betIdx++; updateBet(); }
 });
 
-// Space bar to spin
 document.addEventListener('keydown', e => {
   if (e.code === 'Space' && !spinning && document.activeElement !== spinBtn) {
     e.preventDefault();
@@ -1056,8 +1758,8 @@ document.addEventListener('keydown', e => {
 buildPaytable();
 updateBet();
 updateStats();
+updateAdvancedMetrics();
 
-// Seed reels with random visible symbols (3 per reel, middle centred)
 [0, 1, 2].forEach(i => {
   const strip = document.getElementById(`strip${i}`);
   strip.style.transform = 'translateY(0)';

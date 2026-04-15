@@ -45,6 +45,16 @@ const JACKPOT_MSGS = [
   "🏆 AI SAID 'CONGRATULATIONS' (AND MEANT IT FOR ONCE)",
 ];
 
+const NEAR_MISS_MSGS = [
+  "SO CLOSE… THE MODEL ALMOST ALIGNED",
+  "TWO OUT OF THREE — TRAINING INCOMPLETE",
+  "NEAR MISS — YOUR GRADIENTS ARE NOISY",
+  "ALMOST! CONTEXT WINDOW CLIPPED YOUR WIN",
+];
+
+const PARTICLE_CHARS = ['🪙', '✨', '⭐', '💫', '🌟', '💎', '🔥'];
+const SAD_PARTICLES = ['💨', '🫠', '❌', '📉', '🥀'];
+
 // ── Game state ────────────────────────────────────────────────────────────────
 const state = {
   tokens: 1000,
@@ -52,10 +62,17 @@ const state = {
   spins: 0,
   biggestWin: 0,
   winStreak: 0,
+  lossStreak: 0,
+  maxLossStreak: 0,
+  totalWon: 0,
+  totalLost: 0,
+  wins: 0,
+  losses: 0,
   spinning: false,
   autoPlay: false,
   autoTimer: null,
   results: [null, null, null],
+  history: [],
 };
 
 const BET_OPTIONS = [5, 10, 25, 50, 100, 250];
@@ -63,27 +80,62 @@ let betIdx = 1;
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
-const strips    = [$('strip1'), $('strip2'), $('strip3')];
-const reels     = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
-const resultText  = $('resultText');
-const tokenCount  = $('tokenCount');
-const spinsCount  = $('spinsCount');
-const biggestWin  = $('biggestWin');
+const strips       = [$('strip1'), $('strip2'), $('strip3')];
+const reels        = [$('reel1'), $('reel2'), $('reel3')];
+const resultText   = $('resultText');
+const tokenCount   = $('tokenCount');
+const spinsCount   = $('spinsCount');
+const biggestWinEl = $('biggestWin');
 const winStreakEl  = $('winStreak');
-const betValueEl  = $('betValue');
-const spinBtn    = $('spinBtn');
-const betDown    = $('betDown');
-const betUp      = $('betUp');
-const autoBtn    = $('autoBtn');
-const autoCount  = $('autoCount');
-const logEntries  = $('logEntries');
+const lossStreakEl = $('lossStreak');
+const winRateEl    = $('winRate');
+const totalWonEl   = $('totalWon');
+const totalLostEl  = $('totalLost');
+const betValueEl   = $('betValue');
+const spinBtn      = $('spinBtn');
+const betDown      = $('betDown');
+const betUp        = $('betUp');
+const autoBtn      = $('autoBtn');
+const autoCount    = $('autoCount');
+const logEntries   = $('logEntries');
 const contextFill  = $('contextFill');
 const modalOverlay = $('modalOverlay');
-const modalIcon  = $('modalIcon');
-const modalTitle  = $('modalTitle');
-const modalBody  = $('modalBody');
-const modalBtn   = $('modalBtn');
-const machine    = document.querySelector('.machine');
+const modalIcon    = $('modalIcon');
+const modalTitle   = $('modalTitle');
+const modalBody    = $('modalBody');
+const modalBtn     = $('modalBtn');
+const machine      = $('machine');
+const screenFlash  = $('screenFlash');
+const themeToggle  = $('themeToggle');
+const themeIcon    = $('themeIcon');
+
+const netProfitVal = $('netProfitVal');
+const netBarNeg    = $('netBarNeg');
+const netBarPos    = $('netBarPos');
+const roiVal       = $('roiVal');
+const roiBar       = $('roiBar');
+const wlDistVal    = $('wlDistVal');
+const wlBarWin     = $('wlBarWin');
+const wlBarLoss    = $('wlBarLoss');
+const historyDots  = $('historyDots');
+
+// ── Theme toggle ──────────────────────────────────────────────────────────────
+function getTheme() {
+  return localStorage.getItem('tokenslot-theme') || 'dark';
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('tokenslot-theme', theme);
+}
+
+applyTheme(getTheme());
+
+themeToggle.addEventListener('click', () => {
+  const current = getTheme();
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+});
 
 // ── Weighted random symbol picker ─────────────────────────────────────────────
 function weightedRandom() {
@@ -99,7 +151,6 @@ function weightedRandom() {
 // ── Build reel strips ─────────────────────────────────────────────────────────
 function buildStrip(stripEl) {
   stripEl.innerHTML = '';
-  // Fill with random symbols for the scroll illusion (20 rows)
   for (let i = 0; i < 20; i++) {
     const div = document.createElement('div');
     div.className = 'reel-symbol';
@@ -108,15 +159,12 @@ function buildStrip(stripEl) {
   }
 }
 
-// ── Init strips ───────────────────────────────────────────────────────────────
 strips.forEach(buildStrip);
 
 // ── Build paytable ────────────────────────────────────────────────────────────
 function buildPaytable() {
   const grid = $('paytableGrid');
   grid.innerHTML = '';
-
-  // Three-of-a-kind rows
   const sorted = [...SYMBOLS].sort((a, b) => b.payout - a.payout);
   for (const sym of sorted) {
     const row = document.createElement('div');
@@ -129,8 +177,6 @@ function buildPaytable() {
       </div>`;
     grid.appendChild(row);
   }
-
-  // Any two alike
   const row2 = document.createElement('div');
   row2.className = 'pt-row';
   row2.innerHTML = `
@@ -148,14 +194,62 @@ buildPaytable();
 function updateStats() {
   tokenCount.textContent = state.tokens.toLocaleString();
   spinsCount.textContent = state.spins.toLocaleString();
-  biggestWin.textContent = state.biggestWin.toLocaleString();
+  biggestWinEl.textContent = state.biggestWin.toLocaleString();
   winStreakEl.textContent = state.winStreak;
+  lossStreakEl.textContent = state.lossStreak;
   betValueEl.textContent = BET_OPTIONS[betIdx];
+  totalWonEl.textContent = state.totalWon.toLocaleString();
+  totalLostEl.textContent = state.totalLost.toLocaleString();
 
-  // Context fill grows with spins (up to 95%)
+  const rate = state.spins > 0 ? ((state.wins / state.spins) * 100).toFixed(1) : '0.0';
+  winRateEl.textContent = rate + '%';
+
   const pct = Math.min(12 + state.spins * 0.4, 95);
   contextFill.style.width = pct + '%';
   if (pct > 80) contextFill.style.background = 'linear-gradient(90deg, #ef4444, #fbbf24)';
+
+  updateMetrics();
+}
+
+function updateMetrics() {
+  const net = state.totalWon - state.totalLost;
+  netProfitVal.textContent = (net >= 0 ? '+' : '') + net.toLocaleString();
+  netProfitVal.style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
+
+  const maxNet = Math.max(state.totalWon, state.totalLost, 1);
+  if (net >= 0) {
+    netBarPos.style.width = Math.min((net / maxNet) * 50, 50) + '%';
+    netBarNeg.style.width = '0';
+  } else {
+    netBarNeg.style.width = Math.min((Math.abs(net) / maxNet) * 50, 50) + '%';
+    netBarPos.style.width = '0';
+  }
+
+  const totalInvested = state.totalLost;
+  const roi = totalInvested > 0 ? (((state.totalWon - totalInvested) / totalInvested) * 100).toFixed(1) : '0.0';
+  roiVal.textContent = roi + '%';
+  roiVal.style.color = parseFloat(roi) >= 0 ? 'var(--green)' : 'var(--red)';
+  const roiPct = Math.max(0, Math.min(100, 50 + parseFloat(roi) * 0.5));
+  roiBar.style.width = roiPct + '%';
+
+  const total = state.wins + state.losses;
+  wlDistVal.textContent = `${state.wins}W — ${state.losses}L`;
+  if (total > 0) {
+    wlBarWin.style.width = ((state.wins / total) * 100) + '%';
+    wlBarLoss.style.width = ((state.losses / total) * 100) + '%';
+  }
+}
+
+function addHistoryDot(type) {
+  state.history.push(type);
+  if (state.history.length > 50) {
+    state.history.shift();
+    if (historyDots.firstChild) historyDots.removeChild(historyDots.firstChild);
+  }
+  const dot = document.createElement('div');
+  dot.className = 'history-dot ' + type;
+  dot.title = type.toUpperCase();
+  historyDots.appendChild(dot);
 }
 
 // ── Logging ───────────────────────────────────────────────────────────────────
@@ -166,44 +260,176 @@ function log(msg, type = 'info') {
   entry.className = `log-entry ${type}`;
   entry.innerHTML = `<span class="log-time">${time}</span><span>${msg}</span>`;
   logEntries.prepend(entry);
-  // Keep max 40 entries
   while (logEntries.children.length > 40) logEntries.lastChild.remove();
 }
 
-// ── Coin burst effect ─────────────────────────────────────────────────────────
+// ── RAF-based particle animation ──────────────────────────────────────────────
+function animateParticle(el, startX, startY, dx, dy, duration, rotateEnd) {
+  const start = performance.now();
+  el.style.left = startX + 'px';
+  el.style.top = startY + 'px';
+
+  function frame(now) {
+    const elapsed = now - start;
+    const t = Math.min(elapsed / duration, 1);
+    const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+    const x = startX + dx * ease;
+    const y = startY + dy * t;
+    const rot = rotateEnd * t;
+    const scale = 1 - t * 0.6;
+    const opacity = t < 0.6 ? 1 : 1 - (t - 0.6) / 0.4;
+
+    el.style.transform = `translate(${x - startX}px, ${y - startY}px) rotate(${rot}deg) scale(${scale})`;
+    el.style.opacity = opacity;
+
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      el.remove();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+// ── Coin burst effect (60fps with rAF) ───────────────────────────────────────
 function spawnCoins(count = 10) {
   const spinRect = spinBtn.getBoundingClientRect();
+  const cx = spinRect.left + spinRect.width / 2;
+  const cy = spinRect.top;
+
   for (let i = 0; i < count; i++) {
-    const coin = document.createElement('div');
-    coin.className = 'coin';
-    coin.textContent = '🪙';
-    const startX = spinRect.left + spinRect.width / 2 + (Math.random() - 0.5) * 60;
-    const startY = spinRect.top + (Math.random() - 0.5) * 20;
-    const dx = (Math.random() - 0.5) * 200;
-    const dy = -(80 + Math.random() * 180);
-    coin.style.left = startX + 'px';
-    coin.style.top  = startY + 'px';
-    coin.style.setProperty('--dx', dx + 'px');
-    coin.style.setProperty('--dy', dy + 'px');
-    coin.style.setProperty('--dur', (0.8 + Math.random() * 0.6) + 's');
-    coin.style.animationDelay = Math.random() * 0.3 + 's';
-    document.body.appendChild(coin);
-    coin.addEventListener('animationend', () => coin.remove());
+    const el = document.createElement('div');
+    const isSpecial = Math.random() > 0.5;
+    el.className = isSpecial ? 'sparkle' : 'coin';
+    el.textContent = isSpecial
+      ? PARTICLE_CHARS[1 + Math.floor(Math.random() * (PARTICLE_CHARS.length - 1))]
+      : '🪙';
+    document.body.appendChild(el);
+
+    const startX = cx + (Math.random() - 0.5) * 80;
+    const startY = cy + (Math.random() - 0.5) * 30;
+    const dx = (Math.random() - 0.5) * 300;
+    const dy = -(100 + Math.random() * 200);
+    const dur = 800 + Math.random() * 600;
+    const rot = (Math.random() - 0.5) * 720;
+
+    setTimeout(() => animateParticle(el, startX, startY, dx, dy, dur, rot), Math.random() * 300);
   }
 }
 
+// ── Sad particle effect (losses) ──────────────────────────────────────────────
+function spawnSadParticles(count = 5) {
+  const machineRect = machine.getBoundingClientRect();
+  const cx = machineRect.left + machineRect.width / 2;
+  const cy = machineRect.top + machineRect.height / 2;
+
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'sad-particle';
+    el.textContent = SAD_PARTICLES[Math.floor(Math.random() * SAD_PARTICLES.length)];
+    document.body.appendChild(el);
+
+    const startX = cx + (Math.random() - 0.5) * 200;
+    const startY = cy + (Math.random() - 0.5) * 60;
+    const dx = (Math.random() - 0.5) * 80;
+    const dy = 60 + Math.random() * 100;
+    const dur = 800 + Math.random() * 400;
+
+    animateParticle(el, startX, startY, dx, dy, dur, (Math.random() - 0.5) * 180);
+  }
+}
+
+// ── Floating "+X tokens!" text ───────────────────────────────────────────────
+function spawnFloatingText(amount, isWin) {
+  const machineRect = machine.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'floating-token-text';
+  el.textContent = isWin ? `+${amount} tokens!` : `-${amount}`;
+  el.style.color = isWin ? 'var(--green)' : 'var(--red)';
+  if (amount >= 100) el.style.fontSize = '28px';
+
+  const startX = machineRect.left + machineRect.width / 2 - 60;
+  const startY = machineRect.top + 40;
+  el.style.left = startX + 'px';
+  el.style.top = startY + 'px';
+
+  document.body.appendChild(el);
+
+  const start = performance.now();
+  const duration = 1400;
+
+  function frame(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const y = startY - 80 * t;
+    const opacity = t < 0.7 ? 1 : 1 - (t - 0.7) / 0.3;
+    const scale = t < 0.15 ? 0.5 + t * 3.3 : 1;
+    el.style.transform = `translateY(${y - startY}px) scale(${scale})`;
+    el.style.opacity = opacity;
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      el.remove();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
 // ── Modal ─────────────────────────────────────────────────────────────────────
-function showModal(icon, title, body, onClose) {
+function showModal(icon, title, body, onClose, isJackpot) {
   modalIcon.textContent = icon;
   modalTitle.textContent = title;
   modalBody.textContent = body;
   modalOverlay.classList.add('active');
+  if (isJackpot) modalOverlay.classList.add('jackpot-modal');
   const handler = () => {
-    modalOverlay.classList.remove('active');
+    modalOverlay.classList.remove('active', 'jackpot-modal');
     modalBtn.removeEventListener('click', handler);
     if (onClose) onClose();
   };
   modalBtn.addEventListener('click', handler);
+}
+
+// ── Machine animation helpers ─────────────────────────────────────────────────
+function flashMachine(cls) {
+  machine.classList.remove('win-flash', 'jackpot-flash', 'loss-flash', 'near-miss-glow', 'screen-shake', 'loss-shake', 'pulsing-glow');
+  void machine.offsetWidth;
+  machine.classList.add(cls);
+  machine.addEventListener('animationend', () => machine.classList.remove(cls), { once: true });
+}
+
+function triggerScreenFlash() {
+  screenFlash.classList.remove('active');
+  void screenFlash.offsetWidth;
+  screenFlash.classList.add('active');
+  screenFlash.addEventListener('animationend', () => screenFlash.classList.remove('active'), { once: true });
+}
+
+function bounceWinningSymbols() {
+  strips.forEach(strip => {
+    const symbols = strip.querySelectorAll('.reel-symbol');
+    const last = symbols[symbols.length - 1];
+    if (last) {
+      last.classList.add('bounce');
+      last.addEventListener('animationend', () => last.classList.remove('bounce'), { once: true });
+    }
+  });
+}
+
+function highlightNearMiss(result) {
+  const emojis = result.map(r => r.emoji);
+  const counts = {};
+  emojis.forEach(e => { counts[e] = (counts[e] || 0) + 1; });
+  const pairEmoji = Object.keys(counts).find(e => counts[e] === 2);
+  if (!pairEmoji) return;
+
+  strips.forEach((strip, i) => {
+    if (emojis[i] === pairEmoji) {
+      const symbols = strip.querySelectorAll('.reel-symbol');
+      const last = symbols[symbols.length - 1];
+      if (last) last.classList.add('near-miss-highlight');
+    }
+  });
 }
 
 // ── Spin logic ────────────────────────────────────────────────────────────────
@@ -227,17 +453,8 @@ function setResult(text, className) {
   resultText.textContent = text;
 }
 
-function flashMachine(cls) {
-  machine.classList.remove('win-flash', 'jackpot-flash');
-  void machine.offsetWidth; // reflow
-  machine.classList.add(cls);
-  machine.addEventListener('animationend', () => machine.classList.remove(cls), { once: true });
-}
-
-// Animate a single reel to land on a target symbol
 function animateReel(reelEl, stripEl, targetSymbol, duration) {
   return new Promise(resolve => {
-    // Rebuild strip with random symbols, ending with target
     stripEl.innerHTML = '';
     const rows = 22;
     for (let i = 0; i < rows - 1; i++) {
@@ -246,26 +463,21 @@ function animateReel(reelEl, stripEl, targetSymbol, duration) {
       d.textContent = weightedRandom().emoji;
       stripEl.appendChild(d);
     }
-    // Last visible symbol = target
     const last = document.createElement('div');
     last.className = 'reel-symbol highlighted';
     last.textContent = targetSymbol.emoji;
     stripEl.appendChild(last);
 
-    // Reset position
     stripEl.style.transition = 'none';
     stripEl.style.transform = 'translateY(0)';
 
     const symbolH = 130;
     const totalH = (rows - 1) * symbolH;
 
-    // Small delay so browser paints the reset
     requestAnimationFrame(() => requestAnimationFrame(() => {
       stripEl.style.transition = `transform ${duration}ms cubic-bezier(0.1, 0.8, 0.3, 1)`;
       stripEl.style.transform = `translateY(-${totalH}px)`;
-      setTimeout(() => {
-        resolve();
-      }, duration + 50);
+      setTimeout(resolve, duration + 50);
     }));
   });
 }
@@ -308,30 +520,79 @@ async function spin() {
     type = 'win';
   }
 
+  const isNearMiss = eval_.type === 'pair' && type === 'win' && winAmount === Math.floor(bet * 1.5);
+  const isPureNearMiss = eval_.type === 'pair';
+
   if (winAmount > 0) {
     state.tokens += winAmount;
+    state.totalWon += winAmount;
+    state.wins++;
     if (winAmount > state.biggestWin) state.biggestWin = winAmount;
     state.winStreak++;
+    state.lossStreak = 0;
     const net = winAmount - bet;
 
     if (type === 'jackpot') {
       const msg = JACKPOT_MSGS[Math.floor(Math.random() * JACKPOT_MSGS.length)];
       setResult(msg, 'jackpot');
       flashMachine('jackpot-flash');
-      spawnCoins(24);
+      triggerScreenFlash();
+      setTimeout(() => flashMachine('screen-shake'), 100);
+      setTimeout(() => flashMachine('pulsing-glow'), 500);
+      spawnCoins(40);
+      setTimeout(() => spawnCoins(20), 300);
+      setTimeout(() => spawnCoins(15), 600);
+      bounceWinningSymbols();
+      spawnFloatingText(winAmount, true);
       log(`JACKPOT! +${winAmount} tokens (${result.map(s=>s.emoji).join('')})`, 'jackpot');
+      addHistoryDot('jackpot');
+
+      setTimeout(() => {
+        showModal('💎', 'JACKPOT ACHIEVED',
+          `The model has aligned itself to your wallet.\n\nYou won ${winAmount} tokens on a ${bet} token bet.\n\nThat's a ${eval_.symbol.payout}x multiplier. The training paid off.`,
+          null, true);
+      }, 800);
+
+    } else if (isPureNearMiss) {
+      const msg = NEAR_MISS_MSGS[Math.floor(Math.random() * NEAR_MISS_MSGS.length)];
+      setResult(`+${winAmount} — ${msg}`, 'win');
+      flashMachine('near-miss-glow');
+      highlightNearMiss(result);
+      spawnCoins(4);
+      spawnFloatingText(winAmount, true);
+      log(`Pair +${winAmount}t (net +${net}t) ${result.map(s=>s.emoji).join('')}`, 'win');
+      addHistoryDot('near-miss');
+
     } else {
       const msg = WIN_MSGS[Math.floor(Math.random() * WIN_MSGS.length)];
       setResult(`+${winAmount} TOKENS — ${msg}`, 'win');
       flashMachine('win-flash');
-      spawnCoins(6 + Math.floor(winAmount / bet));
+      if (winAmount >= bet * 8) {
+        setTimeout(() => flashMachine('screen-shake'), 100);
+        setTimeout(() => flashMachine('pulsing-glow'), 500);
+      }
+      const coinCount = Math.min(6 + Math.floor(winAmount / bet), 30);
+      spawnCoins(coinCount);
+      bounceWinningSymbols();
+      spawnFloatingText(winAmount, true);
       log(`WIN +${winAmount}t  (net +${net}t)  ${result.map(s=>s.emoji).join('')}`, 'win');
+      addHistoryDot('win');
     }
   } else {
     state.winStreak = 0;
+    state.lossStreak++;
+    state.losses++;
+    state.totalLost += bet;
+    if (state.lossStreak > state.maxLossStreak) state.maxLossStreak = state.lossStreak;
+
     const msg = LOSE_MSGS[Math.floor(Math.random() * LOSE_MSGS.length)];
     setResult(msg, 'lose');
+    flashMachine('loss-flash');
+    flashMachine('loss-shake');
+    spawnSadParticles(3);
+    spawnFloatingText(bet, false);
     log(`Loss -${bet}t  ${result.map(s=>s.emoji).join('')}`, 'lose');
+    addHistoryDot('loss');
   }
 
   updateStats();
@@ -386,11 +647,8 @@ function startAuto() {
 }
 
 autoBtn.addEventListener('click', () => {
-  if (state.autoPlay) {
-    stopAuto();
-  } else {
-    startAuto();
-  }
+  if (state.autoPlay) stopAuto();
+  else startAuto();
 });
 
 // ── Bet controls ──────────────────────────────────────────────────────────────

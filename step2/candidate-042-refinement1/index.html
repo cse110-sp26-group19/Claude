@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,11 +8,18 @@
 </head>
 <body>
   <div class="scanlines"></div>
+  <div class="particle-container" id="particle-container"></div>
+  <div class="float-container" id="float-container"></div>
 
-  <div class="machine-wrapper">
+  <div class="machine-wrapper" id="machine-wrapper">
     <!-- Header -->
     <header class="machine-header">
-      <div class="header-glow">⚡ AI TOKEN SLOTS ⚡</div>
+      <div class="header-top-row">
+        <div class="header-glow">⚡ AI TOKEN SLOTS ⚡</div>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode">
+          <span class="theme-icon" id="theme-icon">☀️</span>
+        </button>
+      </div>
       <p class="tagline">The only casino where the house was trained on your data</p>
     </header>
 
@@ -29,22 +36,22 @@
     </div>
 
     <!-- Machine Body -->
-    <div class="machine-body">
+    <div class="machine-body" id="machine-body">
       <!-- Reels -->
       <div class="reels-container">
         <div class="reel-frame" id="frame-0">
           <div class="reel" id="reel-0">
-            <div class="symbol"></div>
+            <div class="symbol" id="sym-0"></div>
           </div>
         </div>
         <div class="reel-frame" id="frame-1">
           <div class="reel" id="reel-1">
-            <div class="symbol"></div>
+            <div class="symbol" id="sym-1"></div>
           </div>
         </div>
         <div class="reel-frame" id="frame-2">
           <div class="reel" id="reel-2">
-            <div class="symbol"></div>
+            <div class="symbol" id="sym-2"></div>
           </div>
         </div>
       </div>
@@ -90,7 +97,7 @@
       </table>
     </details>
 
-    <!-- Stats -->
+    <!-- Primary Stats -->
     <div class="stats-panel">
       <div class="stat">
         <div class="stat-value" id="stat-spins">0</div>
@@ -107,6 +114,57 @@
       <div class="stat">
         <div class="stat-value" id="stat-tokens-lost">0</div>
         <div class="stat-label">Tokens Burned</div>
+      </div>
+    </div>
+
+    <!-- Extended Stats -->
+    <div class="stats-panel stats-extended">
+      <div class="stat">
+        <div class="stat-value stat-accent-teal" id="stat-winrate">0%</div>
+        <div class="stat-label">Win Rate</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value stat-accent-amber" id="stat-roi">0%</div>
+        <div class="stat-label">ROI</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value stat-accent-lime" id="stat-streak">0</div>
+        <div class="stat-label">Streak</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value stat-accent-indigo" id="stat-biggest">0</div>
+        <div class="stat-label">Biggest Win</div>
+      </div>
+    </div>
+
+    <!-- Net Profit Bar -->
+    <div class="net-profit-panel">
+      <div class="net-label">
+        <span>NET PROFIT / LOSS</span>
+        <span class="net-value" id="net-value">0</span>
+      </div>
+      <div class="net-bar-wrap">
+        <div class="net-bar-center"></div>
+        <div class="net-bar-fill" id="net-bar-fill"></div>
+      </div>
+    </div>
+
+    <!-- Sparkline: recent results -->
+    <div class="sparkline-panel">
+      <div class="sparkline-label">RECENT RESULTS</div>
+      <div class="sparkline-dots" id="sparkline-dots"></div>
+    </div>
+
+    <!-- Win/Loss Distribution -->
+    <div class="distribution-panel">
+      <div class="distribution-label">WIN / LOSS DISTRIBUTION</div>
+      <div class="distribution-bar-wrap">
+        <div class="distribution-win" id="dist-win"></div>
+        <div class="distribution-loss" id="dist-loss"></div>
+      </div>
+      <div class="distribution-legend">
+        <span class="legend-win">● Wins <span id="dist-win-count">0</span></span>
+        <span class="legend-loss">● Losses <span id="dist-loss-count">0</span></span>
       </div>
     </div>
 

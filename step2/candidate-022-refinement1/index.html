@@ -11,6 +11,11 @@
 
   <div class="scanlines"></div>
 
+  <div class="fullscreen-flash" id="fullscreen-flash"></div>
+  <div id="particle-container"></div>
+
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode" title="Toggle theme">☀</button>
+
   <div class="container">
     <header>
       <h1 class="glitch" data-text="TOKEN BURNER 9000">TOKEN BURNER 9000</h1>
@@ -31,7 +36,7 @@
       </div>
     </div>
 
-    <div class="machine-frame">
+    <div class="machine-frame" id="machine-frame">
       <div class="reels-window">
         <div class="reel-container">
           <div class="reel" id="reel-0"><div class="symbol">🤖</div></div>
@@ -49,6 +54,59 @@
 
     <div id="message-box" class="message-box">
       <p id="message">Insert tokens and press GENERATE to begin inference...</p>
+    </div>
+
+    <div class="stats-panel" id="stats-panel">
+      <h2>/// TELEMETRY DATA ///</h2>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-label">Total Spins</span>
+          <span class="stat-value cyan" id="stat-spins">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Win Rate</span>
+          <span class="stat-value" id="stat-winrate">0%</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Tokens Won</span>
+          <span class="stat-value positive" id="stat-won">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Tokens Lost</span>
+          <span class="stat-value negative" id="stat-lost">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">ROI</span>
+          <span class="stat-value purple" id="stat-roi">0%</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Current Streak</span>
+          <span class="stat-value" id="stat-streak">—</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Biggest Win</span>
+          <span class="stat-value gold" id="stat-biggest">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Net Profit</span>
+          <div class="net-indicator">
+            <span class="net-arrow neutral" id="stat-net-arrow">●</span>
+            <span class="stat-value" id="stat-net">0</span>
+          </div>
+        </div>
+        <div class="stat-item full-width">
+          <span class="stat-label">Win / Loss Ratio</span>
+          <div class="win-loss-bar-container">
+            <div class="win-loss-bar">
+              <div class="wins-fill" id="wins-fill" style="width: 50%"></div>
+            </div>
+            <div class="bar-labels">
+              <span class="wins-label" id="wins-label">W: 0</span>
+              <span class="losses-label" id="losses-label">L: 0</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="paytable">
