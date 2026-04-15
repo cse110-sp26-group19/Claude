@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TokenBurn™ — The AI Slot Machine</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ticker-bar" aria-live="polite">
+    <span class="ticker-text" id="ticker"></span>
+  </div>
+
+  <header>
+    <div class="logo-area">
+      <h1>Token<span class="burn">Burn</span><sup>™</sup></h1>
+      <p class="tagline">Disrupting Gambling With Generative AI — Series F Funded</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="balance-bar">
+      <div class="balance-display">
+        <span class="balance-label">Your Token Balance</span>
+        <span class="balance-amount" id="balance">1000</span>
+        <span class="balance-unit">tokens</span>
+      </div>
+      <div class="bet-controls">
+        <label for="bet-select">Burn Rate:</label>
+        <select id="bet-select">
+          <option value="10">10 tokens (Free Tier)</option>
+          <option value="25">25 tokens (Pro)</option>
+          <option value="50" selected>50 tokens (Enterprise)</option>
+          <option value="100">100 tokens (Unlimited*)</option>
+          <option value="250">250 tokens (AGI Mode)</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="machine-frame">
+      <div class="machine-top-label">⚡ INFERENCE ENGINE ⚡</div>
+      <div class="reels-container">
+        <div class="reel" id="reel-0">
+          <div class="reel-inner">
+            <div class="symbol">🤖</div>
+          </div>
+        </div>
+        <div class="reel" id="reel-1">
+          <div class="reel-inner">
+            <div class="symbol">🧠</div>
+          </div>
+        </div>
+        <div class="reel" id="reel-2">
+          <div class="reel-inner">
+            <div class="symbol">💎</div>
+          </div>
+        </div>
+      </div>
+      <div class="payline"></div>
+    </section>
+
+    <button class="spin-button" id="spin-btn">
+      <span class="spin-text">🎰 Run Inference</span>
+      <span class="spin-subtext">( spend tokens )</span>
+    </button>
+
+    <section class="message-area" id="message-area">
+      <p id="message">Insert tokens and pull the lever. Your VCs are watching.</p>
+    </section>
+
+    <section class="paytable">
+      <h2>📊 Payout Model <span class="fine-print">(not a hallucination, probably)</span></h2>
+      <div class="paytable-grid">
+        <div class="pay-row jackpot">
+          <span class="pay-symbols">🦄 🦄 🦄</span>
+          <span class="pay-label">UNICORN EXIT</span>
+          <span class="pay-amount">50x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">💎 💎 💎</span>
+          <span class="pay-label">GPU Cluster</span>
+          <span class="pay-amount">20x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🧠 🧠 🧠</span>
+          <span class="pay-label">AGI Achieved</span>
+          <span class="pay-amount">15x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🤖 🤖 🤖</span>
+          <span class="pay-label">Sentient Model</span>
+          <span class="pay-amount">10x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">🔥 🔥 🔥</span>
+          <span class="pay-label">Training Run</span>
+          <span class="pay-amount">8x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">📈 📈 📈</span>
+          <span class="pay-label">Hockey Stick</span>
+          <span class="pay-amount">5x</span>
+        </div>
+        <div class="pay-row">
+          <span class="pay-symbols">⚡ ⚡ ⚡</span>
+          <span class="pay-label">Prompt Injected</span>
+          <span class="pay-amount">3x</span>
+        </div>
+        <div class="pay-row partial">
+          <span class="pay-symbols">Any 2 match</span>
+          <span class="pay-label">Partial Hallucination</span>
+          <span class="pay-amount">1.5x</span>
+        </div>
+      </div>
+      <p class="disclaimer">* Payouts are AI-generated and may not reflect reality. Past performance does not guarantee future inference. TokenBurn™ is not responsible for existential dread caused by losing all your tokens. "Unlimited" is limited to 250 tokens per spin. By spinning you agree to our 847-page Terms of Service that our AI wrote and no human has read.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 TokenBurn™ Inc. — "We're not gambling, we're training a reward model."</p>
+    <p class="footer-small">A Conditions Labs Company · Palo Alto, CA · Backed by Andressen Horrowitz Ventures · Valued at $4.2B (pre-revenue)</p>
+  </footer>
+
+  <div class="win-overlay" id="win-overlay" hidden>
+    <div class="win-content">
+      <h2 id="win-title">JACKPOT!</h2>
+      <p id="win-detail"></p>
+      <button id="win-dismiss">Collect & Pivot</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

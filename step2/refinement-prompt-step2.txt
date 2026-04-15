@@ -1,0 +1,2 @@
+Using the existing website files, improve the slot machine website focusing on these enhancements; ensure slot animations run at 60fps with no stutter, add additional metrics to track win loss statistics along with visuals to interpret it, improve visuals by using a wider range of colors, along with a consistent theme. 
+Add more entertaining animations, to make the wins and losses feel more important. Add a dark mode and light mode.
