@@ -2,11 +2,11 @@ Field 	Notes
 Run ID 	candidate-043
 Timestamp 	7:00
 Model + version string 	claude-sonnet-4-20250514
-Cache Read 	N/A
-Cache Write 	N/A
-Input tokens 	N/A
-Output tokens 	N/A
-Total tokens 	N/A
+Cache Read 130,570
+Cache Write 11,539
+Input Tokens 8
+Output Tokens 9,700
+Total Tokens 151,817
 Wall-clock time (s) 	3 min
 Tool-reported time (s) 	approx the same
 Files produced 	3 — index.html, style.css, app.js
